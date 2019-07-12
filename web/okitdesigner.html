@@ -22,10 +22,15 @@
             </div>
             <div id="toolbar" class="flex-row">
                 <div id="leftbuttons">
-                    <input type="file" id="files" name="file[]">
+                    <input type="file" id="files" class="toolbar-button" name="file[]">
                 </div>
                 <div id="rightbuttons">
-                    <input type="button" id="savejson" value="Save">
+                    <input type="button" id="savejson" class="toolbar-button" value="Save">
+                    <label>Generate : </label>
+                    <input type="button" id="generateterraform" class="toolbar-button" value="Terraform">
+                    <input type="button" id="generateansible" class="toolbar-button" value="Ansible">
+                    <input type="button" id="generatepython" class="toolbar-button" value="Python">
+                    <input type="button" id="generatebash" class="toolbar-button" value="Bash">
                 </div>
             </div>
         </div>

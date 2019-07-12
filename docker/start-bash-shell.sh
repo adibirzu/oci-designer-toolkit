@@ -19,6 +19,7 @@ docker run \
        ${VOLUMES} \
        ${ENVIRONMENT} \
        -w /oci/workspace \
+       -p 6443:6443 \
        --rm \
        -it \
        ${DOCKERIMAGE} \
