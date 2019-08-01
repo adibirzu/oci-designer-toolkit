@@ -1,4 +1,3 @@
-
 /* Prevent the text contents of draggable elements from being selectable. */
 [draggable] {
     -moz-user-select: none;
@@ -9,6 +8,7 @@
     -khtml-user-drag: element;
     -webkit-user-drag: element;
 }
+
 .over {
     border: 2px dashed #000;
 }
@@ -75,55 +75,6 @@
     height: calc(100vh - 30px);
 }
 
-.one-console {
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;
-}
-
-#console-header-wrapper {
-    z-index: 100;
-    position: relative;
-}
-
-#console-header-wrapper #console-header-container {
-    position: fixed;
-    width: 100%;
-}
-
-.header-gradient {
-    height: 4px;
-    width: 100%;
-    background: linear-gradient(90deg,#b4ec51 0,#53a0fd);
-}
-
-.console-branding-bar {
-    background: #1d2733;
-    color: #fff;
-    height: 56px;
-}
-
-#console-content-wrapper {
-    flex: 1;
-    overflow-y: auto;
-}
-
-#console-content-wrapper>* {
-    flex-shrink: 0;
-}
-
-#baseplate {
-    height: 100%;
-}
-
-.nav-menu-button {
-    margin-left: 16px;
-    padding-left: 8px;
-    padding-right: 8px;
-}
-
-.nav-menu-button-icon {
-    margin-right: 0;
-    padding: 8px 0;
-}
 
 #header {
     width: 100%;
@@ -146,7 +97,47 @@
     background: lightskyblue;
 }
 
-#designer {
+.main-panel {
+    height: 100%;
+    width: 100%;
+}
+
+.menu-bar {
+    width: 100%;
+    height: 50px;
+    background: lightskyblue;
+}
+
+.icons-pallet {
+    border-width: 1px;
+    border-color: black;
+    width: 100%;
+    height: 70px;
+}
+
+.web-designer-panel {
+    flex-grow: 1;
+    width: 100%;
+}
+
+.canvas-wrapper {
+    background-color: whitesmoke;
+    border-width: 1px;
+    border-color: black;
+    margin: 0;
+    max-width: 100%;
+    min-height: calc(100vh - 60px);
+    display: flex;
+}
+
+.svg-canvas {
+    margin: 0;
+    max-width: 100%;
+    min-height: calc(100vh - 60px);
+    display: flex;
+}
+
+#designerOrig {
     height: 99vh !important;
     width: 100%;
     padding-right: 10px;
@@ -165,10 +156,20 @@
     flex-grow: 1;
 }
 
-.palatteicon {
+.palatte-icon {
     width: 70px;
     height: 70px;
     float: left;
+}
+
+.designer-left-column {
+    flex-grow: 1;
+    height: 100%;
+}
+
+.designer-right-column {
+    width: 20%;
+    height: 100%;
 }
 
 #webdesigner {
@@ -176,7 +177,7 @@
     width: 100%;
 }
 
-#okitcanvas {
+#okitcanvas1 {
     height: 100%;
     width: 100%;
 }
