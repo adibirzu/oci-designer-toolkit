@@ -16,14 +16,17 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/designer.css') }}">
 </head>
 <body>
+    <div class="header-gradient"></div>
     <div id="designer" class="flex-column">
         <div id="header">
             <div id="toolbar" class="flex-row">
                 <div id="leftbuttons">
                     <input type="button" id="newdiagram" class="toolbar-button" value="New">
-                    <input type="file" id="files" class="toolbar-button" name="file[]">
+                    <input type="file" id="files" class="file-button toolbar-button" name="file[]">
+                    <input type="button" id="loaddiagram" class="toolbar-button" value="Load">
                     <input type="button" id="savejson" class="toolbar-button" value="Save">
-                    <input type="button" id="queryoci" class="toolbar-button" value="Query">
+                    <input type="button" id="exportsvg" class="toolbar-button" value="Export">
+                    <input type="button" id="queryoci" class="toolbar-button" value="Query OCI">
                 </div>
                 <div id="rightbuttons">
                     <label class="title-label">Generate : </label>
