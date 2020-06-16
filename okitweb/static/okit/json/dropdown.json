@@ -567,7 +567,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-16.04-Gen2-GPU-2020.05.20-0",
+      "display_name": "Canonical-Ubuntu-16.04-Gen2-GPU-2020.06.11-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -585,7 +585,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 16.04",
-      "time_created": "2020-05-28T23:06:37.873000+00:00"
+      "time_created": "2020-06-12T18:44:15.987000+00:00"
     },
     {
       "agent_features": null,
@@ -593,7 +593,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-16.04-Minimal-2020.05.18-0",
+      "display_name": "Canonical-Ubuntu-16.04-Minimal-2020.06.11-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -611,7 +611,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 16.04 Minimal",
-      "time_created": "2020-05-28T23:20:56.427000+00:00"
+      "time_created": "2020-06-12T18:44:51.216000+00:00"
     },
     {
       "agent_features": null,
@@ -619,7 +619,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-18.04-2020.05.06-0",
+      "display_name": "Canonical-Ubuntu-18.04-2020.06.11-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -637,7 +637,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 18.04",
-      "time_created": "2020-05-28T23:05:40.949000+00:00"
+      "time_created": "2020-06-12T18:42:58.028000+00:00"
     },
     {
       "agent_features": null,
@@ -645,7 +645,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-18.04-Minimal-2020.05.20-0",
+      "display_name": "Canonical-Ubuntu-18.04-Minimal-2020.06.11-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -663,7 +663,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 18.04 Minimal",
-      "time_created": "2020-05-28T23:07:33.901000+00:00"
+      "time_created": "2020-06-12T18:44:15.568000+00:00"
     },
     {
       "agent_features": null,
@@ -671,7 +671,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-20.04-2020.05.18-0",
+      "display_name": "Canonical-Ubuntu-20.04-2020.06.11-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -689,7 +689,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 20.04",
-      "time_created": "2020-05-28T23:05:53.340000+00:00"
+      "time_created": "2020-06-12T18:44:14.738000+00:00"
     },
     {
       "agent_features": null,
@@ -697,7 +697,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-20.04-Minimal-2020.05.19-0",
+      "display_name": "Canonical-Ubuntu-20.04-Minimal-2020.06.11-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -715,7 +715,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 20.04 Minimal",
-      "time_created": "2020-05-28T23:07:25.802000+00:00"
+      "time_created": "2020-06-12T18:46:02.787000+00:00"
     },
     {
       "agent_features": null,
@@ -964,7 +964,7 @@
       "launch_options": {
         "boot_volume_type": "PARAVIRTUALIZED",
         "firmware": "UEFI_64",
-        "is_consistent_volume_naming_enabled": true,
+        "is_consistent_volume_naming_enabled": false,
         "is_pv_encryption_in_transit_enabled": true,
         "network_type": "VFIO",
         "remote_data_volume_type": "PARAVIRTUALIZED"
@@ -983,7 +983,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Windows-Server-2019-Standard-Edition-VM-Gen2-2020.05.19-0",
+      "display_name": "Windows-Server-2019-Standard-Edition-VM-Gen2-2020.06.10-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "PARAVIRTUALIZED",
@@ -992,7 +992,7 @@
         "firmware": "UEFI_64",
         "is_consistent_volume_naming_enabled": false,
         "is_pv_encryption_in_transit_enabled": true,
-        "network_type": "VFIO",
+        "network_type": "PARAVIRTUALIZED",
         "remote_data_volume_type": "PARAVIRTUALIZED"
       },
       "lifecycle_state": "AVAILABLE",
@@ -1001,7 +1001,7 @@
       "shapes": [],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2019 Standard",
-      "time_created": "2020-05-29T20:44:51.144000+00:00"
+      "time_created": "2020-06-11T23:55:06.327000+00:00"
     }
   ],
   "shapes": [
