@@ -723,7 +723,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "CentOS-6.10-2020.05.21-0",
+      "display_name": "CentOS-6.10-2020.06.16-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -741,7 +741,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "CentOS 6.10",
-      "time_created": "2020-05-26T17:34:48.714000+00:00"
+      "time_created": "2020-06-19T16:30:05.763000+00:00"
     },
     {
       "agent_features": null,
@@ -749,7 +749,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "CentOS-7-2020.05.20-0",
+      "display_name": "CentOS-7-2020.06.16-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -767,7 +767,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "CentOS 7",
-      "time_created": "2020-05-26T17:35:53.117000+00:00"
+      "time_created": "2020-06-19T16:31:02.199000+00:00"
     },
     {
       "agent_features": null,
@@ -1009,7 +1009,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Windows-Server-2019-Standard-Edition-VM-Gen2-2020.05.19-0",
+      "display_name": "Windows-Server-2019-Standard-Edition-VM-Gen2-2020.06.10-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "PARAVIRTUALIZED",
@@ -1018,7 +1018,7 @@
         "firmware": "UEFI_64",
         "is_consistent_volume_naming_enabled": false,
         "is_pv_encryption_in_transit_enabled": true,
-        "network_type": "VFIO",
+        "network_type": "PARAVIRTUALIZED",
         "remote_data_volume_type": "PARAVIRTUALIZED"
       },
       "lifecycle_state": "AVAILABLE",
@@ -1027,7 +1027,7 @@
       "shapes": [],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2019 Standard",
-      "time_created": "2020-05-29T20:44:51.144000+00:00"
+      "time_created": "2020-06-11T23:55:06.327000+00:00"
     }
   ],
   "shapes": [
