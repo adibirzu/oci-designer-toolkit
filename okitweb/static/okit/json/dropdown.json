@@ -593,7 +593,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-16.04-Minimal-2020.06.11-0",
+      "display_name": "Canonical-Ubuntu-16.04-Minimal-2020.07.07-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -611,7 +611,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 16.04 Minimal",
-      "time_created": "2020-06-12T18:44:51.216000+00:00"
+      "time_created": "2020-07-22T20:24:16.173000+00:00"
     },
     {
       "agent_features": null,
@@ -619,7 +619,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-18.04-2020.06.11-0",
+      "display_name": "Canonical-Ubuntu-18.04-2020.07.17-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -637,7 +637,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 18.04",
-      "time_created": "2020-06-12T18:42:58.028000+00:00"
+      "time_created": "2020-07-22T20:24:18.688000+00:00"
     },
     {
       "agent_features": null,
@@ -645,7 +645,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-18.04-Minimal-2020.06.11-0",
+      "display_name": "Canonical-Ubuntu-18.04-Minimal-2020.07.14-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -663,7 +663,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 18.04 Minimal",
-      "time_created": "2020-06-12T18:44:15.568000+00:00"
+      "time_created": "2020-07-22T20:24:15.820000+00:00"
     },
     {
       "agent_features": null,
@@ -671,7 +671,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-20.04-2020.06.11-0",
+      "display_name": "Canonical-Ubuntu-20.04-2020.07.16-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -689,7 +689,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 20.04",
-      "time_created": "2020-06-12T18:44:14.738000+00:00"
+      "time_created": "2020-07-22T20:24:03.079000+00:00"
     },
     {
       "agent_features": null,
@@ -697,7 +697,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-20.04-Minimal-2020.06.11-0",
+      "display_name": "Canonical-Ubuntu-20.04-Minimal-2020.07.14-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -715,7 +715,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 20.04 Minimal",
-      "time_created": "2020-06-12T18:46:02.787000+00:00"
+      "time_created": "2020-07-22T20:24:30.596000+00:00"
     },
     {
       "agent_features": null,
