@@ -593,7 +593,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-16.04-Gen2-GPU-2020.05.20-0",
+      "display_name": "Canonical-Ubuntu-16.04-GPU-2020.08.26-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -611,7 +611,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 16.04",
-      "time_created": "2020-05-28T23:06:37.873000+00:00"
+      "time_created": "2020-09-01T19:26:06.498000+00:00"
     },
     {
       "agent_features": null,
@@ -638,6 +638,32 @@
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 16.04",
       "time_created": "2020-07-22T20:24:11.371000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
+      "display_name": "Canonical-Ubuntu-16.04-2020.08.22-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "operating_system": "Canonical Ubuntu",
+      "operating_system_version": "16.04",
+      "shapes": [],
+      "size_in_mbs": 47694,
+      "sort_key": "Canonical Ubuntu 16.04",
+      "time_created": "2020-09-01T18:53:54.900000+00:00"
     },
     {
       "agent_features": null,
@@ -697,7 +723,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-16.04-2020.05.14-0",
+      "display_name": "Canonical-Ubuntu-16.04-Minimal-2020.08.21-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -711,11 +737,11 @@
       },
       "lifecycle_state": "AVAILABLE",
       "operating_system": "Canonical Ubuntu",
-      "operating_system_version": "16.04",
+      "operating_system_version": "16.04 Minimal",
       "shapes": [],
       "size_in_mbs": 47694,
-      "sort_key": "Canonical Ubuntu 16.04",
-      "time_created": "2020-05-28T23:18:24.692000+00:00"
+      "sort_key": "Canonical Ubuntu 16.04 Minimal",
+      "time_created": "2020-09-01T19:26:11.531000+00:00"
     },
     {
       "agent_features": null,
@@ -775,7 +801,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-16.04-Minimal-2020.05.18-0",
+      "display_name": "Canonical-Ubuntu-18.04-2020.08.21-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -789,11 +815,11 @@
       },
       "lifecycle_state": "AVAILABLE",
       "operating_system": "Canonical Ubuntu",
-      "operating_system_version": "16.04 Minimal",
+      "operating_system_version": "18.04",
       "shapes": [],
       "size_in_mbs": 47694,
-      "sort_key": "Canonical Ubuntu 16.04 Minimal",
-      "time_created": "2020-05-28T23:20:56.427000+00:00"
+      "sort_key": "Canonical Ubuntu 18.04",
+      "time_created": "2020-09-01T19:26:07.014000+00:00"
     },
     {
       "agent_features": null,
@@ -853,7 +879,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-18.04-2020.05.06-0",
+      "display_name": "Canonical-Ubuntu-18.04-Minimal-2020.08.25-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -867,11 +893,11 @@
       },
       "lifecycle_state": "AVAILABLE",
       "operating_system": "Canonical Ubuntu",
-      "operating_system_version": "18.04",
+      "operating_system_version": "18.04 Minimal",
       "shapes": [],
       "size_in_mbs": 47694,
-      "sort_key": "Canonical Ubuntu 18.04",
-      "time_created": "2020-05-28T23:05:40.949000+00:00"
+      "sort_key": "Canonical Ubuntu 18.04 Minimal",
+      "time_created": "2020-09-01T19:26:33.362000+00:00"
     },
     {
       "agent_features": null,
@@ -931,7 +957,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-18.04-Minimal-2020.05.20-0",
+      "display_name": "Canonical-Ubuntu-20.04-2020.08.21-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -945,11 +971,11 @@
       },
       "lifecycle_state": "AVAILABLE",
       "operating_system": "Canonical Ubuntu",
-      "operating_system_version": "18.04 Minimal",
+      "operating_system_version": "20.04",
       "shapes": [],
       "size_in_mbs": 47694,
-      "sort_key": "Canonical Ubuntu 18.04 Minimal",
-      "time_created": "2020-05-28T23:07:33.901000+00:00"
+      "sort_key": "Canonical Ubuntu 20.04",
+      "time_created": "2020-09-01T19:20:25.291000+00:00"
     },
     {
       "agent_features": null,
@@ -1009,7 +1035,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-20.04-2020.05.18-0",
+      "display_name": "Canonical-Ubuntu-20.04-Minimal-2020.08.24-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -1023,11 +1049,11 @@
       },
       "lifecycle_state": "AVAILABLE",
       "operating_system": "Canonical Ubuntu",
-      "operating_system_version": "20.04",
+      "operating_system_version": "20.04 Minimal",
       "shapes": [],
       "size_in_mbs": 47694,
-      "sort_key": "Canonical Ubuntu 20.04",
-      "time_created": "2020-05-28T23:05:53.340000+00:00"
+      "sort_key": "Canonical Ubuntu 20.04 Minimal",
+      "time_created": "2020-09-01T19:26:11.046000+00:00"
     },
     {
       "agent_features": null,
@@ -1087,7 +1113,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-20.04-Minimal-2020.05.19-0",
+      "display_name": "CentOS-6.10-2020.08.25-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -1100,12 +1126,12 @@
         "remote_data_volume_type": "PARAVIRTUALIZED"
       },
       "lifecycle_state": "AVAILABLE",
-      "operating_system": "Canonical Ubuntu",
-      "operating_system_version": "20.04 Minimal",
+      "operating_system": "CentOS",
+      "operating_system_version": "6.10",
       "shapes": [],
       "size_in_mbs": 47694,
-      "sort_key": "Canonical Ubuntu 20.04 Minimal",
-      "time_created": "2020-05-28T23:07:25.802000+00:00"
+      "sort_key": "CentOS 6.10",
+      "time_created": "2020-08-31T20:28:41.680000+00:00"
     },
     {
       "agent_features": null,
@@ -1165,7 +1191,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "CentOS-6.10-2020.05.21-0",
+      "display_name": "CentOS-7-2020.08.27-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -1179,11 +1205,11 @@
       },
       "lifecycle_state": "AVAILABLE",
       "operating_system": "CentOS",
-      "operating_system_version": "6.10",
+      "operating_system_version": "7",
       "shapes": [],
       "size_in_mbs": 47694,
-      "sort_key": "CentOS 6.10",
-      "time_created": "2020-05-26T17:34:48.714000+00:00"
+      "sort_key": "CentOS 7",
+      "time_created": "2020-08-31T19:31:59.978000+00:00"
     },
     {
       "agent_features": null,
@@ -1236,32 +1262,6 @@
       "size_in_mbs": 47694,
       "sort_key": "CentOS 7",
       "time_created": "2020-06-19T16:31:02.199000+00:00"
-    },
-    {
-      "agent_features": null,
-      "base_image_id": null,
-      "compartment_id": null,
-      "create_image_allowed": true,
-      "defined_tags": {},
-      "display_name": "CentOS-7-2020.05.20-0",
-      "freeform_tags": {},
-      "id": "ocid1.image.oc1..example",
-      "launch_mode": "NATIVE",
-      "launch_options": {
-        "boot_volume_type": "PARAVIRTUALIZED",
-        "firmware": "UEFI_64",
-        "is_consistent_volume_naming_enabled": true,
-        "is_pv_encryption_in_transit_enabled": true,
-        "network_type": "PARAVIRTUALIZED",
-        "remote_data_volume_type": "PARAVIRTUALIZED"
-      },
-      "lifecycle_state": "AVAILABLE",
-      "operating_system": "CentOS",
-      "operating_system_version": "7",
-      "shapes": [],
-      "size_in_mbs": 47694,
-      "sort_key": "CentOS 7",
-      "time_created": "2020-05-26T17:35:53.117000+00:00"
     },
     {
       "agent_features": null,
@@ -1425,6 +1425,32 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
+      "display_name": "Oracle-Linux-7.8-Gen2-GPU-2020.08.27-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "operating_system": "Oracle Linux",
+      "operating_system_version": "7.8",
+      "shapes": [],
+      "size_in_mbs": 47694,
+      "sort_key": "Oracle Linux 7.8",
+      "time_created": "2020-09-02T22:51:28.464000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
       "display_name": "Oracle-Linux-7.8-Gen2-GPU-2020.07.28-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
@@ -1503,7 +1529,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Oracle-Linux-7.8-Gen2-GPU-2020.05.26-0",
+      "display_name": "Oracle-Linux-7.8-2020.08.26-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -1521,7 +1547,7 @@
       "shapes": [],
       "size_in_mbs": 47694,
       "sort_key": "Oracle Linux 7.8",
-      "time_created": "2020-05-28T22:53:17.377000+00:00"
+      "time_created": "2020-09-02T22:51:26.413000+00:00"
     },
     {
       "agent_features": null,
@@ -1633,7 +1659,7 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Oracle-Linux-7.8-2020.04.17-0",
+      "display_name": "Oracle-Linux-8.2-2020.08.27-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -1647,11 +1673,11 @@
       },
       "lifecycle_state": "AVAILABLE",
       "operating_system": "Oracle Linux",
-      "operating_system_version": "7.8",
+      "operating_system_version": "8",
       "shapes": [],
       "size_in_mbs": 47694,
-      "sort_key": "Oracle Linux 7.8",
-      "time_created": "2020-04-20T23:27:33.912000+00:00"
+      "sort_key": "Oracle Linux 8",
+      "time_created": "2020-09-02T22:51:32.471000+00:00"
     },
     {
       "agent_features": null,
