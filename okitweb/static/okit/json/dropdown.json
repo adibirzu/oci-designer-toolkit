@@ -1,5 +1,1410 @@
 {
-  "compartments": [],
+  "compartments": [
+    {
+      "canonical_name": "/",
+      "display_name": "/",
+      "home_region_key": "IAD",
+      "id": "ocid1.tenancy.oc1..example"
+    },
+    {
+      "canonical_name": "/AFarouk",
+      "display_name": "AFarouk",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/AT_Compt_Training",
+      "display_name": "AT_Compt_Training",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/AT_Compt_Training/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Ajay-comp",
+      "display_name": "Ajay-comp",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Ajay-comp/Network-Comp",
+      "display_name": "Network-Comp",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Ajay-comp/NonProd-Comp",
+      "display_name": "NonProd-Comp",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Ajay-comp/Prod-Comp",
+      "display_name": "Prod-Comp",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Andrew",
+      "display_name": "Andrew",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ArijittestAMScomp",
+      "display_name": "ArijittestAMScomp",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/CTCompartment",
+      "display_name": "CTCompartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/CTCompartment/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Chandra_Syd_Comp",
+      "display_name": "Chandra_Syd_Comp",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Chandra_Syd_Comp/Analytics",
+      "display_name": "Analytics",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Chandra_Syd_Comp/WLS",
+      "display_name": "WLS",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Chandra_Syd_Comp/database",
+      "display_name": "database",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/DBFS-TEST",
+      "display_name": "DBFS-TEST",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/DMM_Compartment",
+      "display_name": "DMM_Compartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/DMS",
+      "display_name": "DMS",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/FarrukhSalman",
+      "display_name": "FarrukhSalman",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Gavin",
+      "display_name": "Gavin",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/GoldenGateDemo",
+      "display_name": "GoldenGateDemo",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Greg",
+      "display_name": "Greg",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/HarpreetSingh",
+      "display_name": "HarpreetSingh",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/HumbertoC",
+      "display_name": "HumbertoC",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Imran",
+      "display_name": "Imran",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Imran-Javeed",
+      "display_name": "Imran-Javeed",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/InternalTools",
+      "display_name": "InternalTools",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Irina",
+      "display_name": "Irina",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Irina/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Kdon",
+      "display_name": "Kdon",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ManagedCompartmentForPaaS",
+      "display_name": "ManagedCompartmentForPaaS",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/My_Compartment",
+      "display_name": "My_Compartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Navin",
+      "display_name": "Navin",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/NetworkCompartment",
+      "display_name": "NetworkCompartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/NoBillingAccess",
+      "display_name": "NoBillingAccess",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/NonProdComp2",
+      "display_name": "NonProdComp2",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/NonProdCompartment",
+      "display_name": "NonProdCompartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/OCICE_ARCH",
+      "display_name": "OCICE_ARCH",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/OKIT",
+      "display_name": "OKIT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/OKIT/infrastructure",
+      "display_name": "infrastructure",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/OKIT/network",
+      "display_name": "network",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Omid",
+      "display_name": "Omid",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Omid/Omid-mig",
+      "display_name": "Omid-mig",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Omid/Omid-mig/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Omid/omid-paas-mig",
+      "display_name": "omid-paas-mig",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Omid/omid-test",
+      "display_name": "omid-test",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Omid/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ProdComp2",
+      "display_name": "ProdComp2",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ProdCompartment",
+      "display_name": "ProdCompartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ProductionLBE2",
+      "display_name": "ProductionLBE2",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ProjectGS",
+      "display_name": "ProjectGS",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/SMOHANKA",
+      "display_name": "SMOHANKA",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/SMOHANKA/aws-2-oci",
+      "display_name": "aws-2-oci",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/SMOHANKA/aws-vs-oci",
+      "display_name": "aws-vs-oci",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/SMOHANKA/bench-dms",
+      "display_name": "bench-dms",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/SMOHANKA/dms-demo2-fn",
+      "display_name": "dms-demo2-fn",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/SMOHANKA/smohanka-oci-c-2-oci",
+      "display_name": "smohanka-oci-c-2-oci",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/SMOHANKA/smohanka-tf",
+      "display_name": "smohanka-tf",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/SOA_compartment",
+      "display_name": "SOA_compartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/SS-ZDM-TESTING",
+      "display_name": "SS-ZDM-TESTING",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Sailen",
+      "display_name": "Sailen",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Sanjay",
+      "display_name": "Sanjay",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Shadab",
+      "display_name": "Shadab",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Shadab/Shadab-Automate",
+      "display_name": "Shadab-Automate",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Shadab/Shadab-Dev",
+      "display_name": "Shadab-Dev",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Shadab/Shadab-Migrate",
+      "display_name": "Shadab-Migrate",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Shadab/Shadab-Prod",
+      "display_name": "Shadab-Prod",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Stephen",
+      "display_name": "Stephen",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Stephen/Compute",
+      "display_name": "Compute",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Stephen/Production",
+      "display_name": "Production",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Stephen/Production/Compute",
+      "display_name": "Compute",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Stephen/Production/Network",
+      "display_name": "Network",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Stephen/Rackware",
+      "display_name": "Rackware",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Stephen/migration",
+      "display_name": "migration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Stephen/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Stephen/oraclemigration/rsm",
+      "display_name": "rsm",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TamerRoot",
+      "display_name": "TamerRoot",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TamerRoot/Keio",
+      "display_name": "Keio",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TamerRoot/KeioNetwork",
+      "display_name": "KeioNetwork",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery",
+      "display_name": "TechnicalDelivery",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/BalajiM",
+      "display_name": "BalajiM",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/BhanuPratap",
+      "display_name": "BhanuPratap",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/CMP_DR",
+      "display_name": "CMP_DR",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Caro-Test",
+      "display_name": "Caro-Test",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Caro-Test/functions-compartment",
+      "display_name": "functions-compartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Demo_Sunjit",
+      "display_name": "Demo_Sunjit",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Imran_Compartment",
+      "display_name": "Imran_Compartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/KKEssbase19c",
+      "display_name": "KKEssbase19c",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Kirandonga",
+      "display_name": "Kirandonga",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/MDS",
+      "display_name": "MDS",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Stanley_CPT",
+      "display_name": "Stanley_CPT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Stanley_CPT/NON_PROD_CPT",
+      "display_name": "NON_PROD_CPT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Stanley_CPT/PROD_CPT",
+      "display_name": "PROD_CPT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Stanley_CPT/TEST_NETWORK_CPT",
+      "display_name": "TEST_NETWORK_CPT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Sun_Test",
+      "display_name": "Sun_Test",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Sunjit_Test",
+      "display_name": "Sunjit_Test",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/TEST_COMPARTMENT_SDS",
+      "display_name": "TEST_COMPARTMENT_SDS",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Test_Vis_par",
+      "display_name": "Test_Vis_par",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Testing_CKS_474",
+      "display_name": "Testing_CKS_474",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Vish_July",
+      "display_name": "Vish_July",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Yakub",
+      "display_name": "Yakub",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/Yakub/terraformpractice",
+      "display_name": "terraformpractice",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/ZDMMIGRATIONKDONGA",
+      "display_name": "ZDMMIGRATIONKDONGA",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/ZDMTARGET",
+      "display_name": "ZDMTARGET",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/ZDMTEST",
+      "display_name": "ZDMTEST",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/abarbare",
+      "display_name": "abarbare",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/compartment4test",
+      "display_name": "compartment4test",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/fmiranda",
+      "display_name": "fmiranda",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/fmiranda/testBI",
+      "display_name": "testBI",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/hvijay_mig",
+      "display_name": "hvijay_mig",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/kdzdm",
+      "display_name": "kdzdm",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/martiCompartment",
+      "display_name": "martiCompartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/migration-zdm",
+      "display_name": "migration-zdm",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/naemmadi_Compartment",
+      "display_name": "naemmadi_Compartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/naemmadi_Compartment/BalajiM",
+      "display_name": "BalajiM",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/naemmadi_Compartment/naresh_test_09062020",
+      "display_name": "naresh_test_09062020",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/naemmadi_Test1",
+      "display_name": "naemmadi_Test1",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/naren-compartment",
+      "display_name": "naren-compartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/narendra-compart",
+      "display_name": "narendra-compart",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/nic",
+      "display_name": "nic",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/nic/NicBin",
+      "display_name": "NicBin",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/nic/NicLab",
+      "display_name": "NicLab",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/nic/NicLabCli",
+      "display_name": "NicLabCli",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/nic/NicLabOKIT",
+      "display_name": "NicLabOKIT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/nic/NicRMM",
+      "display_name": "NicRMM",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/nic/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/projects",
+      "display_name": "projects",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/rajatest",
+      "display_name": "rajatest",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/rsanhuez",
+      "display_name": "rsanhuez",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/rsanhuez/CUSTOMER_TEST1",
+      "display_name": "CUSTOMER_TEST1",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/rsanhuez/test_instances_cl",
+      "display_name": "test_instances_cl",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/srinivas_test",
+      "display_name": "srinivas_test",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/test0123456",
+      "display_name": "test0123456",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/test123",
+      "display_name": "test123",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/testRAZ",
+      "display_name": "testRAZ",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/test_compartment",
+      "display_name": "test_compartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/test_compartment/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TechnicalDelivery/zzz",
+      "display_name": "zzz",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TestLBE",
+      "display_name": "TestLBE",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/TusharTest",
+      "display_name": "TusharTest",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/UA-Migration-Testing",
+      "display_name": "UA-Migration-Testing",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/UA-Migration_testing-new",
+      "display_name": "UA-Migration_testing-new",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/VamshiC",
+      "display_name": "VamshiC",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/VamshiC/Network",
+      "display_name": "Network",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/VamshiC/Non-Prod",
+      "display_name": "Non-Prod",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/VamshiC/Prod",
+      "display_name": "Prod",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/WAEL_Compartment",
+      "display_name": "WAEL_Compartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/WSAAD_COMPARTMENT",
+      "display_name": "WSAAD_COMPARTMENT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/WeblogicCPRT",
+      "display_name": "WeblogicCPRT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/Yakub_compartment",
+      "display_name": "Yakub_compartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ZDM",
+      "display_name": "ZDM",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi",
+      "display_name": "acahyadi",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/network-arch-test",
+      "display_name": "network-arch-test",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/tf-test",
+      "display_name": "tf-test",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/tf-test/ECU-ORA-SYD-COR-COMPARTMENT",
+      "display_name": "ECU-ORA-SYD-COR-COMPARTMENT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/tf-test/ECU-ORA-SYD-COR-COMPARTMENT/NETWORK",
+      "display_name": "NETWORK",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/tf-test/ECU-ORA-SYD-DEV-COMPARTMENT",
+      "display_name": "ECU-ORA-SYD-DEV-COMPARTMENT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/tf-test/ECU-ORA-SYD-DEV-COMPARTMENT/NETWORK",
+      "display_name": "NETWORK",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/tf-test/ECU-ORA-SYD-PRD-COMPARTMENT",
+      "display_name": "ECU-ORA-SYD-PRD-COMPARTMENT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/tf-test/ECU-ORA-SYD-PRD-COMPARTMENT/NETWORK",
+      "display_name": "NETWORK",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/tf-test/ECU-ORA-SYD-QA-COMPARTMENT",
+      "display_name": "ECU-ORA-SYD-QA-COMPARTMENT",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/acahyadi/tf-test/ECU-ORA-SYD-QA-COMPARTMENT/NETWORK",
+      "display_name": "NETWORK",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ag-compartments",
+      "display_name": "ag-compartments",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ag-compartments/ag-migration",
+      "display_name": "ag-migration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/akaulgud",
+      "display_name": "akaulgud",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/akaulgud/AMS",
+      "display_name": "AMS",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/apig-omid",
+      "display_name": "apig-omid",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/arijitcomp",
+      "display_name": "arijitcomp",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/atl-comp-non-prod",
+      "display_name": "atl-comp-non-prod",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/atl-comp-non-prod-corenetwork",
+      "display_name": "atl-comp-non-prod-corenetwork",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/atl-comp-prod",
+      "display_name": "atl-comp-prod",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/atl-comp-prod-corenetwork",
+      "display_name": "atl-comp-prod-corenetwork",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ceg-exacs",
+      "display_name": "ceg-exacs",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/dev-soa-psm",
+      "display_name": "dev-soa-psm",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/dlteixeira",
+      "display_name": "dlteixeira",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/dlteixeira/comp-r1",
+      "display_name": "comp-r1",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/dlteixeira/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/dlteixeira/zdm",
+      "display_name": "zdm",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/dmccrory",
+      "display_name": "dmccrory",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/dmccrory/atom",
+      "display_name": "atom",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/dmccrory/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/harpress_ca",
+      "display_name": "harpress_ca",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/jenlui-okit-1",
+      "display_name": "jenlui-okit-1",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/jenluicomparment",
+      "display_name": "jenluicomparment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/jgeorge",
+      "display_name": "jgeorge",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/jgeorge/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/jnemec",
+      "display_name": "jnemec",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/jnemec/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/jsparker",
+      "display_name": "jsparker",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/jsparker/mxpdemo",
+      "display_name": "mxpdemo",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/kranthi",
+      "display_name": "kranthi",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/laleh",
+      "display_name": "laleh",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/lbanzato",
+      "display_name": "lbanzato",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/lgabriel",
+      "display_name": "lgabriel",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/lolko",
+      "display_name": "lolko",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/lsiliver",
+      "display_name": "lsiliver",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/lsiliver/msdataworkshop",
+      "display_name": "msdataworkshop",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/lsiliver/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/manjinder",
+      "display_name": "manjinder",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/manjinder/Level-2",
+      "display_name": "Level-2",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/manjinder/Level-2/Level-3",
+      "display_name": "Level-3",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/manjinder/Level-2/Level-3/Level-4",
+      "display_name": "Level-4",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/manjinder/Level-2/Level-3/Level-4/Level-5",
+      "display_name": "Level-5",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/manjinder/Testing",
+      "display_name": "Testing",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/manjinder/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/mcomp",
+      "display_name": "mcomp",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/mfransso",
+      "display_name": "mfransso",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/migdemo",
+      "display_name": "migdemo",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/mitra",
+      "display_name": "mitra",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/mxpsoldemo",
+      "display_name": "mxpsoldemo",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/ndbhatt",
+      "display_name": "ndbhatt",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/nidhi_omc",
+      "display_name": "nidhi_omc",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/oci-ce-japac-team",
+      "display_name": "oci-ce-japac-team",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/oraclemigration",
+      "display_name": "oraclemigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/rajacompartment",
+      "display_name": "rajacompartment",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sgetz",
+      "display_name": "sgetz",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua",
+      "display_name": "sjanjua",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua/BI",
+      "display_name": "BI",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua/bata",
+      "display_name": "bata",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua/bata/bbsaadodev",
+      "display_name": "bbsaadodev",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua/bata/bbsaadodr",
+      "display_name": "bbsaadodr",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua/bata/bbsaadonetwork",
+      "display_name": "bbsaadonetwork",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua/bata/bbsaadononprod",
+      "display_name": "bbsaadononprod",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua/bata/bbsaadoprod",
+      "display_name": "bbsaadoprod",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua/bata/bbsaadotst",
+      "display_name": "bbsaadotst",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua/sandbox",
+      "display_name": "sandbox",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sjanjua/sandbox/ocicmigration",
+      "display_name": "ocicmigration",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/smtaylor",
+      "display_name": "smtaylor",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sneto",
+      "display_name": "sneto",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/sridhar",
+      "display_name": "sridhar",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    },
+    {
+      "canonical_name": "/zdm-online",
+      "display_name": "zdm-online",
+      "home_region_key": "IAD",
+      "id": "ocid1.compartment.oc1..example"
+    }
+  ],
   "cpe_device_shapes": [
     {
       "cpe_device_info": {
@@ -1854,6 +3259,84 @@
     {
       "agent_features": null,
       "base_image_id": null,
+      "billable_size_in_gbs": 2,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
+      "display_name": "Canonical-Ubuntu-18.04-2021.06.09-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "listing_type": null,
+      "operating_system": "Canonical Ubuntu",
+      "operating_system_version": "18.04",
+      "shapes": [
+        "VM.DenseIO1.16",
+        "VM.DenseIO1.4",
+        "VM.DenseIO1.8",
+        "VM.DenseIO2.16",
+        "VM.DenseIO2.24",
+        "VM.DenseIO2.8",
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.1.Micro",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "BM.Standard.E2.64",
+        "BM.Standard.E3.128",
+        "BM.GPU4.8",
+        "BM.Standard.E4.128",
+        "BM.Standard1.36",
+        "BM.HighIO1.36",
+        "BM.DenseIO1.36",
+        "x5-2.36.512.nvme-6.4-Internal",
+        "BM.Standard.B1.44",
+        "BM.GPU2.2",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
+      ],
+      "size_in_mbs": 47694,
+      "sort_key": "Canonical Ubuntu 18.04",
+      "time_created": "2021-06-17T23:38:24.801000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
       "billable_size_in_gbs": 0,
       "compartment_id": null,
       "create_image_allowed": true,
@@ -2009,11 +3492,11 @@
     {
       "agent_features": null,
       "base_image_id": null,
-      "billable_size_in_gbs": 0,
+      "billable_size_in_gbs": 2,
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-18.04-2021.03.25-0",
+      "display_name": "Canonical-Ubuntu-18.04-Minimal-2021.06.11-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -2028,7 +3511,7 @@
       "lifecycle_state": "AVAILABLE",
       "listing_type": null,
       "operating_system": "Canonical Ubuntu",
-      "operating_system_version": "18.04",
+      "operating_system_version": "18.04 Minimal",
       "shapes": [
         "VM.DenseIO1.16",
         "VM.DenseIO1.4",
@@ -2040,6 +3523,7 @@
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
+        "VM.Optimized3.Flex",
         "VM.Standard.B1.1",
         "VM.Standard.B1.16",
         "VM.Standard.B1.2",
@@ -2076,11 +3560,12 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "BM.DenseIO2.52"
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
       ],
       "size_in_mbs": 47694,
-      "sort_key": "Canonical Ubuntu 18.04",
-      "time_created": "2021-03-30T00:49:10.276000+00:00"
+      "sort_key": "Canonical Ubuntu 18.04 Minimal",
+      "time_created": "2021-06-17T23:42:21.030000+00:00"
     },
     {
       "agent_features": null,
@@ -2240,11 +3725,11 @@
     {
       "agent_features": null,
       "base_image_id": null,
-      "billable_size_in_gbs": 0,
+      "billable_size_in_gbs": 2,
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-18.04-Minimal-2021.03.25-0",
+      "display_name": "Canonical-Ubuntu-20.04-aarch64-2021.06.03-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -2259,10 +3744,10 @@
       "lifecycle_state": "AVAILABLE",
       "listing_type": null,
       "operating_system": "Canonical Ubuntu",
-      "operating_system_version": "18.04 Minimal",
+      "operating_system_version": "20.04",
       "shapes": [
-        "VM.DenseIO1.16",
-        "VM.DenseIO1.4",
+        "VM.Standard.A1.Flex",
+        "BM.Standard.A1.160",
         "VM.DenseIO1.8",
         "VM.DenseIO2.16",
         "VM.DenseIO2.24",
@@ -2271,6 +3756,7 @@
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
+        "VM.Optimized3.Flex",
         "VM.Standard.B1.1",
         "VM.Standard.B1.16",
         "VM.Standard.B1.2",
@@ -2310,8 +3796,8 @@
         "BM.DenseIO2.52"
       ],
       "size_in_mbs": 47694,
-      "sort_key": "Canonical Ubuntu 18.04 Minimal",
-      "time_created": "2021-03-30T00:53:12.372000+00:00"
+      "sort_key": "Canonical Ubuntu 20.04",
+      "time_created": "2021-06-17T23:47:13.193000+00:00"
     },
     {
       "agent_features": null,
@@ -2384,11 +3870,90 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "BM.DenseIO2.52"
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
       ],
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 20.04",
       "time_created": "2021-05-18T15:51:01.335000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
+      "billable_size_in_gbs": 2,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
+      "display_name": "Canonical-Ubuntu-20.04-2021.06.03-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "listing_type": null,
+      "operating_system": "Canonical Ubuntu",
+      "operating_system_version": "20.04",
+      "shapes": [
+        "VM.DenseIO1.16",
+        "VM.DenseIO1.4",
+        "VM.DenseIO1.8",
+        "VM.DenseIO2.16",
+        "VM.DenseIO2.24",
+        "VM.DenseIO2.8",
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.1.Micro",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "BM.Standard.E2.64",
+        "BM.Standard.E3.128",
+        "BM.GPU4.8",
+        "BM.Standard.E4.128",
+        "BM.Standard1.36",
+        "BM.HighIO1.36",
+        "BM.DenseIO1.36",
+        "x5-2.36.512.nvme-6.4-Internal",
+        "BM.Standard.B1.44",
+        "BM.GPU2.2",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
+      ],
+      "size_in_mbs": 47694,
+      "sort_key": "Canonical Ubuntu 20.04",
+      "time_created": "2021-06-17T23:41:59.584000+00:00"
     },
     {
       "agent_features": null,
@@ -2471,11 +4036,11 @@
     {
       "agent_features": null,
       "base_image_id": null,
-      "billable_size_in_gbs": 0,
+      "billable_size_in_gbs": 2,
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-20.04-2021.04.15-0",
+      "display_name": "Canonical-Ubuntu-20.04-Minimal-2021.06.14-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -2490,7 +4055,7 @@
       "lifecycle_state": "AVAILABLE",
       "listing_type": null,
       "operating_system": "Canonical Ubuntu",
-      "operating_system_version": "20.04",
+      "operating_system_version": "20.04 Minimal",
       "shapes": [
         "VM.DenseIO1.16",
         "VM.DenseIO1.4",
@@ -2539,11 +4104,12 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "BM.DenseIO2.52"
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
       ],
       "size_in_mbs": 47694,
-      "sort_key": "Canonical Ubuntu 20.04",
-      "time_created": "2021-04-21T20:07:49.128000+00:00"
+      "sort_key": "Canonical Ubuntu 20.04 Minimal",
+      "time_created": "2021-06-17T23:41:57.051000+00:00"
     },
     {
       "agent_features": null,
@@ -2699,82 +4265,6 @@
       "size_in_mbs": 47694,
       "sort_key": "Canonical Ubuntu 20.04 Minimal",
       "time_created": "2021-04-21T20:08:50.173000+00:00"
-    },
-    {
-      "agent_features": null,
-      "base_image_id": null,
-      "billable_size_in_gbs": 0,
-      "compartment_id": null,
-      "create_image_allowed": true,
-      "defined_tags": {},
-      "display_name": "Canonical-Ubuntu-20.04-Minimal-2021.03.25-0",
-      "freeform_tags": {},
-      "id": "ocid1.image.oc1..example",
-      "launch_mode": "NATIVE",
-      "launch_options": {
-        "boot_volume_type": "PARAVIRTUALIZED",
-        "firmware": "UEFI_64",
-        "is_consistent_volume_naming_enabled": true,
-        "is_pv_encryption_in_transit_enabled": true,
-        "network_type": "PARAVIRTUALIZED",
-        "remote_data_volume_type": "PARAVIRTUALIZED"
-      },
-      "lifecycle_state": "AVAILABLE",
-      "listing_type": null,
-      "operating_system": "Canonical Ubuntu",
-      "operating_system_version": "20.04 Minimal",
-      "shapes": [
-        "VM.DenseIO1.16",
-        "VM.DenseIO1.4",
-        "VM.DenseIO1.8",
-        "VM.DenseIO2.16",
-        "VM.DenseIO2.24",
-        "VM.DenseIO2.8",
-        "VM.GPU2.1",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "VM.Standard.B1.1",
-        "VM.Standard.B1.16",
-        "VM.Standard.B1.2",
-        "VM.Standard.B1.4",
-        "VM.Standard.B1.8",
-        "VM.Standard.E2.1",
-        "VM.Standard.E2.1.Micro",
-        "VM.Standard.E2.2",
-        "VM.Standard.E2.4",
-        "VM.Standard.E2.8",
-        "VM.Standard.E3.Flex",
-        "VM.Standard.E4.Flex",
-        "VM.Standard1.1",
-        "VM.Standard1.16",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
-        "VM.Standard2.1",
-        "VM.Standard2.16",
-        "VM.Standard2.2",
-        "VM.Standard2.24",
-        "VM.Standard2.4",
-        "VM.Standard2.8",
-        "BM.Standard.E2.64",
-        "BM.Standard.E3.128",
-        "BM.GPU4.8",
-        "BM.Standard.E4.128",
-        "BM.Standard1.36",
-        "BM.HighIO1.36",
-        "BM.DenseIO1.36",
-        "x5-2.36.512.nvme-6.4-Internal",
-        "BM.Standard.B1.44",
-        "BM.GPU2.2",
-        "BM.HPC2.36",
-        "BM.Standard2.52",
-        "BM.GPU3.8",
-        "BM.DenseIO2.52"
-      ],
-      "size_in_mbs": 47694,
-      "sort_key": "Canonical Ubuntu 20.04 Minimal",
-      "time_created": "2021-03-30T01:06:16.928000+00:00"
     },
     {
       "agent_features": null,
@@ -2948,11 +4438,94 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "BM.DenseIO2.52"
+        "BM.DenseIO2.52",
+        "BM.Standard.E3.128",
+        "BM.GPU4.8",
+        "BM.Standard.E4.128",
+        "BM.Standard1.36",
+        "BM.HighIO1.36",
+        "BM.DenseIO1.36",
+        "BM.GPU2.2",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
       ],
       "size_in_mbs": 47694,
       "sort_key": "CentOS 6.10",
       "time_created": "2020-09-30T05:14:13.700000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
+      "billable_size_in_gbs": 3,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
+      "display_name": "CentOS-7-2021.06.14-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "listing_type": null,
+      "operating_system": "CentOS",
+      "operating_system_version": "7",
+      "shapes": [
+        "VM.DenseIO1.16",
+        "VM.DenseIO1.4",
+        "VM.DenseIO1.8",
+        "VM.DenseIO2.16",
+        "VM.DenseIO2.24",
+        "VM.DenseIO2.8",
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.1.Micro",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "BM.Standard.E2.64",
+        "BM.Standard.E3.128",
+        "BM.GPU4.8",
+        "BM.Standard.E4.128",
+        "BM.Standard1.36",
+        "BM.HighIO1.36",
+        "BM.DenseIO1.36",
+        "BM.GPU2.2",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
+      ],
+      "size_in_mbs": 47694,
+      "sort_key": "CentOS 7",
+      "time_created": "2021-06-17T23:39:40.604000+00:00"
     },
     {
       "agent_features": null,
@@ -3090,7 +4663,8 @@
         "BM.Standard2.52",
         "BM.GPU3.8",
         "BM.DenseIO2.52",
-        "BM.Optimized3.36"
+        "BM.Optimized3.36",
+        "BM.DenseIO2.52"
       ],
       "size_in_mbs": 47694,
       "sort_key": "CentOS 7",
@@ -3099,11 +4673,11 @@
     {
       "agent_features": null,
       "base_image_id": null,
-      "billable_size_in_gbs": 0,
+      "billable_size_in_gbs": 3,
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "CentOS-7-2021.03.16-0",
+      "display_name": "CentOS-8-2021.06.15-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -3118,7 +4692,7 @@
       "lifecycle_state": "AVAILABLE",
       "listing_type": null,
       "operating_system": "CentOS",
-      "operating_system_version": "7",
+      "operating_system_version": "8",
       "shapes": [
         "VM.DenseIO1.16",
         "VM.DenseIO1.4",
@@ -3130,6 +4704,7 @@
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
+        "VM.Optimized3.Flex",
         "VM.Standard.E2.1",
         "VM.Standard.E2.1.Micro",
         "VM.Standard.E2.2",
@@ -3159,11 +4734,13 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36",
         "BM.DenseIO2.52"
       ],
       "size_in_mbs": 47694,
-      "sort_key": "CentOS 7",
-      "time_created": "2021-03-17T21:51:17.752000+00:00"
+      "sort_key": "CentOS 8",
+      "time_created": "2021-06-17T23:49:22.061000+00:00"
     },
     {
       "agent_features": null,
@@ -3231,6 +4808,7 @@
         "BM.GPU3.8",
         "BM.DenseIO2.52",
         "BM.Optimized3.36",
+        "BM.GPU3.8",
         "BM.DenseIO2.52"
       ],
       "size_in_mbs": 47694,
@@ -3303,84 +4881,17 @@
         "BM.GPU3.8",
         "BM.DenseIO2.52",
         "BM.Optimized3.36",
-        "BM.DenseIO2.52"
-      ],
-      "size_in_mbs": 47694,
-      "sort_key": "CentOS 8",
-      "time_created": "2021-04-19T20:38:22.333000+00:00"
-    },
-    {
-      "agent_features": null,
-      "base_image_id": null,
-      "billable_size_in_gbs": 0,
-      "compartment_id": null,
-      "create_image_allowed": true,
-      "defined_tags": {},
-      "display_name": "CentOS-8-2021.03.16-0",
-      "freeform_tags": {},
-      "id": "ocid1.image.oc1..example",
-      "launch_mode": "NATIVE",
-      "launch_options": {
-        "boot_volume_type": "PARAVIRTUALIZED",
-        "firmware": "UEFI_64",
-        "is_consistent_volume_naming_enabled": true,
-        "is_pv_encryption_in_transit_enabled": true,
-        "network_type": "PARAVIRTUALIZED",
-        "remote_data_volume_type": "PARAVIRTUALIZED"
-      },
-      "lifecycle_state": "AVAILABLE",
-      "listing_type": null,
-      "operating_system": "CentOS",
-      "operating_system_version": "8",
-      "shapes": [
-        "VM.DenseIO1.16",
-        "VM.DenseIO1.4",
-        "VM.DenseIO1.8",
-        "VM.DenseIO2.16",
-        "VM.DenseIO2.24",
-        "VM.DenseIO2.8",
-        "VM.GPU2.1",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "VM.Standard.E2.1",
-        "VM.Standard.E2.1.Micro",
-        "VM.Standard.E2.2",
-        "VM.Standard.E2.4",
-        "VM.Standard.E2.8",
-        "VM.Standard.E3.Flex",
-        "VM.Standard.E4.Flex",
-        "VM.Standard1.1",
-        "VM.Standard1.16",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
-        "VM.Standard2.1",
-        "VM.Standard2.16",
-        "VM.Standard2.2",
-        "VM.Standard2.24",
-        "VM.Standard2.4",
-        "VM.Standard2.8",
-        "BM.Standard.E2.64",
-        "BM.Standard.E3.128",
-        "BM.GPU4.8",
-        "BM.Standard.E4.128",
-        "BM.Standard1.36",
-        "BM.HighIO1.36",
-        "BM.DenseIO1.36",
+        "BM.Standard.B1.44",
         "BM.GPU2.2",
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
         "BM.DenseIO2.52",
-        "BM.HPC2.36",
-        "BM.Standard2.52",
-        "BM.GPU3.8",
-        "BM.DenseIO2.52"
+        "BM.Optimized3.36"
       ],
       "size_in_mbs": 47694,
       "sort_key": "CentOS 8",
-      "time_created": "2021-03-17T23:46:47.341000+00:00"
+      "time_created": "2021-04-19T20:38:22.333000+00:00"
     },
     {
       "agent_features": null,
@@ -3673,6 +5184,9 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
         "BM.DenseIO2.52"
       ],
       "size_in_mbs": 47694,
@@ -3745,8 +5259,8 @@
         "BM.Standard2.52",
         "BM.GPU3.8",
         "BM.DenseIO2.52",
-        "BM.Standard2.52",
         "BM.GPU3.8",
+        "BM.DenseIO2.52",
         "BM.DenseIO2.52"
       ],
       "size_in_mbs": 47694,
@@ -3830,11 +5344,11 @@
     {
       "agent_features": null,
       "base_image_id": null,
-      "billable_size_in_gbs": 0,
+      "billable_size_in_gbs": 4,
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Oracle-Linux-7.9-aarch64-2021.05.17-0",
+      "display_name": "Oracle-Linux-7.9-aarch64-2021.06.20-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -3899,164 +5413,90 @@
       ],
       "size_in_mbs": 47694,
       "sort_key": "Oracle Linux 7.9",
+      "time_created": "2021-06-21T18:14:36.182000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
+      "billable_size_in_gbs": 0,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
+      "display_name": "Oracle-Linux-7.9-aarch64-2021.05.17-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "listing_type": null,
+      "operating_system": "Oracle Linux",
+      "operating_system_version": "7.9",
+      "shapes": [
+        "VM.Standard.A1.Flex",
+        "BM.Standard.A1.160",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "BM.GPU4.8",
+        "BM.GPU2.2",
+        "BM.GPU3.8",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.1.Micro",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "BM.Standard.E2.64",
+        "BM.Standard.E3.128",
+        "BM.GPU4.8",
+        "BM.Standard1.36",
+        "BM.HighIO1.36",
+        "BM.DenseIO1.36",
+        "x5-2.36.512.nvme-6.4-Internal",
+        "BM.Standard.B1.44",
+        "BM.GPU2.2",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.DenseIO2.52"
+      ],
+      "size_in_mbs": 47694,
+      "sort_key": "Oracle Linux 7.9",
       "time_created": "2021-05-19T03:44:34.922000+00:00"
     },
     {
       "agent_features": null,
       "base_image_id": null,
-      "billable_size_in_gbs": 0,
+      "billable_size_in_gbs": 12,
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Oracle-Linux-7.9-Gen2-GPU-2021.05.12-0",
-      "freeform_tags": {},
-      "id": "ocid1.image.oc1..example",
-      "launch_mode": "NATIVE",
-      "launch_options": {
-        "boot_volume_type": "PARAVIRTUALIZED",
-        "firmware": "UEFI_64",
-        "is_consistent_volume_naming_enabled": true,
-        "is_pv_encryption_in_transit_enabled": true,
-        "network_type": "PARAVIRTUALIZED",
-        "remote_data_volume_type": "PARAVIRTUALIZED"
-      },
-      "lifecycle_state": "AVAILABLE",
-      "listing_type": null,
-      "operating_system": "Oracle Linux",
-      "operating_system_version": "7.9",
-      "shapes": [
-        "VM.GPU2.1",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "BM.GPU4.8",
-        "BM.GPU2.2",
-        "BM.GPU3.8",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "VM.Standard.B1.1",
-        "VM.Standard.B1.16",
-        "VM.Standard.B1.2",
-        "VM.Standard.B1.4",
-        "VM.Standard.B1.8",
-        "VM.Standard.E2.1",
-        "VM.Standard.E2.1.Micro",
-        "VM.Standard.E2.2",
-        "VM.Standard.E2.4",
-        "VM.Standard.E2.8",
-        "VM.Standard.E3.Flex",
-        "VM.Standard1.1",
-        "VM.Standard1.16",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
-        "VM.Standard2.1",
-        "VM.Standard2.16",
-        "VM.Standard2.2",
-        "VM.Standard2.24",
-        "VM.Standard2.4",
-        "VM.Standard2.8",
-        "BM.Standard.E2.64",
-        "BM.Standard.E3.128",
-        "BM.Standard1.36",
-        "BM.HighIO1.36",
-        "BM.DenseIO1.36",
-        "x5-2.36.512.nvme-6.4-Internal",
-        "BM.Standard.B1.44",
-        "BM.GPU2.2",
-        "BM.HPC2.36",
-        "BM.Standard2.52",
-        "BM.GPU3.8",
-        "BM.DenseIO2.52",
-        "BM.DenseIO2.52"
-      ],
-      "size_in_mbs": 47694,
-      "sort_key": "Oracle Linux 7.9",
-      "time_created": "2021-05-20T17:20:18.747000+00:00"
-    },
-    {
-      "agent_features": null,
-      "base_image_id": null,
-      "billable_size_in_gbs": 0,
-      "compartment_id": null,
-      "create_image_allowed": true,
-      "defined_tags": {},
-      "display_name": "Oracle-Linux-7.9-Gen2-GPU-2021.04.21-0",
-      "freeform_tags": {},
-      "id": "ocid1.image.oc1..example",
-      "launch_mode": "NATIVE",
-      "launch_options": {
-        "boot_volume_type": "PARAVIRTUALIZED",
-        "firmware": "UEFI_64",
-        "is_consistent_volume_naming_enabled": true,
-        "is_pv_encryption_in_transit_enabled": true,
-        "network_type": "PARAVIRTUALIZED",
-        "remote_data_volume_type": "PARAVIRTUALIZED"
-      },
-      "lifecycle_state": "AVAILABLE",
-      "listing_type": null,
-      "operating_system": "Oracle Linux",
-      "operating_system_version": "7.9",
-      "shapes": [
-        "VM.GPU2.1",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "BM.GPU4.8",
-        "BM.GPU2.2",
-        "BM.GPU3.8",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "VM.Standard.B1.1",
-        "VM.Standard.B1.16",
-        "VM.Standard.B1.2",
-        "VM.Standard.B1.4",
-        "VM.Standard.B1.8",
-        "VM.Standard.E2.1",
-        "VM.Standard.E2.1.Micro",
-        "VM.Standard.E2.2",
-        "VM.Standard.E2.4",
-        "VM.Standard.E2.8",
-        "VM.Standard.E3.Flex",
-        "VM.Standard1.1",
-        "VM.Standard1.16",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
-        "VM.Standard2.1",
-        "VM.Standard2.16",
-        "VM.Standard2.2",
-        "VM.Standard2.24",
-        "VM.Standard2.4",
-        "VM.Standard2.8",
-        "BM.Standard.E2.64",
-        "BM.Standard.E3.128",
-        "BM.GPU4.8",
-        "BM.Standard1.36",
-        "BM.HighIO1.36",
-        "BM.DenseIO1.36",
-        "x5-2.36.512.nvme-6.4-Internal",
-        "BM.Standard.B1.44",
-        "BM.GPU2.2",
-        "BM.HPC2.36",
-        "BM.Standard2.52",
-        "BM.GPU3.8",
-        "BM.DenseIO2.52"
-      ],
-      "size_in_mbs": 47694,
-      "sort_key": "Oracle Linux 7.9",
-      "time_created": "2021-04-22T07:37:19.473000+00:00"
-    },
-    {
-      "agent_features": null,
-      "base_image_id": null,
-      "billable_size_in_gbs": 0,
-      "compartment_id": null,
-      "create_image_allowed": true,
-      "defined_tags": {},
-      "display_name": "Oracle-Linux-7.9-Gen2-GPU-2021.03.17-0",
+      "display_name": "Oracle-Linux-7.9-Gen2-GPU-2021.06.20-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -4125,7 +5565,241 @@
       ],
       "size_in_mbs": 47694,
       "sort_key": "Oracle Linux 7.9",
-      "time_created": "2021-03-24T02:38:12.493000+00:00"
+      "time_created": "2021-06-21T18:11:19.105000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
+      "billable_size_in_gbs": 0,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
+      "display_name": "Oracle-Linux-7.9-Gen2-GPU-2021.05.12-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "listing_type": null,
+      "operating_system": "Oracle Linux",
+      "operating_system_version": "7.9",
+      "shapes": [
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "BM.GPU4.8",
+        "BM.GPU2.2",
+        "BM.GPU3.8",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.1.Micro",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "BM.Standard.E2.64",
+        "BM.Standard.E3.128",
+        "BM.GPU4.8",
+        "BM.Standard.E4.128",
+        "BM.Standard1.36",
+        "BM.HighIO1.36",
+        "BM.DenseIO1.36",
+        "x5-2.36.512.nvme-6.4-Internal",
+        "BM.Standard.B1.44",
+        "BM.GPU2.2",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
+      ],
+      "size_in_mbs": 47694,
+      "sort_key": "Oracle Linux 7.9",
+      "time_created": "2021-05-20T17:20:18.747000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
+      "billable_size_in_gbs": 0,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
+      "display_name": "Oracle-Linux-7.9-Gen2-GPU-2021.04.21-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "listing_type": null,
+      "operating_system": "Oracle Linux",
+      "operating_system_version": "7.9",
+      "shapes": [
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "BM.GPU4.8",
+        "BM.GPU2.2",
+        "BM.GPU3.8",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.1.Micro",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "BM.Standard.E2.64",
+        "BM.Standard.E3.128",
+        "BM.GPU4.8",
+        "BM.Standard.E4.128",
+        "BM.Standard1.36",
+        "BM.HighIO1.36",
+        "BM.DenseIO1.36",
+        "x5-2.36.512.nvme-6.4-Internal",
+        "BM.Standard.B1.44",
+        "BM.GPU2.2",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
+      ],
+      "size_in_mbs": 47694,
+      "sort_key": "Oracle Linux 7.9",
+      "time_created": "2021-04-22T07:37:19.473000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
+      "billable_size_in_gbs": 3,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
+      "display_name": "Oracle-Linux-7.9-2021.06.20-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "listing_type": null,
+      "operating_system": "Oracle Linux",
+      "operating_system_version": "7.9",
+      "shapes": [
+        "VM.DenseIO1.16",
+        "VM.DenseIO1.4",
+        "VM.DenseIO1.8",
+        "VM.DenseIO2.16",
+        "VM.DenseIO2.24",
+        "VM.DenseIO2.8",
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.1.Micro",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "BM.Standard.E2.64",
+        "BM.Standard.E3.128",
+        "BM.GPU4.8",
+        "BM.Standard.E4.128",
+        "BM.Standard1.36",
+        "BM.HighIO1.36",
+        "BM.DenseIO1.36",
+        "x5-2.36.512.nvme-6.4-Internal",
+        "BM.Standard.B1.44",
+        "BM.GPU2.2",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
+      ],
+      "size_in_mbs": 47694,
+      "sort_key": "Oracle Linux 7.9",
+      "time_created": "2021-06-21T18:21:03.368000+00:00"
     },
     {
       "agent_features": null,
@@ -4286,11 +5960,11 @@
     {
       "agent_features": null,
       "base_image_id": null,
-      "billable_size_in_gbs": 0,
+      "billable_size_in_gbs": 4,
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Oracle-Linux-7.9-2021.03.17-0",
+      "display_name": "Oracle-Linux-8.4-aarch64-2021.06.22-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
       "launch_mode": "NATIVE",
@@ -4305,15 +5979,92 @@
       "lifecycle_state": "AVAILABLE",
       "listing_type": null,
       "operating_system": "Oracle Linux",
-      "operating_system_version": "7.9",
+      "operating_system_version": "8",
       "shapes": [
-        "VM.DenseIO1.16",
-        "VM.DenseIO1.4",
-        "VM.DenseIO1.8",
-        "VM.DenseIO2.16",
-        "VM.DenseIO2.24",
-        "VM.DenseIO2.8",
+        "VM.Standard.A1.Flex",
+        "BM.Standard.A1.160",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "BM.GPU4.8",
+        "BM.GPU2.2",
+        "BM.GPU3.8",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.1.Micro",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "BM.Standard.E2.64",
+        "BM.Standard.E3.128",
+        "BM.Standard.E4.128",
+        "BM.Standard1.36",
+        "BM.HighIO1.36",
+        "BM.DenseIO1.36",
+        "x5-2.36.512.nvme-6.4-Internal",
+        "BM.Standard.B1.44",
+        "BM.GPU2.2",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
+      ],
+      "size_in_mbs": 47694,
+      "sort_key": "Oracle Linux 8",
+      "time_created": "2021-06-23T00:34:02.626000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
+      "billable_size_in_gbs": 12,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
+      "display_name": "Oracle-Linux-8.4-Gen2-GPU-2021.06.20-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "listing_type": null,
+      "operating_system": "Oracle Linux",
+      "operating_system_version": "8",
+      "shapes": [
         "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "BM.GPU4.8",
+        "BM.GPU2.2",
+        "BM.GPU3.8",
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
@@ -4342,7 +6093,6 @@
         "VM.Standard2.8",
         "BM.Standard.E2.64",
         "BM.Standard.E3.128",
-        "BM.GPU4.8",
         "BM.Standard.E4.128",
         "BM.Standard1.36",
         "BM.HighIO1.36",
@@ -4356,8 +6106,85 @@
         "BM.DenseIO2.52"
       ],
       "size_in_mbs": 47694,
-      "sort_key": "Oracle Linux 7.9",
-      "time_created": "2021-03-24T02:42:34.622000+00:00"
+      "sort_key": "Oracle Linux 8",
+      "time_created": "2021-06-21T18:11:12.630000+00:00"
+    },
+    {
+      "agent_features": null,
+      "base_image_id": null,
+      "billable_size_in_gbs": 4,
+      "compartment_id": null,
+      "create_image_allowed": true,
+      "defined_tags": {},
+      "display_name": "Oracle-Linux-8.4-2021.06.20-0",
+      "freeform_tags": {},
+      "id": "ocid1.image.oc1..example",
+      "launch_mode": "NATIVE",
+      "launch_options": {
+        "boot_volume_type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "is_consistent_volume_naming_enabled": true,
+        "is_pv_encryption_in_transit_enabled": true,
+        "network_type": "PARAVIRTUALIZED",
+        "remote_data_volume_type": "PARAVIRTUALIZED"
+      },
+      "lifecycle_state": "AVAILABLE",
+      "listing_type": null,
+      "operating_system": "Oracle Linux",
+      "operating_system_version": "8",
+      "shapes": [
+        "VM.DenseIO1.16",
+        "VM.DenseIO1.4",
+        "VM.DenseIO1.8",
+        "VM.DenseIO2.16",
+        "VM.DenseIO2.24",
+        "VM.DenseIO2.8",
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.1.Micro",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "BM.Standard.E2.64",
+        "BM.Standard.E3.128",
+        "BM.Standard.E4.128",
+        "BM.Standard1.36",
+        "BM.HighIO1.36",
+        "BM.DenseIO1.36",
+        "x5-2.36.512.nvme-6.4-Internal",
+        "BM.Standard.B1.44",
+        "BM.GPU2.2",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
+      ],
+      "size_in_mbs": 47694,
+      "sort_key": "Oracle Linux 8",
+      "time_created": "2021-06-21T18:21:57.142000+00:00"
     },
     {
       "agent_features": null,
@@ -4385,15 +6212,15 @@
       "shapes": [
         "VM.Standard.A1.Flex",
         "BM.Standard.A1.160",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "BM.GPU4.8",
-        "BM.GPU2.2",
-        "BM.GPU3.8",
+        "VM.DenseIO1.8",
+        "VM.DenseIO2.16",
+        "VM.DenseIO2.24",
+        "VM.DenseIO2.8",
+        "VM.GPU2.1",
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
-        "VM.Standard.A1.Flex",
+        "VM.Optimized3.Flex",
         "VM.Standard.B1.1",
         "VM.Standard.B1.16",
         "VM.Standard.B1.2",
@@ -4405,6 +6232,7 @@
         "VM.Standard.E2.4",
         "VM.Standard.E2.8",
         "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
         "VM.Standard1.1",
         "VM.Standard1.16",
         "VM.Standard1.2",
@@ -4418,7 +6246,7 @@
         "VM.Standard2.8",
         "BM.Standard.E2.64",
         "BM.Standard.E3.128",
-        "BM.GPU4.8",
+        "BM.Standard.E4.128",
         "BM.Standard1.36",
         "BM.HighIO1.36",
         "BM.DenseIO1.36",
@@ -4428,7 +6256,8 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "BM.DenseIO2.52"
+        "BM.DenseIO2.52",
+        "BM.Optimized3.36"
       ],
       "size_in_mbs": 47694,
       "sort_key": "Oracle Linux 8",
@@ -4543,7 +6372,6 @@
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
-        "VM.Optimized3.Flex",
         "VM.Standard.B1.1",
         "VM.Standard.B1.16",
         "VM.Standard.B1.2",
@@ -4555,7 +6383,6 @@
         "VM.Standard.E2.4",
         "VM.Standard.E2.8",
         "VM.Standard.E3.Flex",
-        "VM.Standard.E4.Flex",
         "VM.Standard1.1",
         "VM.Standard1.16",
         "VM.Standard1.2",
@@ -4569,83 +6396,6 @@
         "VM.Standard2.8",
         "BM.Standard.E2.64",
         "BM.Standard.E3.128",
-        "BM.Standard.E4.128",
-        "BM.Standard1.36",
-        "BM.HighIO1.36",
-        "BM.DenseIO1.36",
-        "x5-2.36.512.nvme-6.4-Internal",
-        "BM.Standard.B1.44",
-        "BM.GPU2.2",
-        "BM.HPC2.36",
-        "BM.Standard2.52",
-        "BM.GPU3.8",
-        "BM.DenseIO2.52",
-        "BM.Optimized3.36"
-      ],
-      "size_in_mbs": 47694,
-      "sort_key": "Oracle Linux 8",
-      "time_created": "2021-04-22T07:37:02.489000+00:00"
-    },
-    {
-      "agent_features": null,
-      "base_image_id": null,
-      "billable_size_in_gbs": 0,
-      "compartment_id": null,
-      "create_image_allowed": true,
-      "defined_tags": {},
-      "display_name": "Oracle-Linux-8.3-Gen2-GPU-2021.03.19-0",
-      "freeform_tags": {},
-      "id": "ocid1.image.oc1..example",
-      "launch_mode": "NATIVE",
-      "launch_options": {
-        "boot_volume_type": "PARAVIRTUALIZED",
-        "firmware": "UEFI_64",
-        "is_consistent_volume_naming_enabled": true,
-        "is_pv_encryption_in_transit_enabled": true,
-        "network_type": "PARAVIRTUALIZED",
-        "remote_data_volume_type": "PARAVIRTUALIZED"
-      },
-      "lifecycle_state": "AVAILABLE",
-      "listing_type": null,
-      "operating_system": "Oracle Linux",
-      "operating_system_version": "8",
-      "shapes": [
-        "VM.GPU2.1",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "BM.GPU4.8",
-        "BM.GPU2.2",
-        "BM.GPU3.8",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "VM.Standard.B1.1",
-        "VM.Standard.B1.16",
-        "VM.Standard.B1.2",
-        "VM.Standard.B1.4",
-        "VM.Standard.B1.8",
-        "VM.Standard.E2.1",
-        "VM.Standard.E2.1.Micro",
-        "VM.Standard.E2.2",
-        "VM.Standard.E2.4",
-        "VM.Standard.E2.8",
-        "VM.Standard.E3.Flex",
-        "VM.Standard.E4.Flex",
-        "VM.Standard1.1",
-        "VM.Standard1.16",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
-        "VM.Standard2.1",
-        "VM.Standard2.16",
-        "VM.Standard2.2",
-        "VM.Standard2.24",
-        "VM.Standard2.4",
-        "VM.Standard2.8",
-        "BM.Standard.E2.64",
-        "BM.Standard.E3.128",
-        "BM.Standard.E4.128",
         "BM.Standard1.36",
         "BM.HighIO1.36",
         "BM.DenseIO1.36",
@@ -4659,7 +6409,7 @@
       ],
       "size_in_mbs": 47694,
       "sort_key": "Oracle Linux 8",
-      "time_created": "2021-03-24T02:46:22.096000+00:00"
+      "time_created": "2021-04-22T07:37:02.489000+00:00"
     },
     {
       "agent_features": null,
@@ -4822,81 +6572,6 @@
       "compartment_id": null,
       "create_image_allowed": true,
       "defined_tags": {},
-      "display_name": "Oracle-Linux-8.3-2021.03.19-0",
-      "freeform_tags": {},
-      "id": "ocid1.image.oc1..example",
-      "launch_mode": "NATIVE",
-      "launch_options": {
-        "boot_volume_type": "PARAVIRTUALIZED",
-        "firmware": "UEFI_64",
-        "is_consistent_volume_naming_enabled": true,
-        "is_pv_encryption_in_transit_enabled": true,
-        "network_type": "PARAVIRTUALIZED",
-        "remote_data_volume_type": "PARAVIRTUALIZED"
-      },
-      "lifecycle_state": "AVAILABLE",
-      "listing_type": null,
-      "operating_system": "Oracle Linux",
-      "operating_system_version": "8",
-      "shapes": [
-        "VM.DenseIO1.16",
-        "VM.DenseIO1.4",
-        "VM.DenseIO1.8",
-        "VM.DenseIO2.16",
-        "VM.DenseIO2.24",
-        "VM.DenseIO2.8",
-        "VM.GPU2.1",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "VM.Standard.B1.1",
-        "VM.Standard.B1.16",
-        "VM.Standard.B1.2",
-        "VM.Standard.B1.4",
-        "VM.Standard.B1.8",
-        "VM.Standard.E2.1",
-        "VM.Standard.E2.1.Micro",
-        "VM.Standard.E2.2",
-        "VM.Standard.E2.4",
-        "VM.Standard.E2.8",
-        "VM.Standard.E3.Flex",
-        "VM.Standard.E4.Flex",
-        "VM.Standard1.1",
-        "VM.Standard1.16",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
-        "VM.Standard2.1",
-        "VM.Standard2.16",
-        "VM.Standard2.2",
-        "VM.Standard2.24",
-        "VM.Standard2.4",
-        "VM.Standard2.8",
-        "BM.Standard.E2.64",
-        "BM.Standard.E3.128",
-        "BM.Standard.E4.128",
-        "BM.Standard1.36",
-        "BM.HighIO1.36",
-        "BM.DenseIO1.36",
-        "x5-2.36.512.nvme-6.4-Internal",
-        "BM.Standard.B1.44",
-        "BM.GPU2.2",
-        "BM.HPC2.36",
-        "BM.Standard2.52",
-        "BM.GPU3.8",
-        "BM.DenseIO2.52"
-      ],
-      "size_in_mbs": 47694,
-      "sort_key": "Oracle Linux 8",
-      "time_created": "2021-03-24T02:52:53.990000+00:00"
-    },
-    {
-      "agent_features": null,
-      "base_image_id": null,
-      "billable_size_in_gbs": 0,
-      "compartment_id": null,
-      "create_image_allowed": true,
-      "defined_tags": {},
       "display_name": "Oracle-Linux-8.2-Gen2-GPU-2020.11.10-0",
       "freeform_tags": {},
       "id": "ocid1.image.oc1..example",
@@ -4993,44 +6668,7 @@
         "VM.GPU3.4",
         "BM.GPU4.8",
         "BM.GPU2.2",
-        "BM.GPU3.8",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "VM.Standard.B1.1",
-        "VM.Standard.B1.16",
-        "VM.Standard.B1.2",
-        "VM.Standard.B1.4",
-        "VM.Standard.B1.8",
-        "VM.Standard.E2.1",
-        "VM.Standard.E2.1.Micro",
-        "VM.Standard.E2.2",
-        "VM.Standard.E2.4",
-        "VM.Standard.E2.8",
-        "VM.Standard.E3.Flex",
-        "VM.Standard1.1",
-        "VM.Standard1.16",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
-        "VM.Standard2.1",
-        "VM.Standard2.16",
-        "VM.Standard2.2",
-        "VM.Standard2.24",
-        "VM.Standard2.4",
-        "VM.Standard2.8",
-        "BM.Standard.E2.64",
-        "BM.Standard.E3.128",
-        "BM.Standard1.36",
-        "BM.HighIO1.36",
-        "BM.DenseIO1.36",
-        "x5-2.36.512.nvme-6.4-Internal",
-        "BM.Standard.B1.44",
-        "BM.GPU2.2",
-        "BM.HPC2.36",
-        "BM.Standard2.52",
-        "BM.GPU3.8",
-        "BM.DenseIO2.52"
+        "BM.GPU3.8"
       ],
       "size_in_mbs": 47694,
       "sort_key": "Oracle Linux 8",
@@ -5208,8 +6846,9 @@
       "shapes": [
         "VM.Standard.A1.Flex",
         "BM.Standard.A1.160",
-        "BM.DenseIO1.36",
-        "BM.GPU3.8"
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "VM.Standard.E3.Flex"
       ],
       "size_in_mbs": 51200,
       "sort_key": "Oracle Linux Cloud Developer 8",
@@ -5240,10 +6879,18 @@
       "operating_system_version": "Server 2012 R2 Datacenter",
       "shapes": [
         "BM.Standard.E2.64",
-        "BM.DenseIO2.52",
+        "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "VM.Standard.E3.Flex"
+        "BM.GPU3.8",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2012 R2 Datacenter",
@@ -5274,10 +6921,19 @@
       "operating_system_version": "Server 2012 R2 Datacenter",
       "shapes": [
         "BM.Standard.E2.64",
-        "BM.GPU2.2",
         "BM.HPC2.36",
         "BM.Standard2.52",
-        "BM.GPU3.8"
+        "BM.GPU3.8",
+        "VM.Standard.E3.Flex",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "BM.GPU4.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2012 R2 Datacenter",
@@ -5311,7 +6967,15 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "VM.Standard.E3.Flex"
+        "BM.GPU3.8",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2012 R2 Datacenter",
@@ -5345,7 +7009,7 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "BM.GPU3.8",
+        "VM.Standard.E3.Flex",
         "VM.GPU3.2",
         "VM.GPU3.4",
         "VM.Standard2.1",
@@ -5353,7 +7017,8 @@
         "VM.Standard2.2",
         "VM.Standard2.24",
         "VM.Standard2.4",
-        "VM.Standard2.8"
+        "VM.Standard2.8",
+        "BM.GPU4.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2012 R2 Datacenter",
@@ -5388,9 +7053,9 @@
         "BM.Standard2.52",
         "BM.GPU3.8",
         "VM.Standard.E3.Flex",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "VM.Standard2.1",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
         "VM.Standard2.16",
         "VM.Standard2.2",
         "VM.Standard2.24",
@@ -5430,10 +7095,10 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "BM.GPU3.8",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
-        "VM.Standard2.1",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
         "VM.Standard2.16",
         "VM.Standard2.2",
         "VM.Standard2.24",
@@ -5473,15 +7138,14 @@
         "BM.Standard2.52",
         "BM.GPU3.8",
         "VM.Standard.E3.Flex",
-        "VM.GPU3.2",
+        "VM.Standard.E4.Flex",
         "VM.GPU3.4",
         "VM.Standard2.1",
         "VM.Standard2.16",
         "VM.Standard2.2",
         "VM.Standard2.24",
         "VM.Standard2.4",
-        "VM.Standard2.8",
-        "BM.GPU4.8"
+        "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2012 R2 Datacenter",
@@ -5516,9 +7180,9 @@
         "BM.Standard2.52",
         "BM.GPU3.8",
         "VM.Standard.E3.Flex",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
+        "VM.Standard.E4.Flex",
+        "VM.GPU3.4",
+        "VM.Standard2.1",
         "VM.Standard2.16",
         "VM.Standard2.2",
         "VM.Standard2.24",
@@ -5558,10 +7222,10 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "VM.Standard.E3.Flex",
-        "VM.Standard.E4.Flex",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Standard2.1",
         "VM.Standard2.16",
         "VM.Standard2.2",
         "VM.Standard2.24",
@@ -5644,14 +7308,33 @@
         "VM.Standard.E2.8",
         "VM.Standard.E3.Flex",
         "VM.Standard.E4.Flex",
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
         "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
         "VM.Standard2.1",
         "VM.Standard2.16",
         "VM.Standard2.2",
         "VM.Standard2.24",
         "VM.Standard2.4",
-        "VM.Standard2.8",
-        "BM.GPU4.8"
+        "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2012 R2 Datacenter",
@@ -5839,6 +7522,10 @@
         "VM.Standard2.2",
         "VM.Standard2.24",
         "VM.Standard2.4",
+        "VM.Standard2.8",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
         "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
@@ -5878,6 +7565,10 @@
         "VM.GPU3.4",
         "VM.Standard2.1",
         "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
         "VM.Standard2.2",
         "VM.Standard2.24",
         "VM.Standard2.4",
@@ -5981,7 +7672,7 @@
         "VM.Standard1.2",
         "VM.Standard1.4",
         "VM.Standard1.8",
-        "VM.Standard1.8",
+        "VM.Standard.E2.2",
         "VM.Standard.E2.4",
         "VM.Standard.E2.8",
         "VM.Standard2.1",
@@ -6020,13 +7711,13 @@
       "operating_system_version": "Server 2016 Datacenter",
       "shapes": [
         "BM.Optimized3.36",
-        "VM.DenseIO1.4",
-        "VM.DenseIO1.8",
-        "VM.Standard1.1",
-        "VM.Standard1.16",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
+        "BM.HPC2.36",
+        "BM.Standard2.52",
+        "BM.GPU3.8",
+        "BM.GPU3.8",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Standard.E2.1",
         "VM.Standard.E2.2",
         "VM.Standard.E2.4",
         "VM.Standard.E2.8",
@@ -6066,12 +7757,13 @@
       "operating_system_version": "Server 2016 Datacenter",
       "shapes": [
         "BM.Standard.E2.64",
-        "BM.GPU2.2",
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
+        "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
+        "VM.Standard.A1.Flex",
         "VM.Standard.E2.1",
         "VM.Standard.E2.2",
         "VM.Standard.E2.4",
@@ -6112,10 +7804,10 @@
       "operating_system_version": "Server 2016 Datacenter",
       "shapes": [
         "BM.Standard.E2.64",
-        "BM.DenseIO2.52",
+        "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "VM.GPU3.1",
+        "BM.GPU3.8",
         "VM.GPU3.2",
         "VM.GPU3.4",
         "VM.Standard.E2.1",
@@ -6161,7 +7853,7 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "BM.GPU3.8",
+        "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
         "VM.Standard.E2.1",
@@ -6173,6 +7865,7 @@
         "VM.Standard2.2",
         "VM.Standard2.24",
         "VM.Standard2.4",
+        "VM.Standard2.8",
         "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
@@ -6210,7 +7903,6 @@
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
-        "VM.Standard.A1.Flex",
         "VM.Standard.E2.1",
         "VM.Standard.E2.2",
         "VM.Standard.E2.4",
@@ -6254,7 +7946,7 @@
         "BM.HPC2.36",
         "BM.Standard2.52",
         "BM.GPU3.8",
-        "BM.GPU3.8",
+        "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
         "VM.Standard.E2.1",
@@ -6405,6 +8097,16 @@
         "VM.Standard2.2",
         "VM.Standard2.24",
         "VM.Standard2.4",
+        "VM.Standard2.8",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
         "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
@@ -6452,6 +8154,15 @@
         "VM.Standard2.24",
         "VM.Standard2.4",
         "VM.Standard2.8",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
         "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
@@ -6493,6 +8204,22 @@
         "VM.Standard.E2.2",
         "VM.Standard.E2.4",
         "VM.Standard.E2.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
         "VM.Standard2.1",
         "VM.Standard2.16",
         "VM.Standard2.2",
@@ -6642,9 +8369,9 @@
       "shapes": [
         "VM.Standard.E3.Flex",
         "VM.Standard.E4.Flex",
-        "VM.DenseIO1.8",
-        "VM.DenseIO2.16",
-        "VM.DenseIO2.24",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
         "VM.DenseIO2.8",
         "VM.GPU2.1",
         "VM.GPU3.1",
@@ -6704,12 +8431,16 @@
       "shapes": [
         "VM.Standard.E3.Flex",
         "VM.Standard.E4.Flex",
-        "VM.Standard.B1.2",
-        "VM.Standard.B1.4",
-        "VM.Standard.B1.8",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
+        "VM.DenseIO1.8",
+        "VM.DenseIO2.16",
+        "VM.DenseIO2.24",
+        "VM.DenseIO2.8",
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
         "VM.Standard.B1.16",
         "VM.Standard.B1.2",
         "VM.Standard.B1.4",
@@ -6718,6 +8449,8 @@
         "VM.Standard.E2.2",
         "VM.Standard.E2.4",
         "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
         "VM.Standard1.1",
         "VM.Standard1.16",
         "VM.Standard1.2",
@@ -6763,9 +8496,13 @@
         "VM.Standard.B1.2",
         "VM.Standard.B1.4",
         "VM.Standard.B1.8",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
+        "VM.DenseIO2.8",
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
         "VM.Standard.B1.16",
         "VM.Standard.B1.2",
         "VM.Standard.B1.4",
@@ -6774,6 +8511,8 @@
         "VM.Standard.E2.2",
         "VM.Standard.E2.4",
         "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
         "VM.Standard1.1",
         "VM.Standard1.16",
         "VM.Standard1.2",
@@ -6819,9 +8558,9 @@
         "VM.Standard.B1.2",
         "VM.Standard.B1.4",
         "VM.Standard.B1.8",
-        "VM.DenseIO2.8",
-        "VM.GPU2.1",
-        "VM.GPU3.1",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
         "VM.GPU3.2",
         "VM.GPU3.4",
         "VM.Optimized3.Flex",
@@ -7010,7 +8749,6 @@
         "VM.Standard1.8",
         "VM.GPU3.2",
         "VM.GPU3.4",
-        "VM.Optimized3.Flex",
         "VM.Standard.B1.1",
         "VM.Standard.B1.16",
         "VM.Standard.B1.2",
@@ -7419,21 +9157,27 @@
       "operating_system_version": "Server 2019 Datacenter",
       "shapes": [
         "BM.Standard.E4.128",
+        "VM.Standard.E4.Flex",
+        "VM.DenseIO1.8",
+        "VM.DenseIO2.16",
         "VM.DenseIO2.24",
         "VM.DenseIO2.8",
         "VM.GPU2.1",
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
-        "VM.Standard2.1",
-        "VM.Standard2.16",
-        "VM.Standard2.2",
-        "VM.Standard2.24",
-        "VM.Standard2.4",
-        "VM.Standard2.8",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
         "VM.Standard.E2.2",
         "VM.Standard.E2.4",
         "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
         "VM.Standard1.1",
         "VM.Standard1.16",
         "VM.Standard1.2",
@@ -7475,24 +9219,26 @@
       "operating_system_version": "Server 2019 Datacenter",
       "shapes": [
         "BM.Standard.E3.128",
-        "VM.DenseIO1.4",
-        "VM.DenseIO1.8",
-        "VM.DenseIO2.16",
         "VM.DenseIO2.24",
         "VM.DenseIO2.8",
         "VM.GPU2.1",
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
-        "VM.Standard.B1.1",
-        "VM.Standard.B1.16",
-        "VM.Standard.B1.2",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
         "VM.Standard.B1.4",
         "VM.Standard.B1.8",
         "VM.Standard.E2.1",
         "VM.Standard.E2.2",
         "VM.Standard.E2.4",
         "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
         "VM.Standard1.1",
         "VM.Standard1.16",
         "VM.Standard1.2",
@@ -7534,32 +9280,25 @@
       "operating_system_version": "Server 2019 Datacenter",
       "shapes": [
         "BM.Standard.E3.128",
-        "VM.DenseIO1.4",
-        "VM.DenseIO1.8",
+        "VM.DenseIO2.24",
+        "VM.DenseIO2.8",
         "VM.GPU2.1",
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
-        "VM.Standard.B1.1",
-        "VM.Standard.B1.16",
-        "VM.Standard.B1.2",
-        "VM.Standard.B1.4",
-        "VM.Standard.B1.8",
-        "VM.Standard.E2.1",
-        "VM.Standard.E2.2",
-        "VM.Standard.E2.4",
-        "VM.Standard.E2.8",
-        "VM.Standard1.1",
-        "VM.Standard1.16",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8",
         "VM.Standard2.1",
         "VM.Standard2.16",
         "VM.Standard2.2",
         "VM.Standard2.24",
         "VM.Standard2.4",
-        "VM.Standard2.8"
+        "VM.Standard2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2019 Datacenter",
@@ -7590,7 +9329,7 @@
       "operating_system_version": "Server 2019 Datacenter",
       "shapes": [
         "BM.Standard.E3.128",
-        "VM.Standard.E4.Flex",
+        "VM.DenseIO1.4",
         "VM.DenseIO1.8",
         "VM.DenseIO2.16",
         "VM.DenseIO2.24",
@@ -7599,7 +9338,6 @@
         "VM.GPU3.1",
         "VM.GPU3.2",
         "VM.GPU3.4",
-        "VM.Optimized3.Flex",
         "VM.Standard.B1.1",
         "VM.Standard.B1.16",
         "VM.Standard.B1.2",
@@ -7609,8 +9347,6 @@
         "VM.Standard.E2.2",
         "VM.Standard.E2.4",
         "VM.Standard.E2.8",
-        "VM.Standard.E3.Flex",
-        "VM.Standard.E4.Flex",
         "VM.Standard1.1",
         "VM.Standard1.16",
         "VM.Standard1.2",
@@ -7619,6 +9355,9 @@
         "VM.Standard2.1",
         "VM.Standard2.16",
         "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8",
         "VM.Standard2.24",
         "VM.Standard2.4",
         "VM.Standard2.8"
@@ -7724,14 +9463,7 @@
         "VM.Standard2.2",
         "VM.Standard2.24",
         "VM.Standard2.4",
-        "VM.Standard2.8",
-        "VM.Standard.E3.Flex",
-        "VM.Standard.E4.Flex",
-        "VM.Standard1.1",
-        "VM.Standard1.16",
-        "VM.Standard1.2",
-        "VM.Standard1.4",
-        "VM.Standard1.8"
+        "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2019 Standard",
@@ -7790,9 +9522,6 @@
         "VM.Standard2.2",
         "VM.Standard2.24",
         "VM.Standard2.4",
-        "VM.Standard2.8",
-        "VM.Standard2.24",
-        "VM.Standard2.4",
         "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
@@ -7826,13 +9555,7 @@
         "VM.Standard.E3.Flex",
         "VM.Standard.E4.Flex",
         "VM.DenseIO1.8",
-        "VM.DenseIO2.16",
-        "VM.DenseIO2.24",
-        "VM.DenseIO2.8",
-        "VM.GPU2.1",
-        "VM.GPU3.1",
-        "VM.GPU3.2",
-        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
         "VM.Standard.B1.1",
         "VM.Standard.B1.16",
         "VM.Standard.B1.2",
@@ -7848,13 +9571,7 @@
         "VM.Standard1.16",
         "VM.Standard1.2",
         "VM.Standard1.4",
-        "VM.Standard1.8",
-        "VM.Standard2.1",
-        "VM.Standard2.16",
-        "VM.Standard2.2",
-        "VM.Standard2.24",
-        "VM.Standard2.4",
-        "VM.Standard2.8"
+        "VM.Standard1.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2019 Standard",
@@ -7885,7 +9602,38 @@
       "operating_system_version": "Server 2019 Standard",
       "shapes": [
         "VM.Standard.E3.Flex",
-        "VM.Standard.E4.Flex"
+        "VM.Standard.E4.Flex",
+        "VM.DenseIO1.8",
+        "VM.DenseIO2.16",
+        "VM.DenseIO2.24",
+        "VM.DenseIO2.8",
+        "VM.GPU2.1",
+        "VM.GPU3.1",
+        "VM.GPU3.2",
+        "VM.GPU3.4",
+        "VM.Optimized3.Flex",
+        "VM.Standard.B1.1",
+        "VM.Standard.B1.16",
+        "VM.Standard.B1.2",
+        "VM.Standard.B1.4",
+        "VM.Standard.B1.8",
+        "VM.Standard.E2.1",
+        "VM.Standard.E2.2",
+        "VM.Standard.E2.4",
+        "VM.Standard.E2.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8"
       ],
       "size_in_mbs": 48128,
       "sort_key": "Windows Server 2019 Standard",
@@ -7934,7 +9682,20 @@
         "VM.Standard1.16",
         "VM.Standard1.2",
         "VM.Standard1.4",
-        "VM.Standard1.8"
+        "VM.Standard1.8",
+        "VM.Standard.E3.Flex",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2019 Standard",
@@ -7983,7 +9744,19 @@
         "VM.Standard1.16",
         "VM.Standard1.2",
         "VM.Standard1.4",
-        "VM.Standard1.8"
+        "VM.Standard1.8",
+        "VM.Standard.E4.Flex",
+        "VM.Standard1.1",
+        "VM.Standard1.16",
+        "VM.Standard1.2",
+        "VM.Standard1.4",
+        "VM.Standard1.8",
+        "VM.Standard2.1",
+        "VM.Standard2.16",
+        "VM.Standard2.2",
+        "VM.Standard2.24",
+        "VM.Standard2.4",
+        "VM.Standard2.8"
       ],
       "size_in_mbs": 262144,
       "sort_key": "Windows Server 2019 Standard",
@@ -8980,6 +10753,11 @@
       "name": "database-migration"
     },
     {
+      "description": "DevOps",
+      "display_name": "devops",
+      "name": "devops"
+    },
+    {
       "description": "DevOps Deploy",
       "display_name": "devops-deploy",
       "name": "devops-deploy"
@@ -8988,11 +10766,6 @@
       "description": "DevOps Project",
       "display_name": "devops-project",
       "name": "devops-project"
-    },
-    {
-      "description": "DevOps Code Repositories",
-      "display_name": "devops-scm",
-      "name": "devops-scm"
     },
     {
       "description": "Digital Assistant",
