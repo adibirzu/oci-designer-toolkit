@@ -12,14 +12,9 @@ class PolicyView extends OkitArtefactView {
         if (!json_view.policies) json_view.policies = [];
         super(artefact, json_view);
     }
-    // TODO: Return Artefact Parent id e.g. vcn_id for a Internet Gateway
-    get parent_id() {return this.artefact.vcn_id;}
-    // TODO: Return Artefact Parent Object e.g. VirtualCloudNetwork for a Internet Gateway
-    get parent() {return this.getJsonView().getVirtualCloudNetwork(this.parent_id);}
-    // TODO: If the Resource is within a Subnet but the subnet_iss is not at the top level then raise it with the following functions if not required delete them.
-    // Direct Subnet Access
-    get subnet_id() {return this.artefact.primary_mount_target.subnet_id;}
-    set subnet_id(id) {this.artefact.primary_mount_target.subnet_id = id;}
+    get parent_id() {return this.artefact.compartment_id;}
+    get parent() {return this.getJsonView().getCompartment(this.parent_id);}
+
     /*
     ** SVG Processing
     */
@@ -43,8 +38,7 @@ class PolicyView extends OkitArtefactView {
         return Policy.getArtifactReference();
     }
     static getDropTargets() {
-        // TODO: Return List of Artefact Drop Targets Parent Object Reference Names e.g. VirtualCloudNetwork for a Internet Gateway
-        return [VirtualCloudNetwork.getArtifactReference()];
+        return [Compartment.getArtifactReference()];
     }
 }
 /*
@@ -70,6 +64,9 @@ OkitJsonView.prototype.getPolicies = function() {
     }
     return this.policies;
 }
+OkitJsonView.prototype.getPolicys = function() {
+    return this.getPolicies();
+}
 OkitJsonView.prototype.getPolicy = function(id='') {
     for (let artefact of this.getPolicies()) {
         if (artefact.id === id) {
@@ -82,6 +79,9 @@ OkitJsonView.prototype.loadPolicies = function(policies) {
     for (const artefact of policies) {
         this.getPolicies().push(new PolicyView(new Policy(artefact, this.okitjson), this));
     }
+}
+OkitJsonView.prototype.loadPolicys = function(policies) {
+    return this.loadPolicies(policies);
 }
 OkitJsonView.prototype.movePolicy = function(id) {
     // Build Dialog
