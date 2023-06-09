@@ -5,91 +5,54 @@
 console.debug('Loaded Instance Pool Javascript');
 
 /*
-** Define Compartment Artifact Class
- */
+** Define Instance Pool Class
+*/
 class InstancePool extends OkitArtifact {
     /*
     ** Create
-     */
-    constructor(data = {}, okitjson = {}) {
+    */
+    constructor (data={}, okitjson={}) {
         super(okitjson);
         // Configure default values
-        this.compartment_id = '';
-        // this.display_name = this.generateDefaultName(okitjson.instance_pools.length + 1);
-        this.placement_configurations = [
-            {
-                availability_domain: '1',
-                primary_subnet_id: '',
-                fault_domains: [],
-                secondary_vnic_subnets: []
-            }
-        ];
-        this.size = 3;
-        this.load_balancers = [];
-        this.instance_configuration = {
-            source: 'INSTANCE',
-            instance_id: ''
-        };
-        this.auto_scaling = {
-            policies: []
-        }
+        this.compartment_id = data.parent_id;
+        /*
+        ** TODO: Add Resource / Artefact specific parameters and default
+        */
         // Update with any passed data
         this.merge(data);
         this.convert();
+        // TODO: If the Resource is within a Subnet but the subnet_iss is not at the top level then raise it with the following functions if not required delete them.
+        // Expose subnet_id at the top level
+        Object.defineProperty(this, 'subnet_id', {get: function() {return this.primary_mount_target.subnet_id;}, set: function(id) {this.primary_mount_target.subnet_id = id;}, enumerable: false });
     }
-
     /*
-    ** Conversion Routine allowing loading of old json
-     */
-    convert() {
-        super.convert();
-    }
-
+    ** Name Generation
+    */
     getNamePrefix() {
-        return super.getNamePrefix() + 'inp';
+        return super.getNamePrefix() + 'ip';
     }
-
     /*
     ** Static Functionality
-     */
+    */
     static getArtifactReference() {
         return 'Instance Pool';
-    }
-
-    /*
-    ** Initialisation Functions
-     */
-    initialisePolicy() {
-        const policy = {
-            capacity: {
-                initial: 2,
-                max: 2,
-                min: 1
-            },
-            policy_type: ''
-        }
     }
 }
 /*
 ** Dynamically Add Model Functions
 */
 OkitJson.prototype.newInstancePool = function(data) {
-    console.info('New InstancePool');
     this.getInstancePools().push(new InstancePool(data, this));
     return this.getInstancePools()[this.getInstancePools().length - 1];
 }
 OkitJson.prototype.getInstancePools = function() {
-    if (!this.instance_pools) this.instance_pools = [];
+    if (!this.instance_pools) this.instance_pools = []
     return this.instance_pools;
 }
 OkitJson.prototype.getInstancePool = function(id='') {
-    for (let artefact of this.getInstancePools()) {
-        if (artefact.id === id) {
-            return artefact;
-        }
-    }
-    return undefined;
+    return this.getInstancePools().find(r => r.id === id)
 }
 OkitJson.prototype.deleteInstancePool = function(id) {
     this.instance_pools = this.instance_pools ? this.instance_pools.filter((r) => r.id !== id) : []
 }
+
