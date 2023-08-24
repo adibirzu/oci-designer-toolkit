@@ -86,7 +86,7 @@ const OcdModelPaletteResource = ({ provider, type, resource, onDragStart, onDrag
         // Start Drag
         const dragResource: PaletteResource = {
                 container: containerResources.includes(type),
-                title: resource.displayName ? resource.displayName : resource.name,
+                title: resource.resourceTypeName,
                 class: classname,
                 provider: provider
         }
