@@ -1,7 +1,6 @@
 {
     "extends": "../../tsconfig.base.json",
     "references": [
-        {"path": "../codegen"},
         {"path": "../core"},
         {"path": "../export"},
         {"path": "../import"},
