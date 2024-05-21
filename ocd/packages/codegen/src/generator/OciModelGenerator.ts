@@ -4,27 +4,12 @@
 */
 
 import { OcdModelGenerator } from './OcdModelGenerator.js'
+import { commonElements, commonIgnoreElements } from './data/OciCommonResourceProperties.js'
 
 export class OciModelGenerator extends OcdModelGenerator {
-    commonElements = [
-        'compartment_id', // Common Element
-        'defined_tags',   // Common Element
-        'display_name',   // Common Element
-        'freeform_tags',  // Common Element
-        'id',             // Common Element
-        'name',           // Common Element
-    ]
-    commonIgnoreElements = [
-        'region',
-        'inactive_state', 
-        'is_accessible',
-        'state', 
-        'time_created',
-        'system_tags'
-    ]
     constructor () {
         super('Oci')
-        this.ignoreAttributes = [...this.commonElements, ...this.commonIgnoreElements]
+        this.ignoreAttributes = [...commonElements, ...commonIgnoreElements]
     }
 }
 

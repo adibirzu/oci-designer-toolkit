@@ -4,22 +4,12 @@
 */
 
 import { OcdModelGenerator } from './OcdModelGenerator.js'
+import { commonElements, commonIgnoreElements } from './data/AzureCommonResourceProperties.js'
 
 export class AzureModelGenerator extends OcdModelGenerator {
-    commonElements = [
-        'parent_id',      // Common Element
-        'tags',           // Common Element
-        'display_name',   // Common Element
-        'id',             // Common Element
-        'name',           // Common Element
-    ]
-    commonIgnoreElements = [
-        'location',
-        'type'
-    ]
     constructor () {
         super('Azure')
-        this.ignoreAttributes = [...this.commonElements, ...this.commonIgnoreElements]
+        this.ignoreAttributes = [...commonElements, ...commonIgnoreElements]
     }
 }
 
