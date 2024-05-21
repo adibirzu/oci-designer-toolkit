@@ -10,7 +10,7 @@ import { ignoreElements } from './data/AzureIgnoreElements';
 import { elementOverrides } from './data/AzureElementOverrides';
 import { conditionalElements } from './data/AzureConditionalElements';
 
-export class AzureTerraformSchemaImporter extends OcdTerraformSchemaImporter {
+export class AzureAzTerraformSchemaImporter extends OcdTerraformSchemaImporter {
     constructor() {
         super(ignoreElements, elementOverrides, conditionalElements)
         this.tfProvider = 'registry.terraform.io/azure/azapi'
@@ -22,3 +22,6 @@ export class AzureTerraformSchemaImporter extends OcdTerraformSchemaImporter {
     }
 
 }
+
+export default AzureAzTerraformSchemaImporter
+module.exports = { AzureAzTerraformSchemaImporter }
