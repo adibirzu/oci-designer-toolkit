@@ -3,7 +3,6 @@ name: Build/Release
 on: 
   push:
     branches:
-      - 'nightly'
       - 'master'
 
 env:

@@ -1,0 +1,100 @@
+name: Development Build/Release
+
+on: 
+  push:
+    branches:
+      - 'nightly'
+
+env:
+  CI: false
+  OCD_VERSION: 0.1.0-alpha
+  RELEASE_TAG: v0.1.0-alpha.ocd.nightly
+  MAC_ARTEFACT: ocd-mac
+  WIN_ARTEFACT: ocd-win
+  RELEASE_ARTEFACTS_DIR: ./release-artefacts
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+  BRANCH_RELEASE_TAG: v0.1.0.ocd.${{ github.head_ref || github.ref_name }}
+  BRANCH_OCD_VERSION: 0.1.0-${{ github.head_ref || github.ref_name }}
+
+jobs:
+  generate-variables:
+    runs-on: ubuntu-latest
+    outputs:
+      ocd_version: ${{ steps.version.outputs.ocd_version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: version
+        run: echo "ocd_version=$(jq -r '.version' ocd/packages/desktop/package.json)"  >> "$GITHUB_OUTPUT"
+  update-or-create-release: 
+    needs: [generate-variables]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      # matrix:
+      #   os: [macos-latest]
+      #   version: [latest]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      BRANCH_OCD_VERSION: ${{ needs.generate-variables.outputs.ocd_version }}-${{ github.head_ref || github.ref_name }}
+      BRANCH_RELEASE_TAG: v${{ needs.generate-variables.outputs.ocd_version }}.ocd.${{ github.head_ref || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update Release
+        id: update_release
+        run: |
+          gh release edit ${{ env.BRANCH_RELEASE_TAG }} --title "OCD ${{ env.BRANCH_NAME }} Release" --notes-file ./ocd/releasenotes/${{ env.BRANCH_NAME }}/README.md --target ${{ env.BRANCH_NAME }} --latest
+      - name: Create Release if Update fails
+        if: failure()
+        id: create_release
+        run: |
+          gh release create ${{ env.BRANCH_RELEASE_TAG }} --title "OCD ${{ env.BRANCH_NAME }} Release" --notes-file ./ocd/releasenotes/${{ env.BRANCH_NAME }}/README.md --target ${{ env.BRANCH_NAME }} --latest
+    
+  build-and-release:
+    needs: [update-or-create-release, generate-variables]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        version: [latest]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DEBUG1: "electron-*"
+      BRANCH_OCD_VERSION: ${{ needs.generate-variables.outputs.ocd_version }}-${{ github.head_ref || github.ref_name }}
+      BRANCH_RELEASE_TAG: v${{ needs.generate-variables.outputs.ocd_version }}.ocd.${{ github.head_ref || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.version }}
+      - run: node --version
+      - run: npm --version
+      # - name: Install Snapcraft on Ubuntu
+      #   if: startsWith(matrix.os, 'ubuntu')
+      #   run: sudo snap install snapcraft --classic
+      - run: npm run github-action-install
+      - run: npm run github-action-compile-for-codegen
+      - run: npm run github-action-generate
+      - run: npm run github-action-compile
+      - run: npm run github-action-pack
+      - run: npm run github-action-build-react
+      - run: npm run github-action-build-electron
+      - run: ls -R ./ocd/dist
+        if: always()
+      - name: Upload Mac Artifact to Release
+        if: matrix.os == 'macos-latest'
+        run: |
+          gh release upload ${{ env.BRANCH_RELEASE_TAG }} ./ocd/dist/mac/ocd-${{ env.BRANCH_OCD_VERSION }}-*.dmg --clobber
+      - name: Upload Windows Artifact to Release
+        if: matrix.os == 'windows-latest'
+        run: |
+          gh release upload ${{ env.BRANCH_RELEASE_TAG }} ./ocd/dist/win/ocd-${{ env.BRANCH_OCD_VERSION }}-x64.exe --clobber
+      - name: Upload Linux Artifact to Release
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          # gh release upload ${{ env.BRANCH_RELEASE_TAG }} ./ocd/dist/linux/ocd-${{ env.BRANCH_OCD_VERSION }}.rpm --clobber
+          # gh release upload ${{ env.BRANCH_RELEASE_TAG }} ./ocd/dist/linux/ocd-${{ env.BRANCH_OCD_VERSION }}.deb --clobber
+          gh release upload ${{ env.BRANCH_RELEASE_TAG }} ./ocd/dist/linux/ocd-${{ env.BRANCH_OCD_VERSION }}-*.snap --clobber
+          gh release upload ${{ env.BRANCH_RELEASE_TAG }} ./ocd/dist/linux/ocd-${{ env.BRANCH_OCD_VERSION }}-*.AppImage --clobber
