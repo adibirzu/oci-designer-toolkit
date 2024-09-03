@@ -10,6 +10,11 @@
 **
 */
 
+export { AzureContainerRegistry } from './resources/AzureContainerRegistry'
+export { AzureDnsZone } from './resources/AzureDnsZone'
+export { AzureKubernetesCluster } from './resources/AzureKubernetesCluster'
+export { AzureLoadBalancer } from './resources/AzureLoadBalancer'
 export { AzureSubnet } from './resources/AzureSubnet'
+export { AzureVirtualMachine } from './resources/AzureVirtualMachine'
 export { AzureVirtualNetwork } from './resources/AzureVirtualNetwork'
     
