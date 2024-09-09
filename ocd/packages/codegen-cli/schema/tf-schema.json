@@ -143160,7 +143160,7 @@
                         "deprecated": true
                     }
                 },
-                "azurerm_oracle_exadata_database": {
+                "azurerm_oracledatabase_exadata_infrastructure": {
                     "version": 0,
                     "block": {
                         "attributes": {
@@ -143420,7 +143420,267 @@
                         "deprecated": true
                     }
                 },
-                "azurerm_oracle_autonomous_database": {
+                "azurerm_oracledatabase_autonomous_database_regular": {
+                    "version": 0,
+                    "block": {
+                        "attributes": {
+                            "collation": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "create_mode": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true
+                            },
+                            "creation_date": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            },
+                            "default_secondary_location": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            },
+                            "edition": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "elastic_pool_name": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "encryption": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            },
+                            "id": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "location": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "max_size_bytes": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "max_size_gb": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "name": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "read_scale": {
+                                "type": "bool",
+                                "description_kind": "plain",
+                                "optional": true
+                            },
+                            "requested_service_objective_id": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "requested_service_objective_name": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "resource_group_name": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "restore_point_in_time": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "server_name": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "source_database_deletion_date": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "source_database_id": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "tags": {
+                                "type": [
+                                    "map",
+                                    "string"
+                                ],
+                                "description_kind": "plain",
+                                "optional": true
+                            },
+                            "zone_redundant": {
+                                "type": "bool",
+                                "description_kind": "plain",
+                                "optional": true
+                            }
+                        },
+                        "block_types": {
+                            "import": {
+                                "nesting_mode": "list",
+                                "block": {
+                                    "attributes": {
+                                        "administrator_login": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "required": true
+                                        },
+                                        "administrator_login_password": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "required": true,
+                                            "sensitive": true
+                                        },
+                                        "authentication_type": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "required": true
+                                        },
+                                        "operation_mode": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "storage_key": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "required": true,
+                                            "sensitive": true
+                                        },
+                                        "storage_key_type": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "required": true
+                                        },
+                                        "storage_uri": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "required": true
+                                        }
+                                    },
+                                    "description_kind": "plain"
+                                },
+                                "max_items": 1
+                            },
+                            "threat_detection_policy": {
+                                "nesting_mode": "list",
+                                "block": {
+                                    "attributes": {
+                                        "disabled_alerts": {
+                                            "type": [
+                                                "set",
+                                                "string"
+                                            ],
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "email_account_admins": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "email_addresses": {
+                                            "type": [
+                                                "set",
+                                                "string"
+                                            ],
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "retention_days": {
+                                            "type": "number",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "state": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "storage_account_access_key": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true,
+                                            "sensitive": true
+                                        },
+                                        "storage_endpoint": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        }
+                                    },
+                                    "description_kind": "plain"
+                                },
+                                "max_items": 1
+                            },
+                            "timeouts": {
+                                "nesting_mode": "single",
+                                "block": {
+                                    "attributes": {
+                                        "create": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "delete": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "read": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "update": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        }
+                                    },
+                                    "description_kind": "plain"
+                                }
+                            }
+                        },
+                        "description_kind": "plain",
+                        "deprecated": true
+                    }
+                },
+                "azurerm_oracledatabase_cloud_vm_cluster": {
                     "version": 0,
                     "block": {
                         "attributes": {
@@ -207212,7 +207472,7 @@
                         "deprecated": true
                     }
                 },
-                "azurerm_oracle_exadata_database": {
+                "azurerm_oracledatabase_exadata_infrastructure": {
                     "version": 0,
                     "block": {
                         "attributes": {
@@ -207300,7 +207560,95 @@
                         "deprecated": true
                     }
                 },
-                "azurerm_oracle_autonomous_database": {
+                "azurerm_oracledatabase_autonomous_database_regular": {
+                    "version": 0,
+                    "block": {
+                        "attributes": {
+                            "collation": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            },
+                            "default_secondary_location": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            },
+                            "edition": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            },
+                            "elastic_pool_name": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            },
+                            "failover_group_id": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            },
+                            "id": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "location": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            },
+                            "name": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "read_scale": {
+                                "type": "bool",
+                                "description_kind": "plain",
+                                "computed": true
+                            },
+                            "resource_group_name": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "server_name": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "tags": {
+                                "type": [
+                                    "map",
+                                    "string"
+                                ],
+                                "description_kind": "plain",
+                                "optional": true
+                            }
+                        },
+                        "block_types": {
+                            "timeouts": {
+                                "nesting_mode": "single",
+                                "block": {
+                                    "attributes": {
+                                        "read": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        }
+                                    },
+                                    "description_kind": "plain"
+                                }
+                            }
+                        },
+                        "description_kind": "plain",
+                        "deprecated": true
+                    }
+                },
+                "azurerm_oracledatabase_cloud_vm_cluster": {
                     "version": 0,
                     "block": {
                         "attributes": {

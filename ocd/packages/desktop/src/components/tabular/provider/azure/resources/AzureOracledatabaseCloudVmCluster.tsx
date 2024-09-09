@@ -6,7 +6,7 @@
 import { AzureTabularResourceProps } from "../../../../../types/ReactComponentProperties"
 import { OcdTabularContents } from "../AzureTabularContents"
 
-export const AzureOracleAutonomousDatabase = ({ ocdDocument, azureResources, selected }: AzureTabularResourceProps): JSX.Element => {
+export const AzureOracledatabaseCloudVmCluster = ({ ocdDocument, azureResources, selected }: AzureTabularResourceProps): JSX.Element => {
     const columnTitles: string[] = []
     const resourceElements: string[] = []
     return (
@@ -16,7 +16,7 @@ export const AzureOracleAutonomousDatabase = ({ ocdDocument, azureResources, sel
             selected={selected}
             columnTitles={columnTitles}
             resourceElements={resourceElements}
-            key={'AzureOracleAutonomousDatabaseTabularContents'}
+            key={'AzureOracledatabaseCloudVmClusterTabularContents'}
         />
     )
 }

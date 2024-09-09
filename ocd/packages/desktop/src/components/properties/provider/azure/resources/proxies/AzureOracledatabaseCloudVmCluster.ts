@@ -7,7 +7,7 @@ import { OcdCacheData } from '../../../../../OcdCache'
 import { OcdDocument } from '../../../../../OcdDocument'
 import { AzureModelResources as Model } from '@ocd/model'
 
-export namespace AzureOracleExadataDatabaseProxy {
+export namespace AzureOracledatabaseCloudVmClusterProxy {
     export function proxyHandler(ocdDocument: OcdDocument, ocdCache: OcdCacheData)  {
         const proxyHandler = {
             //@ts-ignore
@@ -21,9 +21,9 @@ export namespace AzureOracleExadataDatabaseProxy {
         }
         return proxyHandler
     }
-    export function proxyResource(ocdDocument: OcdDocument, resource: Model.AzureOracleExadataDatabase, ocdCache: OcdCacheData) {
+    export function proxyResource(ocdDocument: OcdDocument, resource: Model.AzureOracledatabaseCloudVmCluster, ocdCache: OcdCacheData) {
         const pH = proxyHandler(ocdDocument, ocdCache)
-        const proxyResource = new Proxy<Model.AzureOracleExadataDatabase>(resource, pH)
+        const proxyResource = new Proxy<Model.AzureOracledatabaseCloudVmCluster>(resource, pH)
         return proxyResource
     }
 }

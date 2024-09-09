@@ -6,6 +6,6 @@
 import { ResourceElementConfig } from "../../../../OcdPropertyTypes"
 import { AzureCommonConfigs } from "../../AzureCommonConfigs"
 
-export namespace AzureOracleExadataDatabaseConfigs {
+export namespace AzureOracledatabaseAutonomousDatabaseRegularConfigs {
     export function configs(): ResourceElementConfig[] {return [...AzureCommonConfigs.configs()]}
 }

@@ -7,7 +7,7 @@ import { OcdCacheData } from '../../../../../OcdCache'
 import { OcdDocument } from '../../../../../OcdDocument'
 import { AzureModelResources as Model } from '@ocd/model'
 
-export namespace AzureOracleAutonomousDatabaseProxy {
+export namespace AzureOracledatabaseAutonomousDatabaseRegularProxy {
     export function proxyHandler(ocdDocument: OcdDocument, ocdCache: OcdCacheData)  {
         const proxyHandler = {
             //@ts-ignore
@@ -21,9 +21,9 @@ export namespace AzureOracleAutonomousDatabaseProxy {
         }
         return proxyHandler
     }
-    export function proxyResource(ocdDocument: OcdDocument, resource: Model.AzureOracleAutonomousDatabase, ocdCache: OcdCacheData) {
+    export function proxyResource(ocdDocument: OcdDocument, resource: Model.AzureOracledatabaseAutonomousDatabaseRegular, ocdCache: OcdCacheData) {
         const pH = proxyHandler(ocdDocument, ocdCache)
-        const proxyResource = new Proxy<Model.AzureOracleAutonomousDatabase>(resource, pH)
+        const proxyResource = new Proxy<Model.AzureOracledatabaseAutonomousDatabaseRegular>(resource, pH)
         return proxyResource
     }
 }
