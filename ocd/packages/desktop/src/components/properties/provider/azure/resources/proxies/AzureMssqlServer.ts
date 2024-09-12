@@ -7,7 +7,7 @@ import { OcdCacheData } from '../../../../../OcdCache'
 import { OcdDocument } from '../../../../../OcdDocument'
 import { AzureModelResources as Model } from '@ocd/model'
 
-export namespace AzureSqlDatabaseProxy {
+export namespace AzureMssqlServerProxy {
     export function proxyHandler(ocdDocument: OcdDocument, ocdCache: OcdCacheData)  {
         const proxyHandler = {
             //@ts-ignore
@@ -21,9 +21,9 @@ export namespace AzureSqlDatabaseProxy {
         }
         return proxyHandler
     }
-    export function proxyResource(ocdDocument: OcdDocument, resource: Model.AzureSqlDatabase, ocdCache: OcdCacheData) {
+    export function proxyResource(ocdDocument: OcdDocument, resource: Model.AzureMssqlServer, ocdCache: OcdCacheData) {
         const pH = proxyHandler(ocdDocument, ocdCache)
-        const proxyResource = new Proxy<Model.AzureSqlDatabase>(resource, pH)
+        const proxyResource = new Proxy<Model.AzureMssqlServer>(resource, pH)
         return proxyResource
     }
 }

@@ -6,6 +6,6 @@
 import { ResourceElementConfig } from "../../../../OcdPropertyTypes"
 import { AzureCommonConfigs } from "../../AzureCommonConfigs"
 
-export namespace AzureSqlDatabaseConfigs {
+export namespace AzureMssqlServerConfigs {
     export function configs(): ResourceElementConfig[] {return [...AzureCommonConfigs.configs()]}
 }
