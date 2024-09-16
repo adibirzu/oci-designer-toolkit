@@ -806,6 +806,252 @@
                 }
             },
             "resource_schemas": {
+                "google_oracledatabase_autonomous_database_regular": {
+                    "version": 0,
+                    "block": {
+                        "attributes": {
+                            "charset": {
+                                "type": "string",
+                                "description": "The charset value. See MySQL's\n[Supported Character Sets and Collations](https://dev.mysql.com/doc/refman/5.7/en/charset-charsets.html)\nand Postgres' [Character Set Support](https://www.postgresql.org/docs/9.6/static/multibyte.html)\nfor more details and supported values. Postgres databases only support\na value of 'UTF8' at creation time.",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "collation": {
+                                "type": "string",
+                                "description": "The collation value. See MySQL's\n[Supported Character Sets and Collations](https://dev.mysql.com/doc/refman/5.7/en/charset-charsets.html)\nand Postgres' [Collation Support](https://www.postgresql.org/docs/9.6/static/collation.html)\nfor more details and supported values. Postgres databases only support\na value of 'en_US.UTF8' at creation time.",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "deletion_policy": {
+                                "type": "string",
+                                "description": "The deletion policy for the database. Setting ABANDON allows the resource\nto be abandoned rather than deleted. This is useful for Postgres, where databases cannot be\ndeleted from the API if there are users other than cloudsqlsuperuser with access. Possible\nvalues are: \"ABANDON\", \"DELETE\". Defaults to \"DELETE\".",
+                                "description_kind": "plain",
+                                "optional": true
+                            },
+                            "id": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "instance": {
+                                "type": "string",
+                                "description": "The name of the Cloud SQL instance. This does not include the project\nID.",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "name": {
+                                "type": "string",
+                                "description": "The name of the database in the Cloud SQL instance.\nThis does not include the project ID or instance name.",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "project": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "self_link": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            }
+                        },
+                        "block_types": {
+                            "timeouts": {
+                                "nesting_mode": "single",
+                                "block": {
+                                    "attributes": {
+                                        "create": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "delete": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "update": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        }
+                                    },
+                                    "description_kind": "plain"
+                                }
+                            }
+                        },
+                        "description_kind": "plain"
+                    }
+                },
+                "google_oracledatabase_exadata_infrastructure": {
+                    "version": 0,
+                    "block": {
+                        "attributes": {
+                            "charset": {
+                                "type": "string",
+                                "description": "The charset value. See MySQL's\n[Supported Character Sets and Collations](https://dev.mysql.com/doc/refman/5.7/en/charset-charsets.html)\nand Postgres' [Character Set Support](https://www.postgresql.org/docs/9.6/static/multibyte.html)\nfor more details and supported values. Postgres databases only support\na value of 'UTF8' at creation time.",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "collation": {
+                                "type": "string",
+                                "description": "The collation value. See MySQL's\n[Supported Character Sets and Collations](https://dev.mysql.com/doc/refman/5.7/en/charset-charsets.html)\nand Postgres' [Collation Support](https://www.postgresql.org/docs/9.6/static/collation.html)\nfor more details and supported values. Postgres databases only support\na value of 'en_US.UTF8' at creation time.",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "deletion_policy": {
+                                "type": "string",
+                                "description": "The deletion policy for the database. Setting ABANDON allows the resource\nto be abandoned rather than deleted. This is useful for Postgres, where databases cannot be\ndeleted from the API if there are users other than cloudsqlsuperuser with access. Possible\nvalues are: \"ABANDON\", \"DELETE\". Defaults to \"DELETE\".",
+                                "description_kind": "plain",
+                                "optional": true
+                            },
+                            "id": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "instance": {
+                                "type": "string",
+                                "description": "The name of the Cloud SQL instance. This does not include the project\nID.",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "name": {
+                                "type": "string",
+                                "description": "The name of the database in the Cloud SQL instance.\nThis does not include the project ID or instance name.",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "project": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "self_link": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            }
+                        },
+                        "block_types": {
+                            "timeouts": {
+                                "nesting_mode": "single",
+                                "block": {
+                                    "attributes": {
+                                        "create": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "delete": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "update": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        }
+                                    },
+                                    "description_kind": "plain"
+                                }
+                            }
+                        },
+                        "description_kind": "plain"
+                    }
+                },
+                "google_oracledatabase_cloud_vm_cluster": {
+                    "version": 0,
+                    "block": {
+                        "attributes": {
+                            "charset": {
+                                "type": "string",
+                                "description": "The charset value. See MySQL's\n[Supported Character Sets and Collations](https://dev.mysql.com/doc/refman/5.7/en/charset-charsets.html)\nand Postgres' [Character Set Support](https://www.postgresql.org/docs/9.6/static/multibyte.html)\nfor more details and supported values. Postgres databases only support\na value of 'UTF8' at creation time.",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "collation": {
+                                "type": "string",
+                                "description": "The collation value. See MySQL's\n[Supported Character Sets and Collations](https://dev.mysql.com/doc/refman/5.7/en/charset-charsets.html)\nand Postgres' [Collation Support](https://www.postgresql.org/docs/9.6/static/collation.html)\nfor more details and supported values. Postgres databases only support\na value of 'en_US.UTF8' at creation time.",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "deletion_policy": {
+                                "type": "string",
+                                "description": "The deletion policy for the database. Setting ABANDON allows the resource\nto be abandoned rather than deleted. This is useful for Postgres, where databases cannot be\ndeleted from the API if there are users other than cloudsqlsuperuser with access. Possible\nvalues are: \"ABANDON\", \"DELETE\". Defaults to \"DELETE\".",
+                                "description_kind": "plain",
+                                "optional": true
+                            },
+                            "id": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "instance": {
+                                "type": "string",
+                                "description": "The name of the Cloud SQL instance. This does not include the project\nID.",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "name": {
+                                "type": "string",
+                                "description": "The name of the database in the Cloud SQL instance.\nThis does not include the project ID or instance name.",
+                                "description_kind": "plain",
+                                "required": true
+                            },
+                            "project": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "optional": true,
+                                "computed": true
+                            },
+                            "self_link": {
+                                "type": "string",
+                                "description_kind": "plain",
+                                "computed": true
+                            }
+                        },
+                        "block_types": {
+                            "timeouts": {
+                                "nesting_mode": "single",
+                                "block": {
+                                    "attributes": {
+                                        "create": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "delete": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        },
+                                        "update": {
+                                            "type": "string",
+                                            "description_kind": "plain",
+                                            "optional": true
+                                        }
+                                    },
+                                    "description_kind": "plain"
+                                }
+                            }
+                        },
+                        "description_kind": "plain"
+                    }
+                },
                 "google_access_context_manager_access_level": {
                     "version": 0,
                     "block": {
