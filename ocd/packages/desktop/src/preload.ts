@@ -12,7 +12,7 @@ contextBridge.exposeInMainWorld('ocdAPI', {
   getVersion: () => ipcRenderer.invoke('ocdBuild:getVersion'),
   // OCI API Calls / Query
   loadOCIConfigProfileNames: () => ipcRenderer.invoke('ociConfig:loadProfileNames'),
-  loadOCIConfigProfile: (profile: string) => ipcRenderer.invoke('ociConfig:loadProfile'),
+  loadOCIConfigProfile: (profile: string) => ipcRenderer.invoke('ociConfig:loadProfile', profile),
   listRegions: (profile: string) => ipcRenderer.invoke('ociQuery:listRegions', profile),
   listTenancyCompartments: (profile: string) => ipcRenderer.invoke('ociQuery:listTenancyCompartments', profile),
   queryTenancy: (profile: string, compartmentIds: string[], region: string) => ipcRenderer.invoke('ociQuery:queryTenancy', profile, compartmentIds, region),

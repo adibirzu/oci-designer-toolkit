@@ -48,7 +48,7 @@ const saveDesktopState = (config: Record<string, any>) => {
 }
 
 let mainWindow: BrowserWindow
-let filePath: string
+let filePath: string | null
 let ready = false
 
 
@@ -379,7 +379,7 @@ async function handleLoadDesign(event: any, filename: string) {
 					properties: ['openFile'],
 					filters: [{name: 'Filetype', extensions: ['okit']}]
 				  }).then(result => {
-					const design = result.canceled ? {} : fs.readFileSync(result.filePaths[0], 'utf-8')
+					const design = result.canceled ? '{}' : fs.readFileSync(result.filePaths[0], 'utf-8')
 					resolve({canceled: result.canceled, filename: result.filePaths[0], design: JSON.parse(design)})
 				}).catch(err => {
 					console.error(err)
