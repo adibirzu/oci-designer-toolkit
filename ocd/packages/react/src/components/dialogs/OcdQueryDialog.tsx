@@ -202,8 +202,10 @@ const CompartmentPicker = ({compartments, selectedCompartmentIds, setSelectedCom
         const compartmentIds = isClosed ? collapsedCompartmentIds.filter((i) => i !== id) : [...collapsedCompartmentIds, id]
         setCollapsedCompartmentIds(compartmentIds)
         // setIsOpen(!isOpen)
+        console.debug('OcdQueryDialog: Click/Collapse Event:', e)
     }
     const onInputClick = (e: React.MouseEvent<HTMLInputElement>) => e.stopPropagation()
+    const onLabelClick = (e: React.MouseEvent<HTMLElement>) => e.stopPropagation()
     const subCompartmentsClasses = collapsedCompartmentIds.includes(parentId) ? 'hidden' : ''
     return (
         <ul className={subCompartmentsClasses}>
@@ -212,7 +214,7 @@ const CompartmentPicker = ({compartments, selectedCompartmentIds, setSelectedCom
                 const isClosed = collapsedCompartmentIds.includes(c.id)
                 const labelClasses = subCompartmentsCount > 0 ? isClosed ? 'ocd-collapable-list-element ocd-list-collapsed' : 'ocd-collapable-list-element ocd-list-open' : 'ocd-collapable-list-element'
                 return <li className={labelClasses} key={c.id} ref={refs[c.hierarchy]} onClick={(e) => onClick(e, c.id)}>
-                            <label onMouseEnter={(e) => onMouseOver(c.id)} onMouseLeave={(e) => onMouseOver('')}><input type="checkbox" checked={selectedCompartmentIds.includes(c.id)} onChange={(e) => onChange(e, c.id)} onClick={onInputClick}></input>{c.name}</label>
+                            <label onMouseEnter={(e) => onMouseOver(c.id)} onMouseLeave={(e) => onMouseOver('')} onClick={onLabelClick} aria-hidden><input type="checkbox" checked={selectedCompartmentIds.includes(c.id)} onChange={(e) => onChange(e, c.id)} onClick={onInputClick}></input>{c.name}</label>
                             {subCompartmentsCount > 0 && <CompartmentPicker 
                                 compartments={compartments} 
                                 selectedCompartmentIds={selectedCompartmentIds}
