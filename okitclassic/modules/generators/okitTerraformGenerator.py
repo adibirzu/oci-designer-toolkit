@@ -1,4 +1,3 @@
-
 # Copyright (c) 2020, 2024, Oracle and/or its affiliates.
 # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
@@ -6,7 +5,7 @@
 """
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-__author__ = ["Andrew Hopkinson (Oracle Cloud Solutions A-Team)"]
+__author__ = ["Anderson Souza (Oracle Edge Cloud Engineering Solutions)"]
 __version__ = "1.0.0"
 __module__ = "ociTerraformGenerator"
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -14,6 +13,7 @@ __module__ = "ociTerraformGenerator"
 
 import os
 import json
+import re
 
 from common.okitCommon import jsonToFormattedString
 from common.okitCommon import writeTerraformFile
@@ -22,6 +22,123 @@ from generators.okitGenerator import OCIGenerator
 
 # Configure logging
 logger = getLogger()
+
+
+# ----------------------------------------------------------------------------
+# HCL safety helpers
+# ----------------------------------------------------------------------------
+# These helpers harden two areas of the generated Terraform:
+#   1. user_defined.terraform - raw HCL supplied via a design file. Verbatim
+#      pass-through allowed code execution at `terraform apply` time via
+#      provisioner blocks and external data sources. The sanitizer rejects
+#      designs containing the most dangerous constructs.
+#   2. variables_schema fields - variable names, defaults and descriptions
+#      were interpolated into HCL via f-strings without escaping, allowing
+#      string-context HCL injection. The escaper produces well-formed HCL
+#      string literals.
+
+# Block headers that allow command execution or arbitrary remote code
+# fetching at apply time. Matching is anchored to the start of a line
+# (after optional whitespace) and is case-sensitive: HCL is case-sensitive
+# and these tokens are reserved.
+_FORBIDDEN_BLOCK_PATTERNS = [
+    # provisioner "local-exec" / "remote-exec" / "file"
+    (re.compile(r'(?m)^\s*provisioner\s+"[^"]+"\s*\{'), 'provisioner block'),
+    # data "external" "..." - executes a program and reads its stdout
+    (re.compile(r'(?m)^\s*data\s+"external"\s+"[^"]+"\s*\{'), 'data "external"'),
+    # data "http" "..." - fetches arbitrary URLs at plan time
+    (re.compile(r'(?m)^\s*data\s+"http"\s+"[^"]+"\s*\{'), 'data "http"'),
+    # module "..." with a source - can clone arbitrary git repositories
+    (re.compile(r'(?m)^\s*module\s+"[^"]+"\s*\{'), 'module block'),
+]
+
+
+def _sanitize_user_defined_terraform(raw):
+    """Validate user-supplied raw Terraform from a design file.
+
+    The user_defined.terraform field exists by design to let advanced
+    users embed extra HCL into the generated output. Historically the
+    field was passed through verbatim, which allowed designs to include
+    `provisioner "local-exec"` blocks and other constructs that execute
+    arbitrary commands when `terraform apply` runs.
+
+    This function performs a denylist check for the highest-risk
+    constructs and raises ValueError if any are present. It is not a
+    full HCL parser; it is a pragmatic guard against the most common
+    weaponization paths.
+
+    Returns the raw text unchanged on success (with a header banner
+    prepended so reviewers can see the content originated from user
+    input).
+    """
+    if not isinstance(raw, str) or raw.strip() == '':
+        return raw
+
+    found = []
+    for pattern, label in _FORBIDDEN_BLOCK_PATTERNS:
+        if pattern.search(raw):
+            found.append(label)
+    if found:
+        raise ValueError(
+            "user_defined.terraform contains disallowed construct(s): "
+            + ", ".join(sorted(set(found)))
+            + ". These constructs can execute arbitrary code at apply "
+            "time and are not permitted in design files."
+        )
+
+    banner = (
+        "# ---------------------------------------------------------------\n"
+        "# WARNING: The contents below originated from the design file's\n"
+        "# user_defined.terraform field. Review carefully before applying.\n"
+        "# ---------------------------------------------------------------\n"
+    )
+    return banner + raw
+
+
+def _escape_hcl_string(value):
+    """Escape a Python value for safe interpolation inside an HCL
+    double-quoted string literal.
+
+    Handles backslashes, double quotes, newlines, carriage returns,
+    tabs and HCL interpolation markers ('${' and '%{'). Also strips
+    NUL bytes which are not legal in HCL.
+
+    Non-string inputs are coerced to str() first.
+    """
+    s = '' if value is None else str(value)
+    s = s.replace('\x00', '')
+    s = s.replace('\\', '\\\\')
+    s = s.replace('"', '\\"')
+    s = s.replace('\n', '\\n')
+    s = s.replace('\r', '\\r')
+    s = s.replace('\t', '\\t')
+    # Neutralize HCL interpolation/template markers so attacker-supplied
+    # values cannot escape into expression context.
+    s = s.replace('${', '$${')
+    s = s.replace('%{', '%%{')
+    return s
+
+
+# Identifier regex per HCL spec: starts with a letter or underscore,
+# followed by letters, digits, underscores or hyphens.
+_HCL_IDENTIFIER_RE = re.compile(r'^[A-Za-z_][A-Za-z0-9_\-]*$')
+
+
+def _validate_hcl_identifier(name):
+    """Validate that name is a syntactically legal HCL identifier.
+
+    Raises ValueError on rejection. HCL block labels (such as variable
+    names) MUST be valid identifiers; allowing arbitrary strings here
+    would let attackers inject closing braces and append new blocks.
+    """
+    if not isinstance(name, str) or not _HCL_IDENTIFIER_RE.match(name):
+        raise ValueError(
+            f"Invalid HCL identifier: {name!r}. Identifiers must start "
+            "with a letter or underscore and contain only letters, "
+            "digits, underscores or hyphens."
+        )
+    return name
+
 
 class OCITerraformGenerator(OCIGenerator):
     DIRECTORY_SUFFIX = 'terraform'
@@ -64,9 +181,14 @@ class OCITerraformGenerator(OCIGenerator):
             #variable_definitions.append('variable "{0:s}" {{\ndefault = "{1}"\n}}'.format(key, value))
         writeTerraformFile(os.path.join(self.output_dir, self.VARIABLES_FILE_NAME), variable_definitions)
         writeTerraformFile(os.path.join(self.output_dir, self.TERRAFORM_FILE_NAME), variable_values)
-        # User Defined - Unchecked Terraform
-        user_defined_terraform = self.visualiser_json.get('user_defined', {}).get('terraform', '')
-        if user_defined_terraform.rstrip() != '':
+        # User Defined - sanitize before writing
+        user_defined_raw = self.visualiser_json.get('user_defined', {}).get('terraform', '')
+        if user_defined_raw.rstrip() != '':
+            try:
+                user_defined_terraform = _sanitize_user_defined_terraform(user_defined_raw)
+            except ValueError as e:
+                logger.warning(f'Rejected user_defined.terraform: {e}')
+                raise
             writeTerraformFile(os.path.join(self.output_dir, self.USER_DEFINED_FILE_NAME), [user_defined_terraform])
 
         return
@@ -89,14 +211,21 @@ class OCITerraformGenerator(OCIGenerator):
                 variable_values.append('{0!s:s} = "{1}"'.format(key, value))
             variable_definitions.append('variable "{0:s}" {{}}'.format(key))
         for var in [v for v in self.visualiser_json.get('variables_schema', {}).get('variables',[]) if v['name'] != '']:
+            # Validate the variable name as a real HCL identifier; reject
+            # anything that could close the block or inject new HCL.
+            try:
+                safe_name = _validate_hcl_identifier(var['name'])
+            except ValueError as e:
+                logger.warning(f'Skipping variable with invalid name: {e}')
+                continue
             var_def = ['{']
-            if var['default'] != '':
-                var_def.append(f'    default = "{var["default"]}"')
-            if var['description'] != '':
-                var_def.append(f'    description = "{var["description"]}"')
+            if var.get('default', '') != '':
+                var_def.append(f'    default = "{_escape_hcl_string(var["default"])}"')
+            if var.get('description', '') != '':
+                var_def.append(f'    description = "{_escape_hcl_string(var["description"])}"')
             var_def.append('}')
             var_def = "\n".join(var_def)
-            variable_definitions.append(f'variable "{var["name"]}" {var_def}')
+            variable_definitions.append(f'variable "{safe_name}" {var_def}')
         return variable_definitions
     
     def getVariableValues(self):
@@ -120,7 +249,8 @@ class OCITerraformGenerator(OCIGenerator):
             "variables.tf": '\n'.join(self.getVariableDefinitions()),
             "terraform.tfvar": '\n'.join(self.getVariableValues()),
             # "output.tf": '\n'.join(self.getRenderedOutput()),
-            "user_defined.tf": self.visualiser_json.get('user_defined', {}).get('terraform', '')
+            "user_defined.tf": _sanitize_user_defined_terraform(
+                self.visualiser_json.get('user_defined', {}).get('terraform', ''))
         }
         return generated_tf
 
@@ -138,7 +268,8 @@ class OCITerraformGenerator(OCIGenerator):
         for key, value in self.rendered_resources.items():
             if len(value) > 0:
                 generated_tf[f'{key}.tf'] = '\n'.join(value)
-        generated_tf[self.USER_DEFINED_FILE_NAME] = self.visualiser_json.get('user_defined', {}).get('terraform', '')
+        generated_tf[self.USER_DEFINED_FILE_NAME] = _sanitize_user_defined_terraform(
+            self.visualiser_json.get('user_defined', {}).get('terraform', ''))
         generated_tf[self.VARIABLES_FILE_NAME] = '\n'.join(self.getVariableDefinitions())
         generated_tf[self.TERRAFORM_FILE_NAME] = '\n'.join(self.getVariableValues())
         # logger.info(jsonToFormattedString(generated_tf))
@@ -184,5 +315,3 @@ class OCITerraformGenerator(OCIGenerator):
         else:
             self.jinja2_variables.pop("defined_tags", None)
         return
-
-
