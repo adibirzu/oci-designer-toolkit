@@ -7,7 +7,7 @@
 """
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-__author__ = ["Andrew Hopkinson (Oracle Cloud Solutions A-Team)"]
+__author__ = ["Anderson Souza (Oracle Edge Cloud Engineering Solutions)"]
 __version__ = "1.0.0.0"
 __module__ = "okitExport"
 
@@ -44,6 +44,57 @@ bp = Blueprint('export', __name__, url_prefix='/okit/export', static_folder='sta
 debug_mode = bool(str(os.getenv('DEBUG_MODE', 'False')).title())
 template_root = f'{getOkitHome()}/modules/templates'
 
+
+def _safe_join_under(base_dir, *user_segments):
+    """Safely join user-supplied path segments under base_dir.
+
+    Resolves the final path to its canonical absolute form and verifies it
+    remains a descendant of base_dir. Rejects any input containing path
+    traversal sequences such as '..' or absolute paths that would escape
+    the intended root. Returns the normalized absolute path on success.
+
+    Raises PermissionError if the resolved path would escape base_dir.
+    """
+    base_abs = os.path.realpath(os.path.abspath(base_dir))
+
+    # Sanitize each user-supplied segment: strip separators and reject any
+    # segment that contains a parent-directory reference or is absolute.
+    cleaned_segments = []
+    for segment in user_segments:
+        if segment is None:
+            continue
+        segment = str(segment).strip()
+        if not segment:
+            continue
+        # Check for absolute paths BEFORE stripping separators so we catch
+        # POSIX ('/etc'), Windows drive ('C:\\'), and backslash-prefixed paths.
+        if (os.path.isabs(segment)
+                or segment.startswith('\\')
+                or (len(segment) >= 2 and segment[1] == ':')):
+            raise PermissionError("Path traversal attempt detected: absolute path not allowed")
+        segment = segment.strip('/').strip('\\')
+        if not segment:
+            continue
+        # Split on both separators to catch mixed-separator inputs
+        parts = segment.replace('\\', '/').split('/')
+        for part in parts:
+            if part in ('', '.'):
+                continue
+            if part == '..':
+                raise PermissionError("Path traversal attempt detected: parent reference not allowed")
+            cleaned_segments.append(part)
+
+    candidate = os.path.realpath(os.path.abspath(os.path.join(base_abs, *cleaned_segments)))
+
+    # Final verification: ensure candidate is base_abs or a descendant of it.
+    # Compare with a trailing separator to avoid prefix collisions
+    # (e.g. '/var/app' vs '/var/app-evil').
+    base_with_sep = base_abs.rstrip(os.sep) + os.sep
+    if candidate != base_abs and not candidate.startswith(base_with_sep):
+        raise PermissionError("Path traversal attempt detected: resolved path escapes base directory")
+
+    return candidate
+
 @bp.route('terraform', methods=(['GET']))
 def terraform():
     if request.method == 'GET':
@@ -58,7 +109,11 @@ def terraform():
         add_suffix = True
         response_json = {}
         if destination == 'file':
-            destination_dir = os.path.join(instance_path, root_dir.strip('/'), directory.strip('/'))
+            try:
+                destination_dir = _safe_join_under(instance_path, root_dir, directory)
+            except PermissionError as e:
+                logger.warning(f'Rejected export request: {e} (root_dir={root_dir!r}, directory={directory!r})')
+                return json.dumps({'error': 'Invalid destination path'}), 400, {'Content-Type': 'application/json'}
             add_suffix = False
         elif destination == 'git':
             destination_dir = '/tmp'
@@ -85,9 +140,17 @@ def terraform():
         elif destination == 'json':
             response_json = generator.toJson()
         if git:
-            top_dir = os.path.normpath(os.path.dirname(directory.strip('/'))).split(os.sep)
-            git_repo_dir = os.path.join(instance_path, root_dir, top_dir[0], top_dir[1])
-            full_directory_name = os.path.join(instance_path, root_dir, directory.strip('/'))
+            try:
+                full_directory_name = _safe_join_under(instance_path, root_dir, directory)
+                # Derive the git repo dir from the validated full path rather than
+                # re-joining unsanitized inputs.
+                top_dir = os.path.normpath(os.path.dirname(directory.strip('/'))).split(os.sep)
+                if len(top_dir) < 2 or '..' in top_dir:
+                    raise PermissionError("Invalid git repository path structure")
+                git_repo_dir = _safe_join_under(instance_path, root_dir, top_dir[0], top_dir[1])
+            except PermissionError as e:
+                logger.warning(f'Rejected git export request: {e}')
+                return json.dumps({'error': 'Invalid git destination path'}), 400, {'Content-Type': 'application/json'}
             logger.debug(f'Git Root Dir : {git_repo_dir}')
             logger.debug(f'Directory : {directory}')
             logger.debug(f'Dest Directory : {full_directory_name}')
@@ -135,7 +198,11 @@ def resourceManager():
         add_suffix = True
         response_json = {}
         if destination == 'file':
-            destination_dir = os.path.join(instance_path, root_dir.strip('/'), directory.strip('/'))
+            try:
+                destination_dir = _safe_join_under(instance_path, root_dir, directory)
+            except PermissionError as e:
+                logger.warning(f'Rejected export request: {e} (root_dir={root_dir!r}, directory={directory!r})')
+                return json.dumps({'error': 'Invalid destination path'}), 400, {'Content-Type': 'application/json'}
             add_suffix = False
         elif destination == 'git':
             destination_dir = '/tmp'
@@ -162,9 +229,15 @@ def resourceManager():
         elif destination == 'json':
             response_json = generator.toJson()
         if git:
-            top_dir = os.path.normpath(os.path.dirname(directory.strip('/'))).split(os.sep)
-            git_repo_dir = os.path.join(instance_path, root_dir, top_dir[0], top_dir[1])
-            full_directory_name = os.path.join(instance_path, root_dir, directory.strip('/'))
+            try:
+                full_directory_name = _safe_join_under(instance_path, root_dir, directory)
+                top_dir = os.path.normpath(os.path.dirname(directory.strip('/'))).split(os.sep)
+                if len(top_dir) < 2 or '..' in top_dir:
+                    raise PermissionError("Invalid git repository path structure")
+                git_repo_dir = _safe_join_under(instance_path, root_dir, top_dir[0], top_dir[1])
+            except PermissionError as e:
+                logger.warning(f'Rejected git export request: {e}')
+                return json.dumps({'error': 'Invalid git destination path'}), 400, {'Content-Type': 'application/json'}
             logger.debug(f'Git Root Dir : {git_repo_dir}')
             logger.debug(f'Directory : {directory}')
             logger.debug(f'Dest Directory : {full_directory_name}')
