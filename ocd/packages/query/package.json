@@ -25,6 +25,16 @@
             "types": "./lib/cjs/index.d.ts",
             "default": "./lib/cjs/index.js"
         }
+    },
+    "./pricing": {
+        "import": {
+            "types": "./lib/esm/OciPriceListQuery.d.ts",
+            "default": "./lib/esm/OciPriceListQuery.js"
+        },
+        "require": {
+            "types": "./lib/cjs/OciPriceListQuery.d.ts",
+            "default": "./lib/cjs/OciPriceListQuery.js"
+        }
     }
   },
   "main": "lib/cjs/index.js",
