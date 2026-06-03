@@ -23,6 +23,7 @@
   "main": ".vite/build/main.js",
   "scripts": {
     "dev": "vite",
+    "web": "vite --host 0.0.0.0",
     "vite-build": "tsc -b ./tsconfig.json && vite build",
     "clean": "rm -rf lib dist .vite out",
     "purge": "npm run clean && rm -rf node_modules",
