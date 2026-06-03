@@ -91,6 +91,8 @@ output/
 log/
 /instance/
 okitclassic/instance/
+baselines/oci-landing-zones/
+addons/oci-observability-end-to-end/dist/
 
 # Testing
 test
@@ -101,5 +103,11 @@ workspace
 # Others
 .coverage
 htmlcov/
+
+# Logs and tooling artifacts
+*.log
+firebase-debug.log*
+firestore-debug.log*
+.firebase/
 
 # Build
