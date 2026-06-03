@@ -1,7 +1,19 @@
 [![License: UPL](https://img.shields.io/badge/license-UPL-green)](https://img.shields.io/badge/license-UPL-green) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=oracle_oci-designer-toolkit&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=oracle_oci-designer-toolkit)
 # Oracle Edge Cloud Infrastructure Designer and Visualisation Toolkit [OKIT-Desktop 0.3.0](CHANGELOG.md#okit-desktop-version-0.3.0) / [OKIT-Classic 0.70.0](CHANGELOG.md#okit-classic-version-0.70.0)
 
-
+> [!NOTE]
+> ## 🛠️ This is an enhanced fork
+>
+> This fork extends the upstream OCI Designer Toolkit (OKIT) with new features focused on **OCI Landing Zones** and a refreshed Oracle Redwood UI/UX. It is a work in progress; expect rapid iteration on the items below.
+>
+> **What we are adding**
+> - **Oracle Redwood (Next-Gen) theme** — aligning OCD's look and feel with the [Landing Zone Next Gen](https://lzng.netlify.app/) designer (Oracle Redwood palette, Segoe UI typography, accessible focus states).
+> - **Real cost estimation** — wiring Oracle's public [OCI list-pricing API](https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/signingup_topic-Estimating_Costs.htm) (`apexapps.oracle.com/.../cetools/api/v1/products/`) into the BoM/cost page, replacing static placeholders, with multi-currency support. _(Closes upstream #143.)_
+> - **OCI Landing Zone mapping** — Observability Landing Zone templates (Free-First and Full-Enterprise), generated Terraform / Resource Manager packages, and a versioned baseline manifest that maps every add-on variable to its Terraform variable, `.auto.tfvars.json` key, OKIT model path, and official [OCI Landing Zones](https://github.com/oracle-quickstart/terraform-oci-open-lz) convention.
+> - **Landing Zone Wizard** — a wizard-driven Landing Zone generator integrated as a new mode inside the designer.
+> - **Expanded OCI resource coverage & reliability** — OKE node pools, NSG-to-NSG rules, LB listeners, and Resource Manager export hardening.
+>
+> See [`docs/observability-landing-zone-enhancements.md`](docs/observability-landing-zone-enhancements.md) for the detailed enhancement log and upstream-issue coverage.
 
 > [!IMPORTANT]  
 > ___As of June 2025 OKIT-Classic and OKIT-Desktop will drop full OCI and Multi-Cloud support and become a pure Oracle Edge Cloud tool.___ 
