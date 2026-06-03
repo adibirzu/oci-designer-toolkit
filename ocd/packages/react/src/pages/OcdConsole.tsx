@@ -95,7 +95,7 @@ export const OcdConsole = (): JSX.Element => {
                         <ConsoleConfigProvider>
                             <CacheProvider>
                                 <ThemeProvider>
-                                    <div className='ocd-console'>
+                                    <div className={`ocd-console ocd-console-${ocdConsoleConfig.config.theme}-theme`}>
                                         <OcdConsoleHeader ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} />
                                         <OcdConsoleToolbar ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} />
                                         <OcdConsoleBody ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} />
@@ -194,7 +194,8 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
     }
     const onEstimateClick = () => {
-        console.info('Estimate Clicked')
+        ocdConsoleConfig.config.displayPage = 'bom'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
     }
     let PageLeftToolbar = OcdEmptyLeftRightToolbar
     let PageRightToolbar = OcdEmptyLeftRightToolbar
@@ -249,7 +250,7 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                         setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} 
                         />
                     <div className={validateClassName} title={validateTitle} onClick={onValidateClick} aria-hidden></div>
-                    {/* <div className='cost-estimate ocd-console-toolbar-icon' onClick={onEstimateClick}></div> */}
+                    <div className='cost-estimate ocd-console-toolbar-icon' title='BoM and Cost Estimate' onClick={onEstimateClick} aria-hidden></div>
                 </div>
             </div>
         </div>
