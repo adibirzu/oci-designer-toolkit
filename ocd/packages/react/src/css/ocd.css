@@ -1510,6 +1510,104 @@ table {
 ** Tabular View
 */
 
+.ocd-bom-view {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100%;
+    padding: 16px;
+    overflow: auto;
+}
+
+.ocd-bom-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.ocd-bom-summary-card,
+.ocd-bom-panel,
+.ocd-bom-cost-line {
+    border: var(--tabular-line-colour) solid 1px;
+    border-radius: 6px;
+    background: #ffffff;
+    padding: 12px;
+}
+
+.ocd-bom-summary-card {
+    display: grid;
+    gap: 6px;
+}
+
+.ocd-bom-summary-card span,
+.ocd-bom-cost-line span,
+.ocd-bom-note {
+    color: #6b7280;
+    font-size: smaller;
+}
+
+.ocd-bom-summary-card strong {
+    font-size: x-large;
+}
+
+.ocd-bom-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr) minmax(260px, 1fr);
+    gap: 12px;
+}
+
+.ocd-bom-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ocd-bom-table th,
+.ocd-bom-table td {
+    border-bottom: var(--tabular-line-colour) solid 1px;
+    padding: 6px;
+    text-align: left;
+}
+
+.ocd-bom-cost-line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ocd-bom-cost-line code {
+    font-weight: bold;
+}
+
+.ocd-bom-usage {
+    display: grid;
+    gap: 10px;
+}
+
+.ocd-bom-usage span {
+    font-weight: bold;
+}
+
+.ocd-bom-usage code {
+    display: block;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: auto;
+    padding: 8px;
+    border: #d1d5db solid 1px;
+    border-radius: 4px;
+    background: #f9fafb;
+    white-space: nowrap;
+}
+
+@media (max-width: 980px) {
+    .ocd-bom-summary,
+    .ocd-bom-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .ocd-tabular-view {
     display: flex;
     flex-direction: column;
@@ -2370,6 +2468,17 @@ table {
     font-size: var(--dialog-input-font-size);
     height: 1.5em;
     vertical-align: middle;
+}
+
+.ocd-resource-manager-status {
+    display: inline-block;
+    font-family: var(--dialog-input-font-family);
+    font-size: var(--dialog-input-font-size);
+    max-width: 410px;
+}
+
+.ocd-resource-manager-error {
+    color: #b42318;
 }
 
 
