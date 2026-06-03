@@ -4,6 +4,7 @@
 */
 
 import { OutputDataStringArray } from "@ocd/export"
+import { getOciPriceList as fetchOciPriceList, PriceMap } from "@ocd/query/pricing"
 
 /*
 ** Facade exists so we can switch between Electron based and Web based which will require a web server
@@ -34,13 +35,26 @@ export namespace OciApiFacade {
     export const listStacks = (profile: string = 'DEFAULT', region: string = 'uk-london-1', compartmentId: string = ''): Promise<any> => {
         return window.ocdAPI ? window.ocdAPI.listStacks(profile, region, compartmentId) : Promise.reject(new Error('Currently Not Implemented'))
     }
-    export const createStack = (profile: string = 'DEFAULT', region: string = 'uk-london-1', compartmentId: string = '', data: OutputDataStringArray = {}, apply: boolean = false): Promise<any> => {
-        return window.ocdAPI ? window.ocdAPI.createStack(profile, region, compartmentId, data, apply) : Promise.reject(new Error('Currently Not Implemented'))
+    export const createStack = (profile: string = 'DEFAULT', region: string = 'uk-london-1', compartmentId: string = '', stackName: string = '', data: OutputDataStringArray = {}, apply: boolean = false): Promise<any> => {
+        return window.ocdAPI ? window.ocdAPI.createStack(profile, region, compartmentId, stackName, data, apply) : Promise.reject(new Error('Currently Not Implemented'))
     }
     export const updateStack = (profile: string = 'DEFAULT', region: string = 'uk-london-1', stackId: string = '', data: OutputDataStringArray = {}, apply: boolean = false): Promise<any> => {
         return window.ocdAPI ? window.ocdAPI.updateStack(profile, region, stackId, data, apply) : Promise.reject(new Error('Currently Not Implemented'))
     }
     export const createJob = (profile: string = 'DEFAULT', region: string = 'uk-london-1', stackId: string = '', apply: boolean = false): Promise<any> => {
         return window.ocdAPI ? window.ocdAPI.createJob(profile, region, stackId, apply) : Promise.reject(new Error('Currently Not Implemented'))
+    }
+    /*
+    ** OCI list-pricing lookup. Desktop routes through the Electron main process
+    ** (no CORS, 24h disk cache). Web has no Electron bridge, so it fetches via
+    ** the vite dev `server.proxy` mount at '/api/pricing' (see
+    ** vite.renderer.config.mts). For a production web deployment, host an
+    ** equivalent reverse proxy that forwards '/api/pricing' to
+    ** https://apexapps.oracle.com/pls/apex/cetools/api/v1/products.
+    */
+    export const getOciPriceList = (partNumbers: string[] = [], currency: string = 'USD'): Promise<PriceMap> => {
+        return window.ocdAPI
+            ? window.ocdAPI.getOciPriceList(partNumbers, currency)
+            : fetchOciPriceList(partNumbers, currency, { baseUrl: '/api/pricing' })
     }
 }

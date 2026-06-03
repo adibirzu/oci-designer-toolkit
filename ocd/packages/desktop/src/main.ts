@@ -15,6 +15,7 @@ import { OcdDesign, OcdResource, OciModelResources } from '@ocd/model'
 import { OcdCache, OcdConsoleConfiguration } from '@ocd/react'
 import { OcdExcelExporter, OcdMarkdownExporter, OcdSVGExporter, OcdTerraformExporter } from '@ocd/export'
 import { OcdTerraformImporter } from '@ocd/import'
+import { handleGetOciPriceList } from './handlers/OciPriceListHandlers'
 
 app.commandLine.appendSwitch('ignore-certificate-errors') // Temporary work around for not being able to add additional certificates
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Temporary work around for not being able to add additional certificates
@@ -254,7 +255,9 @@ app.whenReady().then(() => {
 	ipcMain.handle('OciResourceManager:createStack', handleCreateStack)
 	ipcMain.handle('OciResourceManager:updateStack', handleUpdateStack)
 	ipcMain.handle('OciResourceManager:createJob', handleCreateJob)
-	// OCD Design 
+	// OCI Pricing (unauthenticated public list-pricing API)
+	ipcMain.handle('ociPricing:getPriceList', handleGetOciPriceList)
+	// OCD Design
 	ipcMain.handle('ocdDesign:loadDesign', handleLoadDesign)
 	ipcMain.handle('ocdDesign:saveDesign', handleSaveDesign)
 	ipcMain.handle('ocdDesign:discardConfirmation', handleDiscardConfirmation)
@@ -393,16 +396,22 @@ async function handleListStacks(event: any, profile: string, region: string, com
 	return ociQuery.query([compartmentId])
 }
 // Resource Manager
-async function handleUpdateStack(event: any) {
+async function handleUpdateStack(event: any, profile: string, region: string, stackId: string, data: any, apply: boolean) {
 	console.debug('Electron Main: handleUpdateStack')
+	const ociQuery = new OciResourceManagerQuery(profile, region)
+	return ociQuery.updateStack(stackId, data, apply)
 }
 
-async function handleCreateStack(event: any) {
+async function handleCreateStack(event: any, profile: string, region: string, compartmentId: string, stackName: string, data: any, apply: boolean) {
 	console.debug('Electron Main: handleCreateStack')
+	const ociQuery = new OciResourceManagerQuery(profile, region)
+	return ociQuery.createStack(compartmentId, stackName, data, apply)
 }
 
-async function handleCreateJob(event: any) {
+async function handleCreateJob(event: any, profile: string, region: string, stackId: string, apply: boolean) {
 	console.debug('Electron Main: handleCreateJob')
+	const ociQuery = new OciResourceManagerQuery(profile, region)
+	return ociQuery.createJob(stackId, apply)
 }
 
 
@@ -672,13 +681,11 @@ async function handleLoadLibraryIndex(event: any) {
 function getLibrarySectionSvg(libraryIndex: Record<string, Record<string, string>[]>, section: string) {
 	return new Promise((resolve, reject) => {
 		const librarySection = libraryIndex[section]
-		const svgRequests = librarySection.map((design) => new Request(`${libraryUrl}/${section}/${design.svgFile}`))
-		const svgUrls = svgRequests.map((request) => fetch(request))
-		Promise.allSettled(svgUrls).then((results) => Promise.allSettled(results.map((r) => r.value.text()))).then((svg) => {
-			svg.forEach((r, i) => {
+		const svgUrls = librarySection.map((design, index) => fetch(new Request(`${libraryUrl}/${section}/${design.svgFile}`)).then((response) => response.text()).then((text) => ({index, text})))
+		Promise.allSettled(svgUrls).then((svg) => {
+			svg.filter((r): r is PromiseFulfilledResult<{index: number, text: string}> => r.status === 'fulfilled').forEach((r) => {
 				console.debug('Electron Main: getLibrarySectionSvg: Svg Query Results', section, r.status)
-				// console.debug('Electron Main: getLibrarySectionSvg: Svg Query Results', r.value)
-				librarySection[i].dataUri = `data:image/svg+xml,${encodeURIComponent(r.value)}`
+				librarySection[r.value.index].dataUri = `data:image/svg+xml,${encodeURIComponent(r.value.text)}`
 				// librarySection[i].dataUri = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(r.value)))}`
 			})
 			resolve(librarySection)
