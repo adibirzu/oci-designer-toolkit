@@ -38,7 +38,6 @@ const config: ForgeConfig = {
     }), 
     // new MakerZIP({}, ['darwin']), 
     new MakerDMG({
-      appPath: 'ocd', 
       background: './public/assets/background.png',
       icon: './public/assets/icon.icns',
       title: 'OKIT - Open Cloud Designer',

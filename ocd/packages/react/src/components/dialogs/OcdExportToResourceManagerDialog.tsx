@@ -29,6 +29,8 @@ export const OcdExportToResourceManagerDialog = ({ocdDocument, setOcdDocument}: 
     const [selectedStack, setSelectedStack] = useState('')
     const [stackName, setStackName] = useState('')
     const [stacks, setStacks] = useState([])
+    const [actionStatus, setActionStatus] = useState('')
+    const [actionError, setActionError] = useState('')
     const refs: Record<string, React.RefObject<any>> = compartments.reduce((acc, value: OciModelResources.OciCompartment) => {
         acc[value.hierarchy] = React.createRef();
         return acc;
@@ -82,10 +84,16 @@ export const OcdExportToResourceManagerDialog = ({ocdDocument, setOcdDocument}: 
         console.debug('OcdExportToResourceManagerDialog: loadStacks: Profile', profile, region, compartmentId)
         OciApiFacade.listStacks(profile, region, compartmentId).then((results) => {
             console.debug('OcdExportToResourceManagerDialog: Stacks', results)
-            if (results.stacks) setStacks(results.stacks)
-            else setStacks([])
+            if (results.stacks) {
+                setStacks(results.stacks)
+                setSelectedStack(results.stacks.length > 0 ? results.stacks[0].id : '')
+            } else {
+                setStacks([])
+                setSelectedStack('')
+            }
         }).catch((reason) => {
             setStacks([])
+            setSelectedStack('')
         })
     }
     useEffect(() => {
@@ -104,21 +112,38 @@ export const OcdExportToResourceManagerDialog = ({ocdDocument, setOcdDocument}: 
         setOcdDocument(clone)
     }
     const onClickStackAction = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+        setActionStatus('')
+        setActionError('')
+        if (selectedCompartmentIds.length === 0) {
+            setActionError('Select a compartment before exporting to Resource Manager.')
+            return
+        }
+        if (createStack && stackName.trim().length === 0) {
+            setActionError('Enter a stack name before creating the Resource Manager stack.')
+            return
+        }
+        if (!createStack && selectedStack.trim().length === 0) {
+            setActionError('Select an existing Resource Manager stack to update.')
+            return
+        }
         setWorkingClassName('ocd-query-wrapper')
         console.debug('OcdExportToResourceManagerDialog: Selected Compartments', selectedCompartmentIds)
-        OciApiFacade.queryTenancy(selectedProfile, selectedCompartmentIds, selectedRegion).then((results) => {
-            // @ts-ignore
-            console.debug('OcdExportToResourceManagerDialog: Query Tenancy', JSON.stringify(results, null, 2))
-            const exporter = new OcdResourceManagerExporter()
-            const terraform = exporter.export(ocdDocument.design)
-            console.debug('OcdExportToResourceManagerDialog: Terraform', JSON.stringify(terraform, null, 2))
-            const clone = OcdDocument.clone(ocdDocument)
-            clone.dialog.resourceManager = false
-            setOcdDocument(clone)
+        const exporter = new OcdResourceManagerExporter()
+        const terraform = exporter.export(ocdDocument.design)
+        const stackAction = createStack
+            ? OciApiFacade.createStack(selectedProfile, selectedRegion, selectedCompartmentIds[0], stackName, terraform, applyStack)
+            : OciApiFacade.updateStack(selectedProfile, selectedRegion, selectedStack, terraform, applyStack)
+        stackAction.then((results) => {
+            console.debug('OcdExportToResourceManagerDialog: Resource Manager Results', JSON.stringify(results, null, 2))
+            const stackDisplay = results.stack?.displayName ? results.stack.displayName : createStack ? stackName : selectedStack
+            const jobDisplay = results.job?.id ? ` Job ${results.job.id} submitted.` : ''
+            setActionStatus(`${createStack ? 'Created' : 'Updated'} stack ${stackDisplay}.${jobDisplay}`)
+            setWorkingClassName('ocd-query-wrapper hidden')
         }).catch((reason) => {
-            const clone = OcdDocument.clone(ocdDocument)
-            clone.dialog.resourceManager = false
-            setOcdDocument(clone)
+            console.warn('OcdExportToResourceManagerDialog: Resource Manager export failed', reason)
+            setActionError(`${reason}`)
+            setWorkingClassName('ocd-query-wrapper hidden')
         })
     }
     const onCompartmentSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,6 +202,11 @@ export const OcdExportToResourceManagerDialog = ({ocdDocument, setOcdDocument}: 
                         <div>Execute</div><div className="ocd-radio-buttons">
                             <label><input type="radio" name="planApplyStack" value={'Plan'} checked={!applyStack} onChange={() => setApplyStack(false)}></input>Plan</label>
                             <label><input type="radio" name="planApplyStack" value={'Apply'} checked={applyStack} onChange={() => setApplyStack(true)}></input>Apply</label>
+                        </div>
+                        <div>Status</div><div className="ocd-resource-manager-status">
+                            {actionError && <span className="ocd-resource-manager-error">{actionError}</span>}
+                            {actionStatus && <span>{actionStatus}</span>}
+                            {!actionError && !actionStatus && <span>Ready to package Terraform and submit a Resource Manager job.</span>}
                         </div>
                     </div>
                 </div>
