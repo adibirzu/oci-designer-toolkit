@@ -25,6 +25,13 @@
         "install": "cd ocd && npm install",
         "compile": "cd ocd && npm run compile-for-codegen",
         "generate": "cd ocd && npm run import-and-generate",
+        "generate-observability-lz": "cd ocd && npm run generate-observability-lz",
+        "validate-observability-lz": "cd ocd && npm run validate-observability-lz",
+        "validate-observability-lz-terraform": "python scripts/validate_observability_lz_terraform.py",
+        "sync-oci-lz-baselines": "cd ocd && npm run sync-oci-lz-baselines",
+        "package-observability-lz": "python scripts/package_observability_lz_addon.py",
+        "estimate-observability-lz-costs": "python scripts/estimate_observability_lz_costs.py",
+        "audit-observability-lz": "python scripts/audit_observability_lz_addon.py",
         "build": "cd ocd && npm run build"
     }
 }
