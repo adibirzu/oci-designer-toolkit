@@ -118,6 +118,8 @@ PART_NUMBERS: tuple[str, ...] = (
     "B90618",  # Oracle Functions - Invocations (1MIL Invocations, list 0)
     "B90617",  # Oracle Functions - Execution Time (10,000 GB Memory-Seconds, list 0)
     "B92072",  # API Gateway - 1,000,000 API Calls Per Month
+    "B95697",  # OCI Queue - 1,000,000 Requests
+    "B94277",  # Web Application Firewall - Requests (1M Incoming Requests Per Month)
 )
 
 DEFAULT_CURRENCIES = ("USD", "EUR", "GBP", "JPY", "AUD", "CAD")

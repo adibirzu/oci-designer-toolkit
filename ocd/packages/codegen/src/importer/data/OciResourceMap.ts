@@ -79,6 +79,14 @@ export const resourceMap: OcdResourceMap = {
     // "oci_oda_oda_instance": "oda_instance",
     "oci_vault_secret": "secret",
     // "oci_visual_builder_vb_instance": "visual_builder_instance"
+    "oci_streaming_stream": "streaming_stream",
+    "oci_apigateway_gateway": "api_gateway",
+    "oci_apigateway_deployment": "api_deployment",
+    "oci_sch_service_connector": "service_connector",
+    "oci_events_rule": "events_rule",
+    "oci_queue_queue": "queue",
+    "oci_budget_budget": "budget",
+    "oci_waf_web_app_firewall": "web_app_firewall"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -985,5 +993,62 @@ export const resourceAttributes: OcdIncludedElements = {
         "secret_content.content",
         "secret_content.content_type",
         // "secret_content.name",
+    ],
+    "oci_streaming_stream": [
+        "name",
+        "partitions",
+        "retention_in_hours",
+        "stream_pool_id"
+    ],
+    "oci_apigateway_gateway": [
+        "display_name",
+        "endpoint_type",
+        "subnet_id",
+        "certificate_id",
+        "network_security_group_ids"
+    ],
+    "oci_apigateway_deployment": [
+        "display_name",
+        "gateway_id",
+        "path_prefix"
+    ],
+    "oci_sch_service_connector": [
+        "display_name",
+        "description",
+        "state"
+    ],
+    "oci_events_rule": [
+        "display_name",
+        "description",
+        "condition",
+        "is_enabled"
+    ],
+    "oci_queue_queue": [
+        "display_name",
+        "channel_consumption_limit",
+        "custom_encryption_key_id",
+        "dead_letter_queue_delivery_count",
+        "retention_in_seconds",
+        "timeout_in_seconds",
+        "visibility_in_seconds"
+    ],
+    "oci_budget_budget": [
+        "display_name",
+        "description",
+        "amount",
+        "reset_period",
+        "processing_period_type",
+        "budget_processing_period_start_offset",
+        "start_date",
+        "end_date",
+        "target_type",
+        "target_compartment_id",
+        "targets"
+    ],
+    "oci_waf_web_app_firewall": [
+        "display_name",
+        "backend_type",
+        "load_balancer_id",
+        "web_app_firewall_policy_id"
     ],
 }
