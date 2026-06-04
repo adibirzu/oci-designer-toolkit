@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'path'
 
 // Standalone STATIC web build of the Electron renderer for GitHub Pages.
 //
@@ -40,10 +41,36 @@ function normalizeBase(raw: string | undefined): string {
 
 const base = normalizeBase(process.env.OCD_PAGES_BASE)
 
+// Resolve the @ocd/react workspace package root.
+// When Vite processes the static web build it dereferences the npm workspace
+// symlink (node_modules/@ocd/react -> ../../packages/react). The dist/ files
+// are already-bundled prebuilt chunks; they carry circular inter-dependencies
+// that prevent Rollup's manualChunks from splitting them further.
+// Pointing directly at the TypeScript source lets Vite:
+//   1. Honour the existing React.lazy() boundary (OcdLandingZone stays lazy).
+//   2. Route third-party packages (@xyflow/react, exceljs, react-markdown …)
+//      through manualChunks because they live in workspace node_modules and
+//      their ids contain "node_modules/".
+//   3. Avoid duplicate React / ReactDOM copies (prebuilt chunks bundled their
+//      own copy of @xyflow/react's react dep into index-Cdi2_*.js).
+const ocdReactSrc = resolve(__dirname, '../../packages/react/src/index.ts')
+
 // https://vitejs.dev/config
 export default defineConfig({
   base,
   assetsInclude: ['**/*.wasm'],
+  // Route @ocd/react to its TypeScript source so Vite can split the bundle
+  // properly (see comment above). The esbuild JSX settings are required because
+  // the source contains .tsx files that need the React automatic runtime.
+  resolve: {
+    alias: {
+      '@ocd/react': ocdReactSrc,
+    },
+  },
+  esbuild: {
+    jsx: 'automatic',
+    jsxImportSource: 'react',
+  },
   build: {
     target: 'esnext',
     // Dedicated output dir so the static build never collides with electron-forge's
@@ -67,10 +94,12 @@ export default defineConfig({
           if (pkg === 'oci-sdk') return 'vendor-oci-sdk'         // OCI SDK, large
           if (pkg === '@xyflow/react') return 'vendor-reactflow' // wizard diagram
           if (pkg === 'react' || pkg === 'react-dom' || pkg === 'scheduler') return 'vendor-react'
-          if (pkg === 'react-markdown' || pkg.startsWith('remark') || pkg.startsWith('rehype') ||
-              pkg.startsWith('micromark') || pkg.startsWith('mdast') || pkg.startsWith('hast') ||
-              pkg.startsWith('unist') || pkg === 'unified') return 'vendor-markdown'
-          return 'vendor' // everything else
+          // NOTE: react-markdown and its unified/remark/rehype/hast/micromark ecosystem
+          // packages form a circular import graph with other vendor packages (hast-util-*)
+          // when split into a separate chunk from source. Merging them into the main
+          // vendor bundle eliminates the TDZ/circular-chunk issue. They are medium-weight
+          // (~130 kB gzip) and used only on the Documentation tab.
+          return 'vendor' // everything else (incl. markdown ecosystem)
         },
       },
     },
