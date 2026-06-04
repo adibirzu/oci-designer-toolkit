@@ -301,8 +301,21 @@ function resolveFamilyKey(shape: string): string | undefined {
 ** Always-Free / Micro shapes resolve to a zero-cost mapping. Unrecognized
 ** shapes resolve to the E5 fallback (flagged approximate). Never throws.
 */
+// Memoize by shape name — estimateMonthlyCost + collectRequiredPartNumbers both
+// resolve every instance's shape, so cache the (immutable) result to avoid re-running
+// the family regexes on each BoM render. Callers treat the result as read-only.
+const shapeSkuCache = new Map<string, ResolvedShapeSku>()
+
 export function resolveShapeSkus(shapeName: unknown): ResolvedShapeSku {
     const shape = typeof shapeName === 'string' ? shapeName : ''
+    const cached = shapeSkuCache.get(shape)
+    if (cached) return cached
+    const result = computeShapeSkus(shape)
+    shapeSkuCache.set(shape, result)
+    return result
+}
+
+function computeShapeSkus(shape: string): ResolvedShapeSku {
     if (shape.length === 0) {
         return { ...FALLBACK_E5, familyKey: 'fallback', alwaysFree: false }
     }

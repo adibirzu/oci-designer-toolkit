@@ -17,7 +17,7 @@ import { OcdDesignerBrowserActions } from "../actions/OcdDesignBrowserActions"
 ** dialog / fs read is Electron-specific.
 */
 const pickAndReadTextFiles = (accept: string, multiple = true): Promise<{ canceled: boolean; filename: string; text: string }> =>
-    new Promise((resolve) => {
+    new Promise((resolve, reject) => {
         const input = document.createElement('input')
         input.type = 'file'
         input.accept = accept
@@ -28,9 +28,12 @@ const pickAndReadTextFiles = (accept: string, multiple = true): Promise<{ cancel
             if (files.length === 0) {
                 resolve({ canceled: true, filename: '', text: '' })
             } else {
+                // Concatenating multiple HCL .tf files is valid (Terraform treats all
+                // .tf in a directory as one config). A read failure is surfaced as a
+                // rejection — never silently swallowed as a "cancel".
                 Promise.all(files.map((f) => f.text()))
                     .then((texts) => resolve({ canceled: false, filename: files[0].name, text: texts.join('\n') }))
-                    .catch(() => resolve({ canceled: true, filename: '', text: '' }))
+                    .catch((err) => reject(err instanceof Error ? err : new Error('Failed to read selected file(s)')))
             }
             input.remove()
         })
@@ -78,7 +81,7 @@ export namespace OcdDesignFacade {
         if (window.ocdAPI) return window.ocdAPI.importFromTerraform()
         // Web path: pick .tf/.tf.json files in the browser and parse them with the
         // dependency-free importer (same one the Electron main process uses).
-        return pickAndReadTextFiles('.tf,.tf.json,.json').then(({ canceled, filename, text }) => {
+        return pickAndReadTextFiles('.tf').then(({ canceled, filename, text }) => {
             if (canceled || !text.trim()) return { canceled: true, filename: '', design: undefined }
             const importer = new OcdTerraformImporter()
             return { canceled: false, filename, design: importer.import(text) }
