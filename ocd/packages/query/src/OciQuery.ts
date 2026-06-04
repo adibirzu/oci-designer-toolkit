@@ -385,6 +385,12 @@ export class OciQuery extends OciReferenceDataQuery {
                     console.error(reason)
                     reject(reason)
                 })
+            }).catch((reason) => {
+                // Without this catch a rejection from listTenancyCompartments (e.g. auth /
+                // permission / unreachable region failure) would leave the outer Promise
+                // unsettled, causing the renderer spinner to hang forever (issue #741).
+                console.error('OciQuery: queryTenancy: listTenancyCompartments failed', reason)
+                reject(reason)
             })
         })
     }
@@ -910,8 +916,15 @@ export class OciQuery extends OciReferenceDataQuery {
             const queries = requests.map((r) => this.mysqlClient.listDbSystems(r))
             Promise.allSettled(queries).then((results) => {
                 console.debug('OciQuery: listMySqlDatabaseSystems: All Settled')
+                // Surface per-compartment failures (e.g. missing `mysql-family` read policy) instead
+                // of silently dropping them, which previously made MySQL DB Systems look absent from
+                // the query results with no explanation (issue #543).
+                results.forEach((r, i) => {
+                    if (r.status === 'rejected') console.warn('OciQuery: listMySqlDatabaseSystems: compartment', compartmentIds[i], 'failed', r.reason)
+                })
                 //@ts-ignore
-                const resources = results.filter((r) => r.status === 'fulfilled').reduce((a, c) => [...a, ...c.value.items], [])
+                const resources: any[] = results.filter((r) => r.status === 'fulfilled').reduce((a, c) => [...a, ...c.value.items], [])
+                console.debug('OciQuery: listMySqlDatabaseSystems: retrieved', resources.length, 'MySQL DB System(s)')
                 resolve(resources)
             }).catch((reason) => {
                 console.error(reason)
