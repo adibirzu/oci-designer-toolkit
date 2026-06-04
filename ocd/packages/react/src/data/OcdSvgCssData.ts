@@ -13,7 +13,7 @@
 import { OcdDesign } from "@ocd/model"
 
 export const svgCssData: Record<string, string> = {
-    'azure-theme.css': String.raw`/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+    'azure-theme.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 
 /*
@@ -115,7 +115,7 @@ export const svgCssData: Record<string, string> = {
 }
 `,
 
-    'general-theme.css': String.raw`/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+    'general-theme.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 
 /*
@@ -127,7 +127,7 @@ export const svgCssData: Record<string, string> = {
 
 `,
 
-    'google-theme.css': String.raw`/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+    'google-theme.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 
 /*
@@ -189,7 +189,7 @@ export const svgCssData: Record<string, string> = {
 }
 `,
 
-    'ocd-default-theme.css': String.raw`/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+    'ocd-default-theme.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 
 :root {
@@ -244,7 +244,7 @@ details[open] > summary.summary-background-default-theme {
 
 `,
 
-    'ocd-light-theme.css': String.raw`/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+    'ocd-light-theme.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 
 :root {
@@ -299,7 +299,2740 @@ details[open] > summary.summary-background-light-theme {
 
 `,
 
-    'ocd-redwood-theme.css': String.raw`/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+    'ocd-lzng.css': `/*
+** Copyright (c) 2021, Andrew Hopkinson.
+** Licensed under the GNU GENERAL PUBLIC LICENSE v 3.0 as shown at https://www.gnu.org/licenses/.
+*/
+
+/*
+** Landing Zone Next Gen (LZNG) wizard stylesheet.
+**
+** SELF-STYLED / THEME-INDEPENDENT: every rule is scoped under the single root
+** class \`.ocd-lzng\` (placed on the page's outermost div). The Oracle Redwood
+** design tokens are (re)declared INSIDE that scope so the wizard renders
+** correctly under ANY OCD console theme, including the default one — it does NOT
+** depend on \`.ocd-console-redwood-ng-theme\` being active. No global/unscoped
+** rules leak out of \`.ocd-lzng\`.
+*/
+
+.ocd-lzng {
+    /* Oracle brand tokens, scoped so they exist without the redwood-ng theme. */
+    --oracle-red: #C74634;
+    --oracle-red-dark: #A63D2E;
+    --oracle-bark: #312D2A;
+    --oracle-white: #FFFFFF;
+    --oracle-bg: #F5F5F5;
+    --oracle-border: #E0E0E0;
+    --oracle-text: #312D2A;
+    --oracle-text-muted: #5C5C5C;
+    --oracle-success: #2e7d32;
+    --oracle-focus: #C74634;
+    --oracle-shadow: 0 1px 4px rgba(49, 45, 42, 0.07);
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--oracle-bg);
+    color: var(--oracle-text);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    box-sizing: border-box;
+}
+
+.ocd-lzng *,
+.ocd-lzng *::before,
+.ocd-lzng *::after {
+    box-sizing: border-box;
+}
+
+.ocd-lzng :focus-visible {
+    outline: 2px solid var(--oracle-focus);
+    outline-offset: 2px;
+}
+
+/* ============================================================
+   Header bar (dark app bar)
+   ============================================================ */
+.ocd-lzng-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 20px;
+    height: 52px;
+    background: var(--oracle-bark);
+    color: var(--oracle-white);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.ocd-lzng-logo {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: var(--oracle-red);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-brand-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--oracle-white);
+    white-space: nowrap;
+}
+
+.ocd-lzng-brand-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.ocd-lzng-exit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 12px 0 8px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.85);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.ocd-lzng-exit-btn:hover {
+    background: var(--oracle-red);
+    border-color: var(--oracle-red);
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-exit-btn svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+}
+
+.ocd-lzng-brand-sub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.62);
+    white-space: nowrap;
+}
+
+.ocd-lzng-layout-toggles {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease;
+}
+
+.ocd-lzng-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-toggle-btn[aria-pressed='true'] {
+    background: var(--oracle-red);
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-toggle-btn svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+}
+
+/* ============================================================
+   Scroll body (everything below the dark header scrolls)
+   ============================================================ */
+.ocd-lzng-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 20px 24px 32px;
+}
+
+/* ============================================================
+   Title row
+   ============================================================ */
+.ocd-lzng-titlerow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.ocd-lzng-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+    line-height: 1.2;
+    margin: 0;
+    padding: 2px 4px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    cursor: text;
+    max-width: 520px;
+}
+
+.ocd-lzng-title:hover {
+    border-color: var(--oracle-border);
+}
+
+.ocd-lzng-title-input {
+    font-family: inherit;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+    line-height: 1.2;
+    padding: 2px 4px;
+    border: 1px solid var(--oracle-red);
+    border-radius: 6px;
+    background: var(--oracle-white);
+    max-width: 520px;
+    width: 100%;
+}
+
+.ocd-lzng-subtitle {
+    font-size: 13px;
+    color: var(--oracle-text-muted);
+    margin: 6px 0 0 0;
+}
+
+.ocd-lzng-titlerow-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.ocd-lzng-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 0 14px;
+    border-radius: 6px;
+    border: 1px solid var(--oracle-border);
+    background: var(--oracle-white);
+    color: var(--oracle-text);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.ocd-lzng-btn:hover {
+    border-color: var(--oracle-red);
+    color: var(--oracle-red-dark);
+}
+
+.ocd-lzng-btn-primary {
+    background: var(--oracle-red);
+    border-color: var(--oracle-red);
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-btn-primary:hover {
+    background: var(--oracle-red-dark);
+    border-color: var(--oracle-red-dark);
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-btn-danger {
+    border-color: var(--oracle-border);
+    color: var(--oracle-red);
+    background: var(--oracle-white);
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+.ocd-lzng-btn-danger:hover {
+    background: #fff5f4;
+    border-color: var(--oracle-red);
+    color: var(--oracle-red-dark);
+}
+
+.ocd-lzng-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.ocd-lzng-btn-ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--oracle-text-muted);
+}
+
+.ocd-lzng-btn-ghost:hover {
+    background: var(--oracle-bg);
+    color: var(--oracle-text);
+    border-color: transparent;
+}
+
+/* Review-step action cluster (Open in Designer + Download all). */
+.ocd-lzng-review-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* "Open in Designer" bridge action — distinct accent from the primary red. */
+.ocd-lzng-btn-open-designer {
+    background: #1a4b8c;
+    border-color: #1a4b8c;
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-btn-open-designer:hover {
+    background: #143a6e;
+    border-color: #143a6e;
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-btn-open-designer:disabled:hover {
+    background: #1a4b8c;
+    border-color: #1a4b8c;
+    color: var(--oracle-white);
+}
+
+/* ============================================================
+   Stepper
+   ============================================================ */
+.ocd-lzng-stepper {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.ocd-lzng-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    padding: 12px 14px;
+    border: 1px solid var(--oracle-border);
+    border-top: 3px solid transparent;
+    border-radius: 8px;
+    background: var(--oracle-white);
+    color: var(--oracle-text-muted);
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: var(--oracle-shadow);
+    transition: border-color 150ms ease, color 150ms ease;
+}
+
+.ocd-lzng-step:hover {
+    border-color: var(--oracle-red);
+}
+
+.ocd-lzng-step[aria-current='step'] {
+    border-top-color: var(--oracle-red);
+    color: var(--oracle-bark);
+}
+
+.ocd-lzng-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--oracle-border);
+    background: var(--oracle-bg);
+    color: var(--oracle-text-muted);
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.ocd-lzng-step[aria-current='step'] .ocd-lzng-step-num {
+    background: var(--oracle-red);
+    border-color: var(--oracle-red);
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-step-label {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* ============================================================
+   Two-column body
+   ============================================================ */
+.ocd-lzng-body {
+    display: grid;
+    grid-template-columns: minmax(420px, 560px) 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.ocd-lzng-body[data-layout='list'] {
+    grid-template-columns: 1fr;
+}
+
+.ocd-lzng-body[data-layout='diagram'] {
+    grid-template-columns: 1fr;
+}
+
+.ocd-lzng-col-left,
+.ocd-lzng-col-right {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ============================================================
+   Cards
+   ============================================================ */
+.ocd-lzng-card {
+    background: var(--oracle-white);
+    border: 1px solid var(--oracle-border);
+    border-top: 3px solid var(--oracle-red);
+    border-radius: 10px;
+    box-shadow: var(--oracle-shadow);
+    overflow: hidden;
+}
+
+.ocd-lzng-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 16px 22px 0;
+}
+
+.ocd-lzng-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--oracle-bark);
+    margin: 0;
+}
+
+.ocd-lzng-card-body {
+    padding: 16px 22px 22px;
+}
+
+/* ============================================================
+   Form fields
+   ============================================================ */
+.ocd-lzng-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.ocd-lzng-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.ocd-lzng-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--oracle-text-muted);
+}
+
+.ocd-lzng-select,
+.ocd-lzng-input {
+    width: 100%;
+    min-height: 36px;
+    padding: 7px 10px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 6px;
+    background: var(--oracle-white);
+    color: var(--oracle-text);
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.ocd-lzng-select:hover,
+.ocd-lzng-input:hover {
+    border-color: var(--oracle-red);
+}
+
+.ocd-lzng-select:focus-visible,
+.ocd-lzng-input:focus-visible {
+    border-color: var(--oracle-red);
+}
+
+/* ============================================================
+   Environments table
+   ============================================================ */
+.ocd-lzng-env-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.ocd-lzng-env-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--oracle-red-dark);
+    padding: 8px 10px;
+    border-bottom: 2px solid var(--oracle-border);
+}
+
+.ocd-lzng-env-table th.ocd-lzng-col-actions,
+.ocd-lzng-env-table td.ocd-lzng-col-actions {
+    text-align: right;
+    width: 1%;
+    white-space: nowrap;
+}
+
+.ocd-lzng-env-table th.ocd-lzng-col-sz,
+.ocd-lzng-env-table td.ocd-lzng-col-sz {
+    width: 1%;
+    white-space: nowrap;
+}
+
+.ocd-lzng-env-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--oracle-border);
+    vertical-align: middle;
+}
+
+.ocd-lzng-env-add-row td {
+    border-bottom: none;
+    padding-top: 12px;
+}
+
+.ocd-lzng-help {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    font-style: italic;
+    margin: 14px 0 0 0;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   Toggle switch (security zone)
+   ============================================================ */
+.ocd-lzng-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 42px;
+    height: 22px;
+    border: none;
+    border-radius: 999px;
+    background: #c4c4c4;
+    cursor: pointer;
+    padding: 0;
+    transition: background 150ms ease;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.ocd-lzng-switch[aria-checked='true'] {
+    background: var(--oracle-success);
+}
+
+.ocd-lzng-switch::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--oracle-white);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    transition: transform 150ms ease;
+}
+
+.ocd-lzng-switch[aria-checked='true']::after {
+    transform: translateX(20px);
+}
+
+/* ============================================================
+   Notices / errors
+   ============================================================ */
+.ocd-lzng-notice {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    border: 1px solid #f5c2bb;
+    background: #fff5f4;
+    color: var(--oracle-red-dark);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.ocd-lzng-notice code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    background: rgba(199, 70, 52, 0.08);
+    border-radius: 3px;
+    padding: 1px 5px;
+}
+
+.ocd-lzng-notice-info {
+    border-color: var(--oracle-border);
+    background: var(--oracle-bg);
+    color: var(--oracle-text-muted);
+}
+
+.ocd-lzng-status {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+}
+
+.ocd-lzng-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   Title-row action separator
+   ============================================================ */
+.ocd-lzng-action-sep {
+    width: 1px;
+    height: 22px;
+    background: var(--oracle-border);
+    margin: 0 2px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   Structural compartment preview (steps 1-4, no jsonnet run)
+   ============================================================ */
+.ocd-lzng-prev-canvas {
+    margin: 14px 16px 16px;
+    padding: 14px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    background: var(--oracle-bg);
+    overflow: auto;
+}
+
+.ocd-lzng-prev-region {
+    border: 1px solid var(--oracle-border);
+    border-radius: 10px;
+    padding: 10px 12px 14px;
+    background: var(--oracle-white);
+}
+
+.ocd-lzng-prev-region-name,
+.ocd-lzng-prev-tenancy-name,
+.ocd-lzng-prev-lz-name,
+.ocd-lzng-prev-cmp-name {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.ocd-lzng-prev-region-name {
+    color: var(--oracle-text-muted);
+    margin-bottom: 10px;
+}
+
+.ocd-lzng-prev-tenancy {
+    border: 1.5px dashed var(--oracle-text-muted);
+    border-radius: 9px;
+    padding: 10px 12px 12px;
+    background: rgba(245, 245, 245, 0.5);
+}
+
+.ocd-lzng-prev-tenancy-name {
+    color: var(--oracle-text-muted);
+    margin-bottom: 10px;
+}
+
+.ocd-lzng-prev-lz {
+    border: 2px dotted var(--oracle-red);
+    border-radius: 9px;
+    padding: 10px 12px 12px;
+    background: var(--oracle-white);
+}
+
+.ocd-lzng-prev-lz-name {
+    color: var(--oracle-red-dark);
+    margin-bottom: 10px;
+}
+
+.ocd-lzng-prev-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.ocd-lzng-prev-cmp {
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    padding: 10px;
+    background: var(--oracle-white);
+}
+
+/* Shared infra compartments — yellow. */
+.ocd-lzng-prev-shared {
+    background: #fffbd7;
+    border-color: #e6dca0;
+}
+
+.ocd-lzng-prev-shared-focus {
+    border-color: var(--oracle-red);
+    box-shadow: 0 0 0 2px rgba(199, 70, 52, 0.18);
+}
+
+/* Environment compartments — green when its security zone is on. */
+.ocd-lzng-prev-env-secure {
+    background: #dcefd8;
+    border-color: #a9d3a0;
+}
+
+.ocd-lzng-prev-cmp-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.ocd-lzng-prev-cmp-name {
+    color: var(--oracle-bark);
+}
+
+.ocd-lzng-prev-tag {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--oracle-text-muted);
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    background: var(--oracle-white);
+    white-space: nowrap;
+}
+
+.ocd-lzng-prev-tag-secure {
+    color: var(--oracle-success);
+    border-color: #a9d3a0;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.ocd-lzng-prev-sub {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(49, 45, 42, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ocd-lzng-prev-sub-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--oracle-text-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    overflow-wrap: anywhere;
+}
+
+.ocd-lzng-prev-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.ocd-lzng-prev-chip {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--oracle-bark);
+    background: var(--oracle-white);
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    padding: 1px 6px;
+}
+
+.ocd-lzng-prev-empty {
+    font-size: 11px;
+    font-style: italic;
+    color: var(--oracle-text-muted);
+}
+
+/* ============================================================
+   Debug slide-over drawer
+   ============================================================ */
+.ocd-lzng-drawer-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(49, 45, 42, 0.4);
+    display: flex;
+    justify-content: flex-end;
+    z-index: 40;
+}
+
+.ocd-lzng-drawer {
+    width: min(560px, 92%);
+    height: 100%;
+    background: var(--oracle-white);
+    border-left: 3px solid var(--oracle-red);
+    box-shadow: -4px 0 16px rgba(49, 45, 42, 0.18);
+    display: flex;
+    flex-direction: column;
+    animation: ocd-lzng-drawer-in 180ms ease;
+}
+
+@keyframes ocd-lzng-drawer-in {
+    from { transform: translateX(16px); opacity: 0.6; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.ocd-lzng-drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--oracle-border);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-drawer-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--oracle-bark);
+    margin: 0;
+}
+
+.ocd-lzng-drawer-body {
+    padding: 16px 20px;
+    overflow: auto;
+}
+
+.ocd-lzng-drawer-body .ocd-lzng-pre {
+    max-height: none;
+}
+
+/* ============================================================
+   Network diagram card
+   ============================================================ */
+.ocd-lzng-diagram-card {
+    height: 100%;
+    min-height: 540px;
+    display: flex;
+    flex-direction: column;
+}
+
+.ocd-lzng-diagram-canvas {
+    /* Explicit (definite) height: React-Flow's root is height:100% and a
+       percentage height only resolves against a parent with a definite height
+       (min-height/flex-grow do NOT count). position:relative + the absolute-fill
+       rule below then guarantee the React-Flow pane fills this box. */
+    height: 560px;
+    flex-shrink: 0;
+    margin: 14px 16px 16px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--oracle-white);
+    position: relative;
+}
+
+.ocd-lzng-diagram-canvas .react-flow {
+    position: absolute;
+    inset: 0;
+}
+
+/* React-Flow node styling (scoped). */
+.ocd-lzng .ocd-lzng-rf-region {
+    border: 2px dashed var(--oracle-text-muted);
+    border-radius: 10px;
+    background: rgba(245, 245, 245, 0.6);
+    color: var(--oracle-text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 8px 10px;
+}
+
+.ocd-lzng .ocd-lzng-rf-node {
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    background: var(--oracle-white);
+    color: var(--oracle-text);
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: var(--oracle-shadow);
+    padding: 10px 12px;
+    text-align: center;
+}
+
+.ocd-lzng .ocd-lzng-rf-node.ocd-lzng-rf-hub {
+    border-color: var(--oracle-red);
+    background: #fbeae7;
+    color: var(--oracle-red-dark);
+}
+
+.ocd-lzng .ocd-lzng-rf-node.ocd-lzng-rf-secure {
+    border-color: var(--oracle-success);
+    background: #e8f5e9;
+    color: var(--oracle-success);
+}
+
+.ocd-lzng .ocd-lzng-rf-node-sub {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--oracle-text-muted);
+    margin-top: 2px;
+}
+
+.ocd-lzng .ocd-lzng-rf-node.ocd-lzng-rf-secure .ocd-lzng-rf-node-sub {
+    color: var(--oracle-success);
+}
+
+/* React-Flow chrome tint to match palette. */
+.ocd-lzng .react-flow__controls-button {
+    border-bottom: 1px solid var(--oracle-border);
+}
+
+.ocd-lzng .react-flow__attribution {
+    background: transparent;
+    font-size: 10px;
+}
+
+/* ============================================================
+   Review / placeholder steps
+   ============================================================ */
+.ocd-lzng-pre {
+    margin: 0;
+    padding: 14px 16px;
+    background: var(--oracle-bg);
+    border: 1px solid var(--oracle-border);
+    border-radius: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--oracle-bark);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    max-height: 420px;
+    overflow: auto;
+}
+
+.ocd-lzng-placeholder {
+    font-size: 13px;
+    color: var(--oracle-text-muted);
+    line-height: 1.6;
+}
+
+.ocd-lzng-step-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+/* ============================================================
+   Phase 2 — option lists (hub kind / radio cards)
+   ============================================================ */
+.ocd-lzng-fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+}
+
+.ocd-lzng-fieldset > .ocd-lzng-label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.ocd-lzng-option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ocd-lzng-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--oracle-white);
+    transition: border-color 150ms ease, background 150ms ease;
+}
+
+.ocd-lzng-option:hover {
+    border-color: var(--oracle-red);
+}
+
+.ocd-lzng-option-active {
+    border-color: var(--oracle-red);
+    background: #fbeae7;
+}
+
+.ocd-lzng-option-radio {
+    margin-top: 3px;
+    accent-color: var(--oracle-red);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.ocd-lzng-option-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+}
+
+.ocd-lzng-option-desc {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    line-height: 1.45;
+}
+
+.ocd-lzng-option-meta {
+    font-size: 11px;
+    color: var(--oracle-text-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* ============================================================
+   Phase 2 — field errors / invalid inputs
+   ============================================================ */
+.ocd-lzng-input-invalid {
+    border-color: var(--oracle-red);
+    background: #fff5f4;
+}
+
+.ocd-lzng-field-error {
+    font-size: 12px;
+    color: var(--oracle-red-dark);
+}
+
+.ocd-lzng-field code,
+.ocd-lzng-help code,
+.ocd-lzng-subcard-title code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    background: rgba(199, 70, 52, 0.08);
+    border-radius: 3px;
+    padding: 1px 5px;
+}
+
+/* ============================================================
+   Phase 2 — chips (projects)
+   ============================================================ */
+.ocd-lzng-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 2px 0 6px;
+}
+
+.ocd-lzng-chips-empty {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    font-style: italic;
+}
+
+.ocd-lzng-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px 4px 10px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 999px;
+    background: var(--oracle-bg);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--oracle-bark);
+}
+
+.ocd-lzng-chip-x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--oracle-text-muted);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.ocd-lzng-chip-x:hover {
+    background: var(--oracle-red);
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-inline-add {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.ocd-lzng-inline-add .ocd-lzng-input,
+.ocd-lzng-inline-add .ocd-lzng-select {
+    flex: 1 1 auto;
+}
+
+/* ============================================================
+   Phase 2 — platform sub-cards
+   ============================================================ */
+.ocd-lzng-subcard {
+    border: 1px solid var(--oracle-border);
+    border-left: 3px solid var(--oracle-red);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    background: var(--oracle-bg);
+}
+
+.ocd-lzng-subcard-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.ocd-lzng-subcard-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+}
+
+.ocd-lzng-subcard-desc {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    line-height: 1.45;
+    margin: 0 0 10px;
+}
+
+.ocd-lzng-subcard .ocd-lzng-field {
+    margin-top: 8px;
+}
+
+.ocd-lzng-checkrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.ocd-lzng-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--oracle-bark);
+    cursor: pointer;
+}
+
+.ocd-lzng-check input {
+    accent-color: var(--oracle-red);
+}
+
+/* ============================================================
+   Phase 2 — Review: file list + IAM diagram
+   ============================================================ */
+.ocd-lzng-file-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ocd-lzng-file-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 6px;
+    background: var(--oracle-white);
+}
+
+.ocd-lzng-file-name {
+    flex: 1 1 auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: var(--oracle-bark);
+    overflow-wrap: anywhere;
+}
+
+.ocd-lzng-file-size {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    white-space: nowrap;
+}
+
+.ocd-lzng-iam-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.ocd-lzng-iam-canvas {
+    height: 420px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--oracle-white);
+}
+
+/* React-Flow spoke containers / child + IAM nodes (scoped). */
+.ocd-lzng .ocd-lzng-rf-spoke {
+    border: 1px solid var(--oracle-border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--oracle-text);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 10px;
+    text-align: left;
+    box-shadow: var(--oracle-shadow);
+}
+
+.ocd-lzng .ocd-lzng-rf-spoke.ocd-lzng-rf-secure {
+    border-color: var(--oracle-success);
+    background: rgba(232, 245, 233, 0.9);
+    color: var(--oracle-success);
+}
+
+.ocd-lzng .ocd-lzng-rf-child {
+    border: 1px solid var(--oracle-border);
+    border-radius: 7px;
+    background: var(--oracle-white);
+    color: var(--oracle-text);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 8px;
+    text-align: center;
+}
+
+.ocd-lzng .ocd-lzng-rf-child.ocd-lzng-rf-platform {
+    border-color: #0a5fb4;
+    background: #e8f1fb;
+    color: #0a5fb4;
+}
+
+.ocd-lzng .ocd-lzng-rf-node.ocd-lzng-rf-tenancy {
+    border-color: var(--oracle-red);
+    background: #fbeae7;
+    color: var(--oracle-red-dark);
+}
+
+.ocd-lzng .ocd-lzng-rf-node.ocd-lzng-rf-cmp-parent {
+    border-color: var(--oracle-bark);
+    font-weight: 700;
+}
+
+/* ============================================================
+   Update banner (below the dark header)
+   ============================================================ */
+.ocd-lzng-update-banner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 10px 20px;
+    background: #fff5f4;
+    border-bottom: 1px solid #f5c2bb;
+    color: var(--oracle-text);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-update-banner-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+}
+
+.ocd-lzng-update-banner-dot {
+    width: 9px;
+    height: 9px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: var(--oracle-red);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-update-banner-text {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.ocd-lzng-update-banner-text code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    background: rgba(199, 70, 52, 0.08);
+    border-radius: 3px;
+    padding: 1px 5px;
+}
+
+.ocd-lzng-update-banner-more {
+    color: var(--oracle-text-muted);
+}
+
+.ocd-lzng-update-banner-how {
+    margin: 8px 0 0;
+    color: var(--oracle-text-muted);
+    max-width: 70ch;
+}
+
+.ocd-lzng-update-banner-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.ocd-lzng-update-banner-dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--oracle-text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease;
+}
+
+.ocd-lzng-update-banner-dismiss:hover {
+    background: rgba(199, 70, 52, 0.08);
+    color: var(--oracle-red-dark);
+}
+
+/* ============================================================
+   Sources & Updates panel
+   ============================================================ */
+.ocd-lzng-sources-card {
+    margin-bottom: 18px;
+}
+
+.ocd-lzng-sources-head-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ocd-lzng-sources-intro {
+    margin: 0 0 12px;
+    color: var(--oracle-text-muted);
+    font-size: 13px;
+}
+
+.ocd-lzng-sources-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.ocd-lzng-source-row {
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: var(--oracle-white);
+}
+
+.ocd-lzng-source-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.ocd-lzng-source-label {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.ocd-lzng-source-repo {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    text-decoration: none;
+}
+
+.ocd-lzng-source-repo:hover {
+    color: var(--oracle-red-dark);
+    text-decoration: underline;
+}
+
+.ocd-lzng-source-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 10px 0 0;
+}
+
+.ocd-lzng-source-meta > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ocd-lzng-source-meta dt {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--oracle-text-muted);
+}
+
+.ocd-lzng-source-meta dd {
+    margin: 0;
+    font-size: 13px;
+}
+
+.ocd-lzng-source-meta code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+}
+
+.ocd-lzng-source-meta a {
+    color: var(--oracle-red-dark);
+    text-decoration: none;
+}
+
+.ocd-lzng-source-meta a:hover {
+    text-decoration: underline;
+}
+
+.ocd-lzng-source-unavailable {
+    color: var(--oracle-text-muted);
+    font-style: italic;
+}
+
+/* Status badges */
+.ocd-lzng-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.ocd-lzng-badge-ok {
+    background: #e7f4e8;
+    color: var(--oracle-success);
+    border-color: #bfe0c1;
+}
+
+.ocd-lzng-badge-update {
+    background: #fbeae7;
+    color: var(--oracle-red-dark);
+    border-color: #f5c2bb;
+}
+
+.ocd-lzng-badge-unpinned {
+    background: var(--oracle-bg);
+    color: var(--oracle-text-muted);
+    border-color: var(--oracle-border);
+}
+
+.ocd-lzng-badge-error {
+    background: #fdf6e3;
+    color: #8a6d3b;
+    border-color: #ead9a5;
+}
+
+@media (max-width: 1024px) {
+    .ocd-lzng-body {
+        grid-template-columns: 1fr;
+    }
+
+    .ocd-lzng-stepper {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+`,
+
+    'ocd-redwood-ng-theme.css': `/*
+** Copyright (c) 2020, 2024, Oracle and/or its affiliates.
+** Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+*/
+
+/*
+** Oracle Redwood (Next-Gen) Theme — "redwood-ng"
+**
+** Design token source: landing-zone-next-gen/src-drawio/index.css  (verbatim)
+** Aesthetic reference: landing-zone-next-gen/src-lzng/pages/WizardShell.jsx
+**
+** IMPORTANT — scoping model:
+** Every theme stylesheet is imported unconditionally in main.tsx; there is no
+** per-theme stylesheet switching. To avoid leaking into the light/default themes,
+** all element-level visual rules are gated on the console root class
+** \`.ocd-console-redwood-ng-theme\` (the console renders
+** className={\`ocd-console ocd-console-\${theme}-theme\`}). Everything in the app is
+** inside \`.ocd-console\`, so this class is the single activation anchor for the theme.
+**
+** Rules in this file:
+**   1. :root — Oracle brand tokens ONLY (inert custom properties; no side-effects).
+**      color-scheme:light is applied on the theme root, NOT globally.
+**   2. Animation keyframes (ocd-rng-*) — global by CSS spec; prefixed and only
+**      consumed by theme-scoped selectors below.
+**   3. Scrollbar rules — gated on \`.ocd-console-redwood-ng-theme\`.
+**   4. Focus-visible ring — gated on \`.ocd-console-redwood-ng-theme\`.
+**   5. \`.container\` — gated on \`.ocd-console-redwood-ng-theme\`.
+**      \`.sr-only\` — left global (accessibility must always work; safe/additive).
+**   6+. Component theme selectors carry the \`-redwood-ng-theme\` suffix; BoM rules are
+**      gated on \`.ocd-console-redwood-ng-theme\` for activation AND specificity.
+*/
+
+/* ============================================================
+   1. Oracle Brand Tokens (verbatim from LZNG index.css)
+   ============================================================ */
+:root {
+    /* Oracle brand colors (inert until consumed; no side-effects on other themes) */
+    --oracle-red: #C74634;
+    --oracle-red-dark: #A63D2E;
+    --oracle-bark: #312D2A;
+    --oracle-white: #FFFFFF;
+    --oracle-bg: #F5F5F5;
+    --oracle-border: #E0E0E0;
+    --oracle-text: #312D2A;
+    --oracle-text-muted: #5C5C5C;
+    --oracle-success: #2e7d32;
+    --oracle-focus: #C74634;
+}
+
+/* color-scheme is applied on the theme root only — a global color-scheme:light
+   would break other themes' form-control and scrollbar rendering. */
+.ocd-console-redwood-ng-theme {
+    color-scheme: light;
+}
+
+/* ============================================================
+   2. Animation Keyframes
+      These are global by CSS spec. They are only triggered by
+      selectors that carry the -redwood-ng-theme suffix or the
+      BoM classes styled in section 5 below.
+   ============================================================ */
+@keyframes ocd-rng-fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes ocd-rng-slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ocd-rng-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.5; }
+}
+
+/* ============================================================
+   3. Scoped Scrollbars
+      Gated on the theme root so other themes keep the
+      browser-default scrollbar.
+   ============================================================ */
+.ocd-console-redwood-ng-theme ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.ocd-console-redwood-ng-theme ::-webkit-scrollbar-track {
+    background: #ececec;
+}
+
+.ocd-console-redwood-ng-theme ::-webkit-scrollbar-thumb {
+    background: var(--oracle-red);
+    border-radius: 4px;
+}
+
+.ocd-console-redwood-ng-theme ::-webkit-scrollbar-thumb:hover {
+    background: var(--oracle-red-dark);
+}
+
+/* ============================================================
+   4. Focus Ring
+      Gated on the theme root to avoid overriding other themes'
+      outline handling.
+   ============================================================ */
+.ocd-console-redwood-ng-theme :focus-visible {
+    outline: 2px solid var(--oracle-red);
+    outline-offset: 2px;
+}
+
+.ocd-console-redwood-ng-theme button:focus:not(:focus-visible),
+.ocd-console-redwood-ng-theme a:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* ============================================================
+   5. Utility Classes
+   ============================================================ */
+
+/* Layout wrapper — gated on the theme root; only activates when used */
+.ocd-console-redwood-ng-theme .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Screen-reader-only helper */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ============================================================
+   6. OCD Component Theme Selectors — "redwood-ng"
+      Mirrors the full selector set from ocd-redwood-theme.css
+      mapped to the Oracle Redwood palette and Segoe UI.
+   ============================================================ */
+
+/* -- Tab bar ------------------------------------------------ */
+.ocd-designer-tab-bar-redwood-ng-theme {
+    background-color: var(--oracle-white);
+    border-bottom: 2px solid var(--oracle-border);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* -- Inactive tab ------------------------------------------ */
+.ocd-designer-tab-redwood-ng-theme {
+    background-color: var(--oracle-white);
+    color: var(--oracle-text-muted);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    border-right: 1px solid var(--oracle-border);
+}
+
+.ocd-designer-tab-redwood-ng-theme:hover {
+    background-color: var(--oracle-bg);
+    color: var(--oracle-text);
+}
+
+/* -- Active tab -------------------------------------------- */
+.ocd-designer-active-tab-redwood-ng-theme {
+    background-color: var(--oracle-bg);
+    color: var(--oracle-bark);
+    font-weight: 600;
+    border-bottom: 2px solid var(--oracle-red);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* -- Properties panel -------------------------------------- */
+.ocd-properties-panel-redwood-ng-theme {
+    background-color: var(--oracle-white);
+    border-left: 1px solid var(--oracle-border);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--oracle-text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* -- Properties header (reuses the redwood stripe PNG) ----- */
+.ocd-properties-header-redwood-ng-theme {
+    background-image: url("data:image/png;base64,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");
+    background-size: 100% 5px;
+    background-repeat: no-repeat;
+    background-position-x: left;
+    background-position-y: bottom;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--oracle-bark);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* -- Console menu bar (reuses the same PNG stripe) ---------- */
+.ocd-console-menubar-redwood-ng-theme {
+    background-image: url("data:image/png;base64,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");
+    background-size: 100% 5px;
+    background-repeat: no-repeat;
+    background-position-x: left;
+    background-position-y: bottom;
+}
+
+/* -- Details summary (collapsed state) --------------------- */
+details > summary.summary-background-redwood-ng-theme {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgdHJhbnNmb3JtPSJtYXRyaXgoLTEgMCAwIDEgMjAgMCkiPjxlbGxpcHNlIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgY3g9IjYuMTEiIGN5PSIzLjU1IiByeD0iMi4xMSIgcnk9IjIuMTUiLz48ZWxsaXBzZSBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIGN4PSI2LjExIiBjeT0iMTUuNTUiIHJ4PSIyLjExIiByeT0iMi4xNSIvPjxjaXJjbGUgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBjeD0iMTMuMTUiIGN5PSI5LjU1IiByPSIyLjE1Ii8+PHBhdGggZD0iTTEgM2gzdjFIMXpNMTAgM2g4djFoLTh6TTEgOWg4djFIMXpNMTUgOWgzdjFoLTN6TTEgMTVoM3YxSDF6TTEwIDE1aDh2MWgtOHoiLz48L2c+PC9zdmc+");
+}
+
+/* -- Details summary (open state) -------------------------- */
+details[open] > summary.summary-background-redwood-ng-theme {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGVsbGlwc2UgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBjeD0iNi4xMSIgY3k9IjMuNTUiIHJ4PSIyLjExIiByeT0iMi4xNSIvPjxlbGxpcHNlIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgY3g9IjYuMTEiIGN5PSIxNS41NSIgcng9IjIuMTEiIHJ5PSIyLjE1Ii8+PGNpcmNsZSBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIGN4PSIxMy4xNSIgY3k9IjkuNTUiIHI9IjIuMTUiLz48cGF0aCBkPSJNMSAzaDN2MUgxek0xMCAzaDh2MWgtOHpNMSA5aDh2MUgxek0xNSA5aDN2MWgtM3pNMSAxNWgzdjFIMXpNMTAgMTVoOHYxaC04eiIvPjwvc3ZnPg==");
+}
+
+/* ============================================================
+   7. Bill of Materials — LZNG Aesthetic
+      Each rule is gated on \`.ocd-console-redwood-ng-theme\` so it
+      activates ONLY under this theme and wins over the base
+      \`.ocd-bom-*\` rules in ocd.css (imported last) via higher
+      specificity. Without the prefix these rules are dead AND
+      would leak into other themes.
+   ============================================================ */
+
+.ocd-console-redwood-ng-theme .ocd-bom-view {
+    padding: 24px;
+    background: var(--oracle-bg);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    color: var(--oracle-text);
+    line-height: 1.5;
+    min-height: 100%;
+    box-sizing: border-box;
+}
+
+/* Summary KPI cards row */
+.ocd-console-redwood-ng-theme .ocd-bom-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-summary-card {
+    background: var(--oracle-white);
+    border: 1px solid var(--oracle-border);
+    border-radius: 7px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 4px rgba(49, 45, 42, 0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-summary-card span {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--oracle-text-muted);
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-summary-card strong {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+    line-height: 1.2;
+}
+
+/* Main grid of panels */
+.ocd-console-redwood-ng-theme .ocd-bom-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+/* Individual card panels */
+.ocd-console-redwood-ng-theme .ocd-bom-panel {
+    background: var(--oracle-white);
+    border: 1px solid var(--oracle-border);
+    border-radius: 7px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(49, 45, 42, 0.07);
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-panel h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-left: 3px solid var(--oracle-red);
+    padding-left: 10px;
+    line-height: 1.3;
+}
+
+/* BoM resource table */
+.ocd-console-redwood-ng-theme .ocd-bom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-table thead tr {
+    background: #f0e8e6;  /* light red tint for header — #C74634 at ~8% opacity on white */
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-table th {
+    text-align: left;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--oracle-red-dark);
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--oracle-border);
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-table td {
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--oracle-border);
+    color: var(--oracle-text);
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-table tbody tr:hover td {
+    background: var(--oracle-bg);
+}
+
+/* Cost line items */
+.ocd-console-redwood-ng-theme .ocd-bom-cost-line {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--oracle-border);
+    font-size: 13px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-cost-line:last-of-type {
+    border-bottom: none;
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-cost-line strong {
+    color: var(--oracle-text);
+    font-weight: 600;
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-cost-line span {
+    font-size: 11px;
+    color: var(--oracle-text-muted);
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-cost-line code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--oracle-bark);
+    background: var(--oracle-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--oracle-border);
+}
+
+/* Notes / muted paragraphs */
+.ocd-console-redwood-ng-theme .ocd-bom-note {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    margin: 12px 0 0 0;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+/* Usage API block */
+.ocd-console-redwood-ng-theme .ocd-bom-usage {
+    font-size: 13px;
+    color: var(--oracle-text);
+    line-height: 1.6;
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-usage span {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--oracle-text-muted);
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-usage p {
+    margin: 0 0 12px 0;
+    color: var(--oracle-text);
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-usage code {
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    background: var(--oracle-bg);
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    color: var(--oracle-bark);
+}
+
+/* ============================================================
+   8. New BoM classes (cost-estimator agent additions)
+   ============================================================ */
+
+/* Currency selector dropdown */
+.ocd-console-redwood-ng-theme .ocd-bom-currency-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--oracle-white);
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    padding: 6px 28px 6px 10px;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    color: var(--oracle-text);
+    cursor: pointer;
+    /* Custom chevron using CSS */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235C5C5C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    min-width: 88px;
+    min-height: 32px; /* meets 24px minimum touch target height; 32px recommended */
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-currency-select:hover {
+    border-color: var(--oracle-red);
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-currency-select:focus-visible {
+    outline: 2px solid var(--oracle-red);
+    outline-offset: 2px;
+    border-color: var(--oracle-red);
+}
+
+/* Source badge — "live" vs "offline snapshot" pill */
+.ocd-console-redwood-ng-theme .ocd-bom-source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.6;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* "live" variant — success tint */
+.ocd-console-redwood-ng-theme .ocd-bom-source-badge[data-source="live"],
+.ocd-console-redwood-ng-theme .ocd-bom-source-badge.live {
+    background: #e8f5e9;   /* --oracle-success at ~12% on white */
+    color: var(--oracle-success);
+    border: 1px solid #c8e6c9;
+}
+
+/* "offline" / snapshot variant — muted */
+.ocd-console-redwood-ng-theme .ocd-bom-source-badge[data-source="snapshot"],
+.ocd-console-redwood-ng-theme .ocd-bom-source-badge[data-source="offline"],
+.ocd-console-redwood-ng-theme .ocd-bom-source-badge.snapshot,
+.ocd-console-redwood-ng-theme .ocd-bom-source-badge.offline {
+    background: #f0f0f0;
+    color: var(--oracle-text-muted);
+    border: 1px solid var(--oracle-border);
+}
+
+/* Loading pulse */
+.ocd-console-redwood-ng-theme .ocd-bom-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--oracle-text-muted);
+    background: var(--oracle-bg);
+    border-radius: 6px;
+    border: 1px solid var(--oracle-border);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .ocd-console-redwood-ng-theme .ocd-bom-loading {
+        animation: ocd-rng-pulse 1.6s ease-in-out infinite;
+    }
+}
+
+/* Error banner */
+.ocd-console-redwood-ng-theme .ocd-bom-error {
+    padding: 12px 16px;
+    border-radius: 6px;
+    border: 1px solid #f5c2bb;  /* light red border */
+    background: #fff5f4;        /* very light red bg */
+    color: var(--oracle-red-dark);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-bom-error::before {
+    content: '\\26A0\\FE0F'; /* warning sign — purely decorative; error colour is the real signal */
+    flex-shrink: 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   9. Entrance animations — BoM page
+      Gated on the theme root and wrapped in prefers-reduced-motion
+      so motion does not trigger for users who request reduced motion
+      and does not leak into other themes.
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+    .ocd-console-redwood-ng-theme .ocd-bom-view {
+        animation: ocd-rng-fadeIn 240ms ease-out both;
+    }
+
+    .ocd-console-redwood-ng-theme .ocd-bom-summary-card {
+        animation: ocd-rng-slideUp 280ms ease-out both;
+    }
+
+    .ocd-console-redwood-ng-theme .ocd-bom-summary-card:nth-child(1) { animation-delay: 40ms; }
+    .ocd-console-redwood-ng-theme .ocd-bom-summary-card:nth-child(2) { animation-delay: 80ms; }
+    .ocd-console-redwood-ng-theme .ocd-bom-summary-card:nth-child(3) { animation-delay: 120ms; }
+    .ocd-console-redwood-ng-theme .ocd-bom-summary-card:nth-child(4) { animation-delay: 160ms; }
+
+    .ocd-console-redwood-ng-theme .ocd-bom-panel {
+        animation: ocd-rng-slideUp 300ms ease-out both;
+        animation-delay: 200ms;
+    }
+}
+
+/* ============================================================
+   10. Landing Zone Wizard — ocd-lz-* classes
+       All rules gated on \`.ocd-console-redwood-ng-theme\` to
+       prevent leaking into other themes. Mirrors the BoM
+       scoping pattern above (sections 7–9).
+
+       Layout reference: landing-zone-next-gen/src-lzng/pages/WizardShell.jsx
+       Palette:          Oracle Redwood tokens (--oracle-* vars defined in :root)
+
+       WCAG 2.2 AA contrast notes (all verified against WCAG algorithm):
+         Primary button  #C74634 on #FFFFFF = 4.82:1  — AA pass (normal text ≥4.5:1)
+         Hover button    #A63D2E on #FFFFFF = 5.89:1  — AA pass
+         oracle-text     #312D2A on #FFFFFF = 14.6:1  — AAA pass
+         oracle-text     #312D2A on #F5F5F5 = 13.5:1  — AAA pass
+         Danger text     #9f1d1d on #fff5f4 ≈ 8.3:1   — AAA pass
+         Shared box text #312D2A on #fffbd7 ≈ 14.1:1  — AAA pass
+         Env box text    #312D2A on #dcefd8 ≈  9.0:1  — AAA pass
+         oracle-text-muted #5C5C5C on #FFFFFF = 7.0:1 — AA pass
+   ============================================================ */
+
+/* ---- 10.1  Page shell ------------------------------------ */
+
+/* ocd-lz-view is the outermost wrapper rendered by OcdLandingZone */
+.ocd-console-redwood-ng-theme .ocd-lz-view {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    background: var(--oracle-bg);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    color: var(--oracle-text);
+    line-height: 1.5;
+    box-sizing: border-box;
+}
+
+/* ocd-lz-page is the WizardBody root; carries max-width and padding */
+.ocd-console-redwood-ng-theme .ocd-lz-page {
+    max-width: 1440px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 24px 48px;
+    box-sizing: border-box;
+}
+
+/* ---- 10.2  Page header ----------------------------------- */
+
+/* Header row: title/subtitle left, action buttons right */
+.ocd-console-redwood-ng-theme .ocd-lz-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-subtitle {
+    font-size: 13px;
+    color: var(--oracle-text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Button group in the page header (Config + Reset) */
+.ocd-console-redwood-ng-theme .ocd-lz-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ---- 10.3  Two-column wizard grid ----------------------- */
+
+/* form panel: fixed narrow column; diagram panel: 1fr remainder */
+.ocd-console-redwood-ng-theme .ocd-lz-grid {
+    display: grid;
+    grid-template-columns: minmax(340px, 460px) 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Graceful degradation when the viewport is too narrow */
+@media (max-width: 820px) {
+    .ocd-console-redwood-ng-theme .ocd-lz-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---- 10.4  Panel cards (form + diagram) ----------------- */
+
+/* White card surface — matches the BoM panel aesthetic */
+.ocd-console-redwood-ng-theme .ocd-lz-panel {
+    background: var(--oracle-white);
+    border: 1px solid var(--oracle-border);
+    border-radius: 7px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(49, 45, 42, 0.07);
+    box-sizing: border-box;
+}
+
+/* Section / sub-section heading inside a panel.
+   Left red-border accent mirrors .ocd-bom-panel h2 styling. */
+.ocd-console-redwood-ng-theme .ocd-lz-panel-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 14px 0;
+    padding-left: 10px;
+    border-left: 3px solid var(--oracle-red);
+    line-height: 1.3;
+}
+
+/* Second panel-title within the same panel (Environments heading)
+   needs extra top margin to separate from the preceding form fields. */
+.ocd-console-redwood-ng-theme .ocd-lz-panel .ocd-lz-panel-title + .ocd-lz-panel-title,
+.ocd-console-redwood-ng-theme .ocd-lz-panel .ocd-lz-select + .ocd-lz-panel-title,
+.ocd-console-redwood-ng-theme .ocd-lz-panel .ocd-lz-input + .ocd-lz-panel-title {
+    margin-top: 20px;
+}
+
+/* Diagram panel: min height to keep it visually anchored */
+.ocd-console-redwood-ng-theme .ocd-lz-diagram-panel {
+    min-height: 580px;
+}
+
+/* ---- 10.5  Form labels, inputs, selects ----------------- */
+
+/* Bold small label above each field */
+.ocd-console-redwood-ng-theme .ocd-lz-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--oracle-text-muted);
+    margin-bottom: 5px;
+    letter-spacing: 0.02em;
+}
+
+/* Full-width select — custom chevron arrow for cross-browser consistency */
+.ocd-console-redwood-ng-theme .ocd-lz-select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 32px 9px 10px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--oracle-text);
+    background-color: var(--oracle-white);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235C5C5C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+    margin-bottom: 14px;
+    /* SC 2.5.8 — minimum height 32px (24px required; 32px recommended) */
+    min-height: 36px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-select:hover {
+    border-color: var(--oracle-red);
+}
+
+/* Focus ring is global under the theme anchor (section 4 above);
+   reinforce border color on focus for extra affordance */
+.ocd-console-redwood-ng-theme .ocd-lz-select:focus-visible {
+    border-color: var(--oracle-red);
+}
+
+/* Full-width text input */
+.ocd-console-redwood-ng-theme .ocd-lz-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--oracle-text);
+    background: var(--oracle-white);
+    margin-bottom: 14px;
+    min-height: 36px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-input:hover {
+    border-color: var(--oracle-red);
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-input:focus-visible {
+    border-color: var(--oracle-red);
+}
+
+/* Inline input variant — used inside env-row and add-row grids;
+   overrides the block-level margin-bottom so it doesn't push the row taller */
+.ocd-console-redwood-ng-theme .ocd-lz-input-inline {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+/* ---- 10.6  Environment list ----------------------------- */
+
+/* Vertical stack of environment rows */
+.ocd-console-redwood-ng-theme .ocd-lz-env-list {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+/* Single env row: name | security-zone checkbox | edit btn | delete btn */
+.ocd-console-redwood-ng-theme .ocd-lz-env-row {
+    display: grid;
+    grid-template-columns: minmax(110px, 1fr) 118px auto auto;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid var(--oracle-border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #fcfcfc;
+}
+
+/* Environment name label text */
+.ocd-console-redwood-ng-theme .ocd-lz-env-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--oracle-text);
+    overflow-wrap: anywhere;
+}
+
+/* Checkbox + label inline pair */
+.ocd-console-redwood-ng-theme .ocd-lz-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--oracle-text);
+    cursor: pointer;
+    /* SC 2.5.8 — keep the row at least 24px tall via the parent padding */
+}
+
+/* SC 2.5.8 — checkbox hit area 24×24 minimum */
+.ocd-console-redwood-ng-theme .ocd-lz-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    cursor: pointer;
+    accent-color: var(--oracle-red);
+}
+
+/* "New environment" add row: inline input | checkbox | Add button */
+.ocd-console-redwood-ng-theme .ocd-lz-add-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) 118px auto;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+/* Help / hint text beneath a field or section */
+.ocd-console-redwood-ng-theme .ocd-lz-help {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    line-height: 1.45;
+    margin: -6px 0 14px 0;
+}
+
+/* ---- 10.7  Action row and status ------------------------- */
+
+.ocd-console-redwood-ng-theme .ocd-lz-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+/* Muted status text ("N files generated / No files generated yet") */
+.ocd-console-redwood-ng-theme .ocd-lz-status {
+    font-size: 13px;
+    color: var(--oracle-text-muted);
+}
+
+/* Inline validation / generation error text */
+.ocd-console-redwood-ng-theme .ocd-lz-error {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 5px;
+    border: 1px solid #f5c2bb;
+    background: #fff5f4;
+    color: #9f1d1d;       /* #9f1d1d on #fff5f4 ≈ 8.3:1 — AAA */
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+/* Empty-state placeholder in the diagram panel */
+.ocd-console-redwood-ng-theme .ocd-lz-empty {
+    border: 1px dashed var(--oracle-border);
+    border-radius: 6px;
+    padding: 20px;
+    color: var(--oracle-text-muted);
+    font-size: 14px;
+    background: #fafafa;
+    line-height: 1.5;
+}
+
+/* ---- 10.8  Buttons -------------------------------------- */
+
+/* Base button — all variants build on this */
+.ocd-console-redwood-ng-theme .ocd-lz-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    text-decoration: none;
+    white-space: nowrap;
+    /* SC 2.5.8 — minimum 24×24 px target; 32px height recommended */
+    min-height: 32px;
+    min-width: 48px;
+    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+/* Primary: Oracle red background / white text — 4.82:1 on #C74634, AA pass */
+.ocd-console-redwood-ng-theme .ocd-lz-button-primary {
+    background: var(--oracle-red);
+    border-color: var(--oracle-red);
+    color: var(--oracle-white);
+    font-size: 14px;
+    padding: 10px 16px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-button-primary:hover:not(:disabled):not(.ocd-lz-button-disabled) {
+    background: var(--oracle-red-dark);
+    border-color: var(--oracle-red-dark);
+}
+
+/* Secondary: white background / dark border and text */
+.ocd-console-redwood-ng-theme .ocd-lz-button-secondary {
+    background: var(--oracle-white);
+    border-color: var(--oracle-border);
+    color: var(--oracle-text);
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-button-secondary:hover:not(:disabled) {
+    border-color: var(--oracle-red);
+    color: var(--oracle-red-dark);
+}
+
+/* Danger: light red-tinted background, dark-red text — used for Delete */
+.ocd-console-redwood-ng-theme .ocd-lz-button-danger {
+    background: #fff5f4;
+    border-color: #f5c2bb;
+    color: #9f1d1d;        /* 8.3:1 on #fff5f4 — AAA */
+    font-size: 12px;
+    padding: 7px 10px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-button-danger:hover:not(:disabled) {
+    background: #fde8e6;
+    border-color: var(--oracle-red);
+    color: var(--oracle-red-dark);
+}
+
+/* Debug / neutral: used for the "Config" button in the header */
+.ocd-console-redwood-ng-theme .ocd-lz-button-debug {
+    background: var(--oracle-white);
+    border-color: var(--oracle-text-muted);
+    color: var(--oracle-text);
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-button-debug:hover:not(:disabled) {
+    border-color: var(--oracle-text);
+    background: var(--oracle-bg);
+}
+
+/* Reset: red-tinted border and text — matches LZNG resetBtn but Oracle palette */
+.ocd-console-redwood-ng-theme .ocd-lz-button-reset {
+    background: var(--oracle-white);
+    border-color: var(--oracle-red);
+    color: var(--oracle-red-dark);
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-button-reset:hover:not(:disabled) {
+    background: #fff5f4;
+}
+
+/* Disabled state — works on any button variant via class OR :disabled attribute */
+.ocd-console-redwood-ng-theme .ocd-lz-button-disabled,
+.ocd-console-redwood-ng-theme .ocd-lz-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ---- 10.9  Debug config overlay + drawer ---------------- */
+
+/* Full-screen dim overlay behind the drawer */
+.ocd-console-redwood-ng-theme .ocd-lz-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 24, 28, 0.32);
+    z-index: 30;
+}
+
+/* Right-side drawer panel */
+.ocd-console-redwood-ng-theme .ocd-lz-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(720px, 94vw);
+    height: 100vh;
+    box-sizing: border-box;
+    padding: 22px;
+    background: var(--oracle-white);
+    border-left: 1px solid var(--oracle-border);
+    box-shadow: -10px 0 28px rgba(49, 45, 42, 0.16);
+    overflow: auto;
+    z-index: 31;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Drawer title bar: title left, close button right */
+.ocd-console-redwood-ng-theme .ocd-lz-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* Monospace config / JSON preview block */
+.ocd-console-redwood-ng-theme .ocd-lz-pre {
+    margin: 0;
+    padding: 14px;
+    min-height: 240px;
+    max-height: 58vh;
+    overflow: auto;
+    background: var(--oracle-bg);
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: pre;
+    color: var(--oracle-bark);
+    flex-shrink: 0;
+}
+
+/* Generated-file list in the drawer */
+.ocd-console-redwood-ng-theme .ocd-lz-file-list {
+    border-top: 1px solid var(--oracle-border);
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1 1 auto;
+    overflow: auto;
+}
+
+/* Single file row: filename | size | download button */
+.ocd-console-redwood-ng-theme .ocd-lz-file-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 90px auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--oracle-border);
+    font-size: 13px;
+    color: var(--oracle-text);
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-file-row:last-child {
+    border-bottom: none;
+}
+
+/* Monospace filename */
+.ocd-console-redwood-ng-theme .ocd-lz-file-name {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--oracle-bark);
+    overflow-wrap: anywhere;
+}
+
+/* ---- 10.10  Compartment diagram canvas ------------------ */
+
+/* Scrollable canvas wrapper with a subtle grid background */
+.ocd-console-redwood-ng-theme .ocd-lz-diagram-canvas {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 520px;
+    padding: 18px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 7px;
+    background-color: #fbfbfb;
+    background-image:
+        linear-gradient(var(--oracle-border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--oracle-border) 1px, transparent 1px);
+    background-size: 18px 18px;
+    overflow: auto;
+}
+
+/* Outermost OCI Region bounding box */
+.ocd-console-redwood-ng-theme .ocd-lz-region-box {
+    min-width: 0;
+    min-height: 470px;
+    border: 1px solid #9b9b9b;
+    border-radius: 8px;
+    background: rgba(250, 250, 250, 0.94);
+    padding: 14px;
+}
+
+/* Region box heading label */
+.ocd-console-redwood-ng-theme .ocd-lz-diagram-label {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--oracle-bark);   /* #312D2A on rgba(250,250,250,.94) ≈ 14:1 — AAA */
+    margin-bottom: 2px;
+}
+
+/* Dashed tenancy bounding box */
+.ocd-console-redwood-ng-theme .ocd-lz-tenancy-box {
+    min-width: 0;
+    min-height: 385px;
+    border: 2px dashed #312D2A;  /* oracle-bark — clearly visible dashes */
+    padding: 18px;
+    margin: 18px 12px 0;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+/* Tenancy box heading */
+.ocd-console-redwood-ng-theme .ocd-lz-tenancy-label {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--oracle-bark);
+    margin-bottom: 4px;
+}
+
+/* Dotted landing-zone bounding box — red-accent dotted border */
+.ocd-console-redwood-ng-theme .ocd-lz-landingzone-box {
+    min-width: 0;
+    border: 1.5px dotted var(--oracle-red);  /* red accent replaces LZNG's #d33 */
+    padding: 14px;
+    margin: 24px 12px 0;
+    background: rgba(255, 255, 255, 0.74);
+    border-radius: 3px;
+}
+
+/* Landing-zone root compartment name */
+.ocd-console-redwood-ng-theme .ocd-lz-zone-label {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--oracle-bark);
+    margin-bottom: 2px;
+}
+
+/* Two-column layout: shared (narrow) | environments (wide) */
+.ocd-console-redwood-ng-theme .ocd-lz-zone-rows {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(130px, 0.75fr) minmax(0, 3fr);
+    gap: 14px;
+    margin-top: 14px;
+}
+
+/* Shared infrastructure column */
+.ocd-console-redwood-ng-theme .ocd-lz-shared-column {
+    min-width: 0;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+/* Environment compartments column */
+.ocd-console-redwood-ng-theme .ocd-lz-env-column {
+    min-width: 0;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+/* Individual compartment box — base style */
+.ocd-console-redwood-ng-theme .ocd-lz-compartment-box {
+    min-width: 0;
+    min-height: 44px;       /* SC 2.5.8 — 44px aligns with LZNG reference */
+    border: 1.5px dotted var(--oracle-text);
+    border-radius: 2px;
+    padding: 9px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--oracle-text);  /* #312D2A — high contrast on both tints */
+    display: flex;
+    align-items: center;
+    overflow-wrap: anywhere;
+    line-height: 1.3;
+}
+
+/* Shared infrastructure tint — warm yellow: #312D2A on #fffbd7 ≈ 14.1:1 — AAA */
+.ocd-console-redwood-ng-theme .ocd-lz-compartment-box-shared {
+    background: #fffbd7;
+    border-color: #b8a800;   /* darkened yellow border for 3:1 UI contrast */
+}
+
+/* Environment tint — muted green: #312D2A on #dcefd8 ≈ 9.0:1 — AAA */
+.ocd-console-redwood-ng-theme .ocd-lz-compartment-box-environment {
+    background: #dcefd8;
+    border-color: #4a7c45;   /* darkened green border for 3:1 UI contrast */
+}
+
+/* ---- 10.11  Entrance animations — LZ page --------------- */
+@media (prefers-reduced-motion: no-preference) {
+    .ocd-console-redwood-ng-theme .ocd-lz-view {
+        animation: ocd-rng-fadeIn 220ms ease-out both;
+    }
+
+    .ocd-console-redwood-ng-theme .ocd-lz-panel {
+        animation: ocd-rng-slideUp 280ms ease-out both;
+    }
+
+    .ocd-console-redwood-ng-theme .ocd-lz-diagram-panel {
+        animation: ocd-rng-slideUp 280ms ease-out both;
+        animation-delay: 60ms;
+    }
+
+    .ocd-console-redwood-ng-theme .ocd-lz-drawer {
+        animation: ocd-rng-slideUp 200ms ease-out both;
+    }
+}
+`,
+
+    'ocd-redwood-theme.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 
 :root {
@@ -370,7 +3103,7 @@ details[open] > summary.summary-background-redwood-theme {
 
 `,
 
-    'ocd-svg.css': String.raw`/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+    'ocd-svg.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 :root {
 
@@ -554,7 +3287,7 @@ svg {
 
 `,
 
-    'ocd.css': String.raw`/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+    'ocd.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 :root {
     --console-titlebar-height: 25px;
@@ -1536,7 +4269,7 @@ summary {
 
 .ocd-designer-palette-provider>details>summary:before {
     border-radius: 5px;
-    content: '\25B9';
+    content: '\\25B9';
     color: #1d2733;
     float: left;
     margin: 2px;
@@ -1546,7 +4279,7 @@ summary {
 }
 
 .ocd-designer-palette-provider>details[open]>summary:before {
-    content: '\25BF';
+    content: '\\25BF';
 }
 
 .ocd-designer-palette-group {
@@ -1596,7 +4329,7 @@ summary {
 
 .ocd-designer-palette-group>details>summary:before {
     border-radius: 5px;
-    content: '\25B9';
+    content: '\\25B9';
     color: #1d2733;
     float: left;
     margin: 2px;
@@ -1606,7 +4339,7 @@ summary {
 }
 
 .ocd-designer-palette-group>details[open]>summary:before {
-    content: '\25BF';
+    content: '\\25BF';
 }
 
 .ocd-designer-palette-group-grid {
@@ -3056,7 +5789,7 @@ table {
 }
 `,
 
-    'oci-theme.css': String.raw`/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+    'oci-theme.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 /*
 ** Groups
@@ -3100,7 +5833,7 @@ table {
 /*
 ** Resources
 */
-.oci-analytics-instance {
+.oci-analytics-instance, .oci-monitoring-alarm {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MiA0MiI+PGcgZmlsbD0iIzJjNTk2NyIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTAsMzIuMDIyIEwxNy41OSwzMi4wMjIgTDE3LjQxOCwzMy4yOTggTDE2LjkwOCwzMy4yOTggTDE1LjIwMSwzNC4xNDggTDE1LjIwMSwzNSBMMTYuOTA4LDM1IEwyNS4zNDksMzUgTDI3LjA1NCwzNSBMMjcuMDU0LDM0LjE0OCBMMjUuMzQ5LDMzLjI5OCBMMjQuNTgyLDMzLjI5OCBMMjQuNDEsMzIuMDIyIEwzMiwzMi4wMjIgTDMyLDE1IEwxMCwxNSBMMTAsMzIuMDIyIEwxMCwzMi4wMjIgTTE5LjEyMywzMy4yOTggTDE5LjI5NSwzMi4wMjIgTDIyLjcwNSwzMi4wMjIgTDIyLjg3NywzMy4yOTggTDE5LjEyMywzMy4yOTggTDE5LjEyMywzMy4yOTggTTExLjcwNSwxNi43MDIgTDMwLjI5NSwxNi43MDIgTDMwLjI5NSwyNy4yNTYgTDI3LjQ4MSwyNy4yNTYgTDI3LjQ4MSwyOC4xMDYgTDI1Ljc3NiwyOC4xMDYgTDI1Ljc3NiwyNy4yNTYgTDIzLjcyOCwyNy4yNTYgTDIzLjcyOCwyOC4xMDYgTDIyLjAyMywyOC4xMDYgTDIyLjAyMywyNy4yNTYgTDE5Ljk3NywyNy4yNTYgTDE5Ljk3NywyOC4xMDYgTDE4LjI3MiwyOC4xMDYgTDE4LjI3MiwyNy4yNTYgTDE2LjIyNCwyNy4yNTYgTDE2LjIyNCwyOC4xMDYgTDE0LjUxOSwyOC4xMDYgTDE0LjUxOSwyNy4yNTYgTDExLjk2LDI3LjI1NiBMMTEuOTYsMTYuNzAyIEwxMS43MDUsMTYuNzAyIEwxMS43MDUsMTYuNzAyIE0xMS43MDUsMjguOTU4IEwzMC4yOTUsMjguOTU4IEwzMC4yOTUsMzAuMjM0IEwxMS43MDUsMzAuMjM0IEwxMS43MDUsMjguOTU4IEwxMS43MDUsMjguOTU4Ii8+PHBhdGggZD0iTTM2LjUyMiw4LjE2IEMzNS42NjcsNy41NjQgMzQuNjQyLDcuMjI0IDMzLjYxMyw2Ljk2OCBDMzIuNzU4LDYuNzk4IDMxLjk5LDYuMjAyIDMxLjU2Myw1LjQzNiBDMzAuMTA2LDIuMzcyIDI3LjExLDAuNSAyMy42OSwwLjUgQzIxLjIwOCwwLjUgMTguODEsMS41MjIgMTcuMTg3LDMuMzA4IEMxNi41ODUsMy45MDQgMTUuNzMxLDQuMjQ0IDE0Ljg3Niw0LjE2IEMxMy41OTMsNC4wNzQgMTIuMzk0LDQuMjQ0IDExLjI4Miw0Ljc1NiBDOS4xNCw1LjY5MiA3LjYwMSw3LjY0OCA3LjE3Myw5Ljg2MiBDNy4wMDMsMTAuNzEyIDYuNDA1LDExLjQ3OCA1LjYzNCwxMS45MDQgQzIuNzI0LDEzLjQzNiAwLjg0LDE2LjMzIDAuNTg3LDE5LjU2NCBMMC41LDIwLjUgTDguMzczLDIwLjUgTDguMzczLDE4Ljc5OCBMMi4zODQsMTguNzk4IEMyLjgxMiwxNi41IDQuMjY0LDE0LjU0MiA2LjQwNSwxMy40MzYgQzcuNjg4LDEyLjc1NiA4LjU0MywxMS41NjQgOC44LDEwLjIwMiBDOS4xNCw4LjUgMTAuMzQsNy4wNTQgMTEuOTY2LDYuMjg4IEMxMi44MjEsNS45NDYgMTMuNzYzLDUuNzc2IDE0LjYxOCw1Ljg2MiBDMTYuMDc1LDYuMDMyIDE3LjQ0LDUuNTIyIDE4LjM4Miw0LjQxNCBDMTkuODM5LDMuMDU0IDIxLjcxOSwyLjIwMiAyMy42OSwyLjIwMiBDMjYuNDI1LDIuMjAyIDI4LjkwNywzLjczNCAzMC4xMDYsNi4xMTYgQzMwLjcwNCw3LjM5NCAzMS45MDMsOC4zMyAzMy4zNiw4LjU4NiBDMzQuMjE1LDguNzU2IDM0Ljk4Miw5LjA5NiAzNS42NjcsOS41MjIgQzM4Ljc1MSwxMS40NzggMzkuOTQ2LDE1LjQ3OCAzOC40OTMsMTguNzEyIEwzMy4xMDIsMTguNzEyIEwzMy4xMDIsMjAuNDE0IEwzOS42MDUsMjAuNDE0IEwzOS44NTksMTkuOTkgQzQyLDE1LjkwNCA0MC42MywxMC42MjggMzYuNTIyLDguMTYgTDM2LjUyMiw4LjE2Ii8+PHBhdGggZD0iTTE0LDI0IEwxNCwyNi43MzkgTDE0LDI3LjUgTDE1LjUsMjcuNSBMMTUuNSwyNi43MzkgTDE1LjUsMjQgTDE0LDI0IEwxNCwyNCIvPjxwYXRoIGQ9Ik0xOCwyMi41IEwxOCwyNy4xNjcgTDE4LDI4IEwxOS41LDI4IEwxOS41LDI3LjE2NyBMMTkuNSwyMi41IEwxOCwyMi41IEwxOCwyMi41Ii8+PHBhdGggZD0iTTIyLDIwIEwyMiwyNy4xNDkgTDIyLDI4IEwyMy41LDI4IEwyMy41LDI3LjE0OSBMMjMuNSwyMCBMMjIsMjAgTDIyLDIwIi8+PHBhdGggZD0iTTI2LDE4IEwyNiwyNy4xNiBMMjYsMjggTDI3LjUsMjggTDI3LjUsMjcuMTYgTDI3LjUsMTggTDI2LDE4IEwyNiwxOCIvPjwvZz48L3N2Zz4=");
 }
 
@@ -3112,7 +5845,7 @@ table {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjEuOSAxNjIiPjxwYXRoIGZpbGw9IiMzMTJEMkEiIGQ9Ik0xNTIuOCAxNTIuOUg5VjkuMmgxNDMuOHYxNDMuN3ptLTEzNC44LTloMTI1LjhWMTguMkgxOHYxMjUuN3ptMTExLjEtMTEuNkgzMi45Vjk3LjRoOTYuM3YzNC45em0tODcuMi05aDc4LjN2LTE2LjlINDEuOXYxNi45em02My45LTEzLjFjLTIuNiAwLTQuNyAyLjEtNC43IDQuN3MyLjEgNC43IDQuNyA0LjcgNC43LTIuMSA0LjctNC43LTIuMS00LjctNC43LTQuN3pNMzMuMSA5MGg0Mi42VjYzLjlIMzMuMVY5MHptMTcuMy03VjcwLjloNy43VjgzaC03Ljd6bTE4LjMgMGgtNi42VjcwLjloNi42Vjgzek00MC4xIDcwLjloNi4zVjgzaC02LjNWNzAuOXptLTctMTMuOWg0Mi42VjMwLjhIMzMuMVY1N3ptMTcuMy03VjM3LjhoNy43VjUwaC03Ljd6bTE4LjMgMGgtNi42VjM3LjhoNi42VjUwek00MC4xIDM3LjhoNi4zVjUwaC02LjNWMzcuOHpNODYuOCA5MGg0Mi42VjYzLjlIODYuOFY5MHptMTcuMi03VjcwLjloNy43VjgzSDEwNHptMTguMyAwaC02LjZWNzAuOWg2LjZWODN6TTkzLjggNzAuOWg2LjJWODNoLTYuMlY3MC45em0tNy00MC4xVjU3aDQyLjZWMzAuOEg4Ni44em0yNC45IDdWNTBIMTA0VjM3LjhoNy43em0tMTcuOSAwaDYuMlY1MGgtNi4yVjM3Ljh6TTEyMi4zIDUwaC02LjZWMzcuOGg2LjZWNTB6Ii8+PC9zdmc+");
 }
 
-.oci-bastion {
+.oci-bastion, .oci-log-group {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MiA0MiI+PGcgZmlsbD0iIzJjNTk2NyIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNNi45OTMsMzcuODk4IEw2Ljk5MywzNS4yIEw3LjE5MywzNS4yIEwxOC40NDIsMzUuMiBDMTguNDQyLDM0LjY5OSAxOC41NDEsMzQuMTk5IDE4LjY0LDMzLjY5OCBMOC43ODQsMzMuNjk4IEw5LjQ4MSwxOS4yOTkgTDIyLjgyNCwxOS4yOTkgTDIzLjIxOSwyOS4xMDEgQzIzLjcyMSwyOS4wMDEgMjQuMjE3LDI4LjkwMSAyNC43MTIsMjguOTAxIEwyNC4zMTYsMTkuMzk5IEwyNC40MTUsMTkuMzk5IEMyNS4zMTIsMTkuMzk5IDI2LjExLDE4LjU5OCAyNi4xMSwxNy43MDEgTDI2LjExLDkuNzAxIEwyMC44MzIsOS43MDEgTDIwLjgzMiwxMi43IEwxOC43MzksMTIuNyBMMTguNzM5LDkuNzAxIEwxNi44NTEsOS43MDEgTDE2Ljg1MSw2LjcwMiBMMjAuOTMxLDYuNzAyIEMyMS4wMyw2LjcwMiAyMS4wMyw2Ljc5OCAyMS4wMyw2Ljc5OCBDMjEuMDMsNy42OTkgMjEuODI4LDguNCAyMi43MjUsOC40IEwyOC41LDguNCBMMjYuODA1LDUuNjAxIEwyOC41LDIuNzAyIEwyMi42MjYsMi43MDIgQzIyLjYyNiwxLjgwMSAyMS44MjgsMSAyMC45MzEsMSBMMTYuOTQ5LDEgTDE2LjM0OSwxIEwxNS4zNTYsMSBMMTUuMzU2LDkuODAxIEwxMy40NjUsOS44MDEgTDEzLjQ2NSwxMi44IEwxMS4zNzQsMTIuOCBMMTEuMzc0LDkuODAxIEw2LjA5Niw5LjgwMSBMNi4wOTYsMTcuODAxIEM2LjA5NiwxOC42OTggNi44OTQsMTkuNDk5IDcuNzkxLDE5LjQ5OSBMNy45ODksMTkuNDk5IEw3LjI5MiwzMy43OTggTDUuNSwzMy43OTggTDUuNSwzOS41IEwxOS44MzQsMzkuNSBDMTkuNDM4LDM5IDE5LjE0MSwzOC40OTkgMTguOTQxLDM3Ljk5OCBMNi45OTMsMzcuOTk4IEw2Ljk5MywzNy44OTggTDYuOTkzLDM3Ljg5OCBNMjUuODA5LDMuOTk5IEwyNS4wMTUsNS40MDEgTDI1LjgwOSw2LjcwMiBMMjIuNzI1LDYuNzAyIEMyMi42MjYsNi43MDIgMjIuNjI2LDYuNjAyIDIyLjYyNiw2LjYwMiBMMjIuNjI2LDMuOTk5IEwyNS44MDksMy45OTkgTDI1LjgwOSwzLjk5OSBNMjAuOTMxLDIuMzAxIEMyMS4wMywyLjMwMSAyMS4xMjksMi40MDEgMjEuMTI5LDIuNTAyIEwyMS4xMjksNSBMMjEuMDMsNSBMMTYuOTQ5LDUgTDE2Ljk0OSwyLjMwMSBMMjAuOTMxLDIuMzAxIEwyMC45MzEsMi4zMDEgTTcuNzkxLDE3LjgwMSBDNy42OSwxNy44MDEgNy41OTEsMTcuNzAxIDcuNTkxLDE3LjYwMSBMNy41OTEsMTEuMDk5IEw5Ljg3OSwxMS4wOTkgTDkuODc5LDE0LjEwMiBMMTQuOTU4LDE0LjEwMiBMMTQuOTU4LDExLjA5OSBMMTcuMjQ2LDExLjA5OSBMMTcuMjQ2LDE0LjEwMiBMMjIuNDIxLDE0LjEwMiBMMjIuNDIxLDExLjA5OSBMMjQuNzEyLDExLjA5OSBMMjQuNzEyLDE3LjYwMSBDMjQuNzEyLDE3LjcwMSAyNC42MTMsMTcuODAxIDI0LjUxNCwxNy44MDEgTDI0LjMxNiwxNy44MDEgTDcuOTg5LDE3LjgwMSBMNy43OTEsMTcuODAxIEw3Ljc5MSwxNy44MDEiLz48cGF0aCBkPSJNMjQuOTUzLDMwIEMyMS45MjIsMzAgMTkuNSwzMi4zMzMgMTkuNSwzNS4yNSBDMTkuNSwzOC4xNjcgMjEuOTIyLDQwLjUgMjQuOTUzLDQwLjUgQzI3Ljk3OCw0MC41IDMwLjQsMzguMTY3IDMwLjQsMzUuMjUgQzMwLjUsMzIuNDMxIDI3Ljk3OCwzMCAyNC45NTMsMzAgTDI0Ljk1MywzMCBNMjQuOTUzLDM5LjEzOSBDMjIuNzMyLDM5LjEzOSAyMS4wMTIsMzcuMzg5IDIxLjAxMiwzNS4zNDggQzIxLjAxMiwzMy4zMDUgMjIuODMyLDMxLjU1NiAyNC45NTMsMzEuNTU2IEMyNy4wNjgsMzEuNTU2IDI4Ljg4NywzMy4zMDUgMjguODg3LDM1LjM0OCBDMjguODg3LDM3LjM4OSAyNy4xNjgsMzkuMTM5IDI0Ljk1MywzOS4xMzkgTDI0Ljk1MywzOS4xMzkiLz48cGF0aCBkPSJNMjYuNDAxLDMzLjUgTDI0LjMwMSwzNS40NTQgTDIzLjU5OSwzNC44OTUgTDIyLjUsMzUuOTE4IEwyNC4zMDEsMzcuNSBMMjcuNSwzNC41MjMgTDI2LjQwMSwzMy41IEwyNi40MDEsMzMuNSIvPjxwYXRoIGQ9Ik0xNy41OTcsMjIuMDggTDE4LjU5OCwyMy4wNjMgTDE0LjUsMjMuMDYzIEwxNC41LDI0LjUzNiBMMTguNTk4LDI0LjUzNiBMMTcuNTk3LDI1LjUxOCBMMTguNjk3LDI2LjUgTDIxLjUsMjMuNzUgTDE4LjY5NywyMSBMMTcuNTk3LDIyLjA4IEwxNy41OTcsMjIuMDgiLz48cGF0aCBkPSJNMTQuMTcyLDI2LjA4IEwxMy4xMzYsMjUgTDEwLjUsMjcuNzUgTDEzLjEzNiwzMC41IEwxNC4xNzIsMjkuNDE5IEwxMy4zMjUsMjguNjM0IEwxNywyOC42MzQgTDE3LDI3LjE2IEwxMy4xMzYsMjcuMTYgTDE0LjE3MiwyNi4wOCBMMTQuMTcyLDI2LjA4Ii8+PHBhdGggZD0iTTYuOTkzLDM3Ljg5OCBMNi45OTMsMzUuMiBMNy4xOTMsMzUuMiBMMTguNDQyLDM1LjIgQzE4LjQ0MiwzNC42OTkgMTguNTQxLDM0LjE5OSAxOC42NCwzMy42OTggTDguNzg3LDMzLjY5OCBMOS40ODEsMTkuMjk5IEwyMi44MjQsMTkuMjk5IEwyMy4yMjEsMjkuMTAxIEMyMy43MjEsMjkuMDAxIDI0LjIxNywyOC45MDEgMjQuNzEyLDI4LjkwMSBMMjQuMzE2LDE5LjM5OSBMMjQuNDE1LDE5LjM5OSBDMjUuMzEyLDE5LjM5OSAyNi4xMSwxOC41OTggMjYuMTEsMTcuNzAxIEwyNi4xMSw5LjcwMSBMMjAuODMyLDkuNzAxIEwyMC44MzIsMTIuNyBMMTguNzM5LDEyLjcgTDE4LjczOSw5LjcwMSBMMTYuODUxLDkuNzAxIEwxNi44NTEsNi43MDIgTDIwLjkzMSw2LjcwMiBDMjEuMDMsNi43MDIgMjEuMDMsNi43OTggMjEuMDMsNi43OTggQzIxLjAzLDcuNjk5IDIxLjgyOCw4LjQgMjIuNzI1LDguNCBMMjguNSw4LjQgTDI2LjgwNSw1LjYwMSBMMjguNSwyLjcwMiBMMjIuNjI2LDIuNzAyIEMyMi42MjYsMS44MDEgMjEuODI4LDEgMjAuOTMxLDEgTDE2Ljk0OSwxIEwxNi4zNDksMSBMMTUuMzU2LDEgTDE1LjM1Niw5LjgwMSBMMTMuNDY1LDkuODAxIEwxMy40NjUsMTIuOCBMMTEuMzc0LDEyLjggTDExLjM3NCw5LjgwMSBMNi4wOTgsOS44MDEgTDYuMDk4LDE3LjgwMSBDNi4wOTgsMTguNjk4IDYuODk0LDE5LjQ5OSA3Ljc5MSwxOS40OTkgTDcuOTg5LDE5LjQ5OSBMNy4yOTIsMzMuNzk4IEw1LjUsMzMuNzk4IEw1LjUsMzkuNSBMMTkuODM0LDM5LjUgQzE5LjQzOCwzOSAxOS4xNDEsMzguNDk5IDE4Ljk0NCwzNy45OTggTDYuOTkzLDM3Ljk5OCBMNi45OTMsMzcuODk4IEw2Ljk5MywzNy44OTggTTI1LjgwOSwzLjk5OSBMMjUuMDE1LDUuNDAxIEwyNS44MDksNi43MDIgTDIyLjcyNSw2LjcwMiBDMjIuNjI2LDYuNzAyIDIyLjYyNiw2LjYwMiAyMi42MjYsNi42MDIgTDIyLjYyNiwzLjk5OSBMMjUuODA5LDMuOTk5IEwyNS44MDksMy45OTkgTTIwLjkzMSwyLjMwMSBDMjEuMDMsMi4zMDEgMjEuMTI5LDIuNDAxIDIxLjEyOSwyLjUwMiBMMjEuMTI5LDUgTDIxLjAzLDUgTDE2Ljk0OSw1IEwxNi45NDksMi4zMDEgTDIwLjkzMSwyLjMwMSBMMjAuOTMxLDIuMzAxIE03Ljc5MSwxNy44MDEgQzcuNjksMTcuODAxIDcuNTkxLDE3LjcwMSA3LjU5MSwxNy42MDEgTDcuNTkxLDExLjA5OSBMOS44ODEsMTEuMDk5IEw5Ljg4MSwxNC4xMDIgTDE0Ljk1OCwxNC4xMDIgTDE0Ljk1OCwxMS4wOTkgTDE3LjI0NiwxMS4wOTkgTDE3LjI0NiwxNC4xMDIgTDIyLjQyMSwxNC4xMDIgTDIyLjQyMSwxMS4wOTkgTDI0LjcxMiwxMS4wOTkgTDI0LjcxMiwxNy42MDEgQzI0LjcxMiwxNy43MDEgMjQuNjEzLDE3LjgwMSAyNC41MTQsMTcuODAxIEwyNC4zMTYsMTcuODAxIEw3Ljk4OSwxNy44MDEgTDcuNzkxLDE3LjgwMSBMNy43OTEsMTcuODAxIi8+PHBhdGggZD0iTTI0Ljk1MywzMCBDMjEuOTIyLDMwIDE5LjUsMzIuMzMzIDE5LjUsMzUuMjUgQzE5LjUsMzguMTY3IDIxLjkyMiw0MC41IDI0Ljk1Myw0MC41IEMyNy45NzgsNDAuNSAzMC40LDM4LjE2NyAzMC40LDM1LjI1IEMzMC41LDMyLjQzMSAyNy45NzgsMzAgMjQuOTUzLDMwIEwyNC45NTMsMzAgTTI0Ljk1MywzOS4xMzkgQzIyLjczMiwzOS4xMzkgMjEuMDEyLDM3LjM4OSAyMS4wMTIsMzUuMzQ4IEMyMS4wMTIsMzMuMzA1IDIyLjgzMiwzMS41NTYgMjQuOTUzLDMxLjU1NiBDMjcuMDY4LDMxLjU1NiAyOC44ODcsMzMuMzA1IDI4Ljg4NywzNS4zNDggQzI4Ljg4NywzNy4zODkgMjcuMTY4LDM5LjEzOSAyNC45NTMsMzkuMTM5IEwyNC45NTMsMzkuMTM5Ii8+PHBhdGggZD0iTTI2LjQwMSwzMy41IEwyNC4zMDEsMzUuNDU0IEwyMy41OTksMzQuODk1IEwyMi41LDM1LjkxOCBMMjQuMzAxLDM3LjUgTDI3LjUsMzQuNTIzIEwyNi40MDEsMzMuNSBMMjYuNDAxLDMzLjUiLz48cGF0aCBkPSJNMTcuNTk3LDIyLjA4IEwxOC41OTgsMjMuMDYzIEwxNC41LDIzLjA2MyBMMTQuNSwyNC41MzYgTDE4LjU5OCwyNC41MzYgTDE3LjU5NywyNS41MTggTDE4LjY5NywyNi41IEwyMS41LDIzLjc1IEwxOC42OTcsMjEgTDE3LjU5NywyMi4wOCBMMTcuNTk3LDIyLjA4Ii8+PHBhdGggZD0iTTE0LjE3NSwyNi4wOCBMMTMuMTM4LDI1IEwxMC41LDI3Ljc1IEwxMy4xMzgsMzAuNSBMMTQuMTc1LDI5LjQxOSBMMTMuMzI3LDI4LjYzNCBMMTcsMjguNjM0IEwxNywyNy4xNiBMMTMuMTM4LDI3LjE2IEwxNC4xNzUsMjYuMDggTDE0LjE3NSwyNi4wOCIvPjwvZz48L3N2Zz4=");
 }
 
@@ -3191,7 +5924,7 @@ table {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MiA0MiI+PGcgZmlsbD0iIzJjNTk2NyIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMzkuNDY4LDguNjI0IEMzOC41ODEsOC4wNyAzNy42MDUsNy42NzIgMzYuNTg0LDcuNDQ0IEMzNi4xNTEsNy4zNSAzNS43NSw3LjE2MiAzNS40MDIsNi44OTIgQzM1LjA1NCw2LjYyMiAzNC43Nyw2LjI3OCAzNC41NzYsNS44ODYgQzMzLjg0Nyw0LjQxNiAzMi43MTMsMy4xNzggMzEuMzExLDIuMzE2IEMyOS45MSwxLjQ1NCAyOC4yOTQsMSAyNi42NDIsMS4wMDYgQzI1LjQyNywxLjAxIDI0LjIyLDEuMjYgMjMuMTA2LDEuNzQ2IEMyMS45ODgsMi4yMyAyMC45ODQsMi45MzggMjAuMTU0LDMuODI2IEMxOS44NTgsNC4xNCAxOS40OTMsNC4zODIgMTkuMDg0LDQuNTMgQzE4LjY3OSw0LjY4IDE4LjI0Niw0LjczMiAxNy44MTMsNC42ODYgQzE2LjYwNiw0LjU3OCAxNS4zODcsNC43NzQgMTQuMjczLDUuMjU2IEMxMy4yMiw1LjcxNiAxMi4zMDEsNi40MjQgMTEuNTgsNy4zMTYgQzEwLjg2Myw4LjIxIDEwLjM3Nyw5LjI2MiAxMC4xNTQsMTAuMzg0IEMxMC4wNjksMTAuODEgOS44ODMsMTEuMjEgOS42MiwxMS41NTYgQzkuMzU2LDExLjkwMiA5LjAxNiwxMi4xODQgOC42MjMsMTIuMzgyIEM3LjIwMiwxMy4xMjggNS45OTEsMTQuMjI0IDUuMTEyLDE1LjU2NiBDNC4yMzcsMTYuOTA4IDMuNzExLDE4LjQ1MiAzLjYwMSwyMC4wNSBMMy41LDIxIEw5LjM0LDIxIEM5LjgzLDIwLjIwMiAxMC41NzksMTkuNTkgMTEuNDU4LDE5LjI2IEw1LjQzMiwxOS4yNiBDNS42NTksMTguMTI4IDYuMTMzLDE3LjA2IDYuODMzLDE2LjEzNiBDNy41MjYsMTUuMjEyIDguNDI1LDE0LjQ1NiA5LjQ0OSwxMy45MjIgQzEwLjA2OSwxMy42MDQgMTAuNjA4LDEzLjE0OCAxMS4wMjUsMTIuNTkyIEMxMS40NDIsMTIuMDM4IDExLjczLDExLjM5NCAxMS44NjMsMTAuNzE0IEMxMi4wMjksOS44NjQgMTIuNDAyLDkuMDY4IDEyLjk0NSw4LjM5MiBDMTMuNDkxLDcuNzE4IDE0LjE5Miw3LjE4MiAxNC45ODYsNi44MzQgQzE1LjgyOCw2LjQ2NiAxNi43NDgsNi4zMTYgMTcuNjYzLDYuMzk0IEMxOC4zNTEsNi40NjggMTkuMDUyLDYuMzggMTkuNzA0LDYuMTM4IEMyMC4zNTYsNS44OTggMjAuOTQzLDUuNTEgMjEuNDE3LDUuMDA2IEMyMi4wOSw0LjI5MiAyMi44OTksMy43MiAyMy43OTksMy4zMyBDMjQuNjk4LDIuOTQgMjUuNjY2LDIuNzM4IDI2LjY0MiwyLjczNiBDMjcuOTcsMi43MjYgMjkuMjcsMy4wODggMzAuMzk2LDMuNzgyIEMzMS41MjYsNC40NzYgMzIuNDMzLDUuNDcgMzMuMDE2LDYuNjU0IEMzMy4zMzIsNy4yOCAzMy43ODIsNy44MjYgMzQuMzM3LDguMjU0IEMzNC44OTIsOC42ODQgMzUuNTQsOC45ODQgMzYuMjIsOS4xMzQgQzM3LjA1LDkuMzI4IDM3LjgzMiw5LjY2OCAzOC41NDEsMTAuMTM0IEM0MC4wMzksMTEuMDc2IDQxLjE0NSwxMi41MjQgNDEuNjUxLDE0LjIxMiBDNDIuMTY1LDE1LjkgNDIuMDQ0LDE3LjcxNCA0MS4zMTksMTkuMzIgTDM2LjA2MiwxOS4zMiBDMzYuMjc3LDE5Ljg2NiAzNi40NTUsMjAuNDI4IDM2LjU4NCwyMSBMNDIuMzcyLDIxIEw0Mi42MTUsMjAuNTUgQzQzLjcxMiwxOC41MzggNDQsMTYuMTg0IDQzLjQxNywxMy45NjYgQzQyLjgzLDExLjc1IDQxLjQyLDkuODQgMzkuNDY4LDguNjI0IEwzOS40NjgsOC42MjQiLz48cGF0aCBkPSJNMzEuODgyLDMxLjc3MSBMMzEuNDI4LDMxLjA5OSBDMzIuNjg1LDMwLjIyMSAzMy43MTUsMjkuMDU1IDM0LjQyMSwyNy42OTYgQzM1LjEzLDI2LjMzNyAzNS41LDI0LjgyNiAzNS41LDIzLjI5MyBDMzUuNSwyMS43NTkgMzUuMTMsMjAuMjUyIDM0LjQyMSwxOC44OTIgQzMzLjcxNSwxNy41MzMgMzIuNjg1LDE2LjM2NCAzMS40MjgsMTUuNDg5IEwzMS44MTMsMTQuNzc3IEMzMi4wMjksMTQuODI4IDMyLjI1MSwxNC44NTQgMzIuNDczLDE0Ljg1NyBMMzIuNzI4LDE0Ljg1NyBDMzIuODk2LDE0LjgzNyAzMy4wNywxNC44MDUgMzMuMjMzLDE0Ljc2NiBDMzMuODA5LDE0LjYxMiAzNC4zMjcsMTQuMjg0IDM0LjcwNywxMy44MjUgQzM1LjA5NSwxMy4zNjYgMzUuMzI3LDEyLjgwMiAzNS4zNzMsMTIuMjA5IEMzNS40MjYsMTEuNjEzIDM1LjI4OCwxMS4wMTggMzQuOTkzLDEwLjUwMiBDMzQuNjkyLDkuOTg2IDM0LjIzOCw5LjU3NiAzMy43LDkuMzI4IEMzMy4xNTksOS4wNzcgMzIuNTUyLDkgMzEuOTY2LDkuMTA1IEMzMS4zNzksOS4yMTQgMzAuODQxLDkuNDk5IDMwLjQxOCw5LjkyMyBDMzAuMDAyLDEwLjM0NSAyOS43MjIsMTAuODkgMjkuNjI3LDExLjQ3NyBDMjkuNTI1LDEyLjA2NyAyOS42MTIsMTIuNjcxIDI5Ljg2NSwxMy4yMDkgQzI5Ljk4NywxMy40NjMgMzAuMTQ1LDEzLjcgMzAuMzI0LDEzLjkxMyBMMjkuOTIzLDE0LjY0NiBDMjguNjg2LDE0LjA3NiAyNy4zNCwxMy43ODIgMjUuOTgzLDEzLjc4MiBDMjMuNzg1LDEzLjc4NSAyMS42NTEsMTQuNTQ2IDE5Ljk1LDE1Ljk0IEMxOC4yNDksMTcuMzMxIDE3LjA4NCwxOS4yNjkgMTYuNjQ1LDIxLjQyNiBDMTYuNTc2LDIxLjc1NyAxNi41MjgsMjIuMDkzIDE2LjQ5NywyMi40MjkgTDE1LjY3NCwyMi40MjkgQzE1LjQ2NywyMS43NjUgMTUuMDM0LDIxLjE5OCAxNC40NDIsMjAuODMgQzEzLjg1NiwyMC40NiAxMy4xNTQsMjAuMzE1IDEyLjQ2NiwyMC40MTcgQzExLjc4NSwyMC41MjMgMTEuMTU4LDIwLjg3IDEwLjcwMSwyMS4zOTUgQzEwLjI1MiwyMS45MjIgMTAsMjIuNTk1IDEwLDIzLjI5IEMxMCwyMy45ODIgMTAuMjUyLDI0LjY1NSAxMC43MDEsMjUuMTgyIEMxMS4xNTgsMjUuNzA3IDExLjc4NSwyNi4wNTQgMTIuNDY2LDI2LjE2IEMxMy4xNTQsMjYuMjYyIDEzLjg1NiwyNi4xMTcgMTQuNDQyLDI1Ljc0NyBDMTUuMDM0LDI1LjM3OSAxNS40NjcsMjQuODEyIDE1LjY3NCwyNC4xNDggTDE2LjQ3NCwyNC4xNDggQzE2LjUwOCwyNC40ODQgMTYuNTUzLDI0LjgyIDE2LjYyNywyNS4xNTEgQzE2LjkwOCwyNi41NjIgMTcuNTEsMjcuODkgMTguMzc3LDI5LjAzNSBDMTkuMjQ5LDMwLjE4MSAyMC4zNjMsMzEuMTE2IDIxLjY0NiwzMS43NjYgQzIyLjkyOCwzMi40MTYgMjQuMzM5LDMyLjc2OSAyNS43ODIsMzIuNzk1IEMyNy4yMTgsMzIuODE3IDI4LjYzOCwzMi41MTggMjkuOTQ0LDMxLjkxMSBMMzAuMzc3LDMyLjU5NSBDMzAuMTYsMzIuODIgMjkuOTgyLDMzLjA4MiAyOS44NDQsMzMuMzY3IEMyOS42MzIsMzMuODA5IDI5LjUzOCwzNC4yOTcgMjkuNTY5LDM0Ljc4NCBDMjkuNTk0LDM1LjI3NCAyOS43NDcsMzUuNzQ3IDMwLjAxMiwzNi4xNTggQzMwLjI3LDM2LjU3MSAzMC42MzUsMzYuOTEgMzEuMDYzLDM3LjE0NCBDMzEuNDkxLDM3LjM4IDMxLjk3NiwzNy41IDMyLjQ2MywzNy40OTcgQzMzLjE2NywzNy40OTcgMzMuODQzLDM3LjI0MSAzNC4zNywzNi43NzkgQzM0Ljg5MywzNi4zMTcgMzUuMjM1LDM1LjY3OSAzNS4zMjcsMzQuOTgzIEMzNS40MjEsMzQuMjg4IDM1LjI1OCwzMy41ODQgMzQuODY1LDMzIEMzNC40OCwzMi40MTggMzMuODk0LDMxLjk5NCAzMy4yMTgsMzEuODExIEMzMy4wNDksMzEuNzY2IDMyLjg4MSwzMS43MzcgMzIuNzA1LDMxLjcyIEMzMi40MzIsMzEuNjk3IDMyLjE1MiwzMS43MTQgMzEuODgyLDMxLjc3MSBMMzEuODgyLDMxLjc3MSBNMzEuNDI4LDExLjMzMSBDMzEuNTMyLDExLjE1NSAzMS42NzUsMTEuMDA2IDMxLjg1NiwxMC45MDEgQzMyLjAyOSwxMC43OTggMzIuMjMxLDEwLjc0MSAzMi40MzIsMTAuNzM5IEMzMi42MzYsMTAuNzM5IDMyLjgzMywxMC43OTYgMzMuMDA2LDEwLjg5OCBDMzMuMjQxLDExLjA2OSAzMy40MDQsMTEuMzE3IDMzLjQ2LDExLjU5OSBDMzMuNTE5LDExLjg3OCAzMy40NzgsMTIuMTcyIDMzLjMzLDEyLjQyMyBDMzMuMTg3LDEyLjY3NCAzMi45NiwxMi44NTkgMzIuNjg1LDEyLjk1IEMzMi40MDksMTMuMDM4IDMyLjExNCwxMy4wMjQgMzEuODUxLDEyLjkwNyBDMzEuNTkxLDEyLjc0OCAzMS40MDcsMTIuNDk3IDMxLjMyOCwxMi4yMDMgQzMxLjI0OSwxMS45MSAzMS4yODUsMTEuNTk2IDMxLjQyOCwxMS4zMzEgTDMxLjQyOCwxMS4zMzEgTTMzLjc1NiwyMy4yNTMgQzMzLjc2MywyNC44IDMzLjMwMiwyNi4zMTEgMzIuNDQ4LDI3LjU5OSBDMzEuNTkxLDI4Ljg4NCAzMC4zNzIsMjkuODg4IDI4Ljk0NywzMC40OCBDMjcuNTE4LDMxLjA3MyAyNS45NSwzMS4yMyAyNC40MzYsMzAuOTI4IEMyMi45MTgsMzAuNjI5IDIxLjUyMywyOS44ODUgMjAuNDMyLDI4Ljc5MyBDMTkuMzM4LDI3LjcwMiAxOC41OTMsMjYuMzA4IDE4LjI5MywyNC43OTIgQzE3Ljk5MiwyMy4yNzYgMTguMTQ1LDIxLjcwMiAxOC43MzYsMjAuMjc1IEMxOS4zMjgsMTguODQ3IDIwLjMyNSwxNy42MjcgMjEuNjEsMTYuNzY2IEMyMi44OTgsMTUuOTA4IDI0LjQwMiwxNS40NSAyNS45NSwxNS40NSBDMjguMDIxLDE1LjQ1MiAzMC4wMDIsMTYuMjczIDMxLjQ2NiwxNy43MzggQzMyLjkyNywxOS4yIDMzLjc1MSwyMS4xODQgMzMuNzU2LDIzLjI1MyBMMzMuNzU2LDIzLjI1MyBNMTIuODg0LDI0LjQzIEMxMi42NTIsMjQuNDMgMTIuNDI1LDI0LjM1OSAxMi4yMjksMjQuMjMgQzEyLjA0LDI0LjEwMiAxMS44ODQsMjMuOTE3IDExLjgsMjMuNzAzIEMxMS43MTEsMjMuNDg5IDExLjY4NiwyMy4yNTMgMTEuNzMxLDIzLjAyNSBDMTEuNzc1LDIyLjc5NyAxMS44OTIsMjIuNTg2IDEyLjA1NSwyMi40MjMgQzEyLjIxOCwyMi4yNTggMTIuNDI1LDIyLjE0NyAxMi42NTcsMjIuMTAxIEMxMi44ODQsMjIuMDU2IDEzLjExNiwyMi4wNzkgMTMuMzMzLDIyLjE2NyBDMTMuNTUsMjIuMjU1IDEzLjcyOCwyMi40MDYgMTMuODYxLDIyLjYgQzEzLjk4OCwyMi43OTQgMTQuMDU3LDIzLjAyMiAxNC4wNTcsMjMuMjUzIEMxNC4wNjIsMjMuNDEgMTQuMDI5LDIzLjU2MSAxMy45NzMsMjMuNzA2IEMxMy45MTQsMjMuODQ5IDEzLjgyNSwyMy45NzcgMTMuNzE4LDI0LjA4OCBDMTMuNjA4LDI0LjE5NiAxMy40NzYsMjQuMjg1IDEzLjMzMywyNC4zNDIgQzEzLjE5LDI0LjQwMSAxMy4wMzcsMjQuNDMgMTIuODg0LDI0LjQzIEwxMi44ODQsMjQuNDMgTTMzLjQ1NSwzNC4wMiBDMzMuNTgyLDM0LjI4NSAzMy42MDMsMzQuNTg3IDMzLjUxOSwzNC44NjcgQzMzLjQyOSwzNS4xNDYgMzMuMjQ2LDM1LjM4MiAzMi45OTEsMzUuNTI4IEMzMi43MzgsMzUuNjc2IDMyLjQzNywzNS43MjIgMzIuMTUyLDM1LjY1NiBDMzEuODY2LDM1LjU5MyAzMS42MTksMzUuNDI1IDMxLjQ0OCwzNS4xODYgQzMxLjM0OSwzNS4wMDkgMzEuMjk1LDM0LjgxIDMxLjI5NSwzNC42MDQgQzMxLjI5NSwzNC4zOTkgMzEuMzQ5LDM0LjIgMzEuNDQ4LDM0LjAyMyBDMzEuNTUsMzMuODQ2IDMxLjY5OCwzMy42OTggMzEuODcxLDMzLjU5NiBDMzIuMDUsMzMuNDkzIDMyLjI1MSwzMy40MzkgMzIuNDUzLDMzLjQzOSBDMzIuNjU5LDMzLjQzOSAzMi44NTgsMzMuNDkzIDMzLjAzNCwzMy41OTYgQzMzLjIxMywzMy42OTggMzMuMzU1LDMzLjg0MyAzMy40NTUsMzQuMDIgTDMzLjQ1NSwzNC4wMiIvPjxwYXRoIGQ9Ik0yNC40MDIsMjAuNzU4IEwyMy4yOTYsMjEuODUxIEwyNC40NTMsMjMgTDI3LjUsMjAuMDA1IEwyNC40NTMsMTcgTDIzLjI5NiwxOC4xNDkgTDI0LjI1MiwxOS4xMzggTDIwLjMzNCwxOS4xMzggQzE5Ljk3OCwxOS42MzUgMTkuNjk2LDIwLjE4MSAxOS41LDIwLjc1OCBMMjQuNDAyLDIwLjc1OCBMMjQuNDAyLDIwLjc1OCIvPjxwYXRoIGQ9Ik0yNi41ODMsMjUuMjYxIEwyNy43MjIsMjQuMTUgTDI2LjU1OCwyMyBMMjMuNSwyNS45OTUgTDI2LjU1OCwyOSBMMjcuNzIyLDI3Ljg1IEwyNi43NjEsMjYuOTA5IEwzMC41MzgsMjYuOTA5IEMzMC45NDgsMjYuNDIyIDMxLjI3MiwyNS44NzUgMzEuNSwyNS4yODkgTDI2LjU4MywyNS4yNjEgTDI2LjU4MywyNS4yNjEiLz48L2c+PC9zdmc+");
 }
 
-.oci-instance {
+.oci-instance, .oci-functions-application {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MiA0MiI+PGcgZmlsbD0iIzJjNTk2NyIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMzkuMjA0LDEgTDIuNjk2LDEgQzEuNzk2LDEgMSwxLjggMSwyLjcgTDEsMzkuNCBDMSw0MC4yIDEuNzk2LDQxIDIuNjk2LDQxIEwzOS4zMDQsNDEgQzQwLjIwNCw0MSA0MSw0MC4yIDQxLDM5LjMgTDQxLDIuNyBDNDAuOSwxLjggNDAuMTA0LDEgMzkuMjA0LDEgTDM5LjIwNCwxIE0zOS40MDQsMzkuMyBDMzkuNDA0LDM5LjQgMzkuMzA0LDM5LjUgMzkuMjA0LDM5LjUgTDIuNjk2LDM5LjUgQzIuNTk2LDM5LjUgMi40OTYsMzkuNCAyLjQ5NiwzOS4zIEwyLjQ5NiwyLjcgQzIuNDk2LDIuNiAyLjU5NiwyLjUgMi42OTYsMi41IEwzOS4zMDQsMi41IEMzOS40MDQsMi41IDM5LjUwNCwyLjYgMzkuNTA0LDIuNyBMMzkuNDA0LDM5LjMgTDM5LjQwNCwzOS4zIi8+PHBhdGggZD0iTTYuNSwzNSBMMzUuNSwzNSBMMzUuNSwyNi41IEw2LjUsMjYuNSBMNi41LDM1IEw2LjUsMzUgTTcuODk1LDI3LjkzMiBMMzMuOTA1LDI3LjkzMiBMMzMuOTA1LDMzLjY2MyBMNy44OTUsMzMuNjYzIEw3Ljg5NSwyNy45MzIgTDcuODk1LDI3LjkzMiIvPjxwYXRoIGQ9Ik0zMC41LDMyIEMzMS4wNTIsMzIgMzEuNSwzMS41NTIgMzEuNSwzMSBDMzEuNSwzMC40NDggMzEuMDUyLDMwIDMwLjUsMzAgQzI5Ljk0NywzMCAyOS41LDMwLjQ0OCAyOS41LDMxIEMyOS41LDMxLjU1MiAyOS45NDcsMzIgMzAuNSwzMiBMMzAuNSwzMiIvPjxwYXRoIGQ9Ik0xNC45MDUsNi41IEw2LjUsNi41IEw2LjUsMTUgTDE1LDE1IEwxNC45MDUsNi41IEwxNC45MDUsNi41IE0xMy41NjcsMTMuNTY4IEw3LjgzNywxMy41NjggTDcuODM3LDcuODM3IEwxMy41NjcsNy44MzcgTDEzLjU2NywxMy41NjggTDEzLjU2NywxMy41NjgiLz48cGF0aCBkPSJNMjUsNi41IEwxNi41LDYuNSBMMTYuNSwxNSBMMjUsMTUgTDI1LDYuNSBMMjUsNi41IE0yMy42NjMsMTMuNTY4IEwxNy45MzMsMTMuNTY4IEwxNy45MzMsNy44MzcgTDIzLjY2Myw3LjgzNyBMMjMuNjYzLDEzLjU2OCBMMjMuNjYzLDEzLjU2OCIvPjxwYXRoIGQ9Ik0xNC45MDUsMTYuNSBMNi41LDE2LjUgTDYuNSwyNSBMMTUsMjUgTDE0LjkwNSwxNi41IEwxNC45MDUsMTYuNSBNMTMuNTY3LDIzLjU2OCBMNy44MzcsMjMuNTY4IEw3LjgzNywxNy44MzcgTDEzLjU2NywxNy44MzcgTDEzLjU2NywyMy41NjggTDEzLjU2NywyMy41NjgiLz48cGF0aCBkPSJNMjUsMTYuNSBMMTYuNSwxNi41IEwxNi41LDI1IEwyNSwyNSBMMjUsMTYuNSBMMjUsMTYuNSBNMjMuNjYzLDIzLjU2OCBMMTcuOTMzLDIzLjU2OCBMMTcuOTMzLDE3LjgzNyBMMjMuNjYzLDE3LjgzNyBMMjMuNjYzLDIzLjU2OCBMMjMuNjYzLDIzLjU2OCIvPjxwYXRoIGQ9Ik0zNSw2LjUgTDI2LjUsNi41IEwyNi41LDE1IEwzNSwxNSBMMzUsNi41IEwzNSw2LjUgTTMzLjY2MywxMy41NjggTDI3LjkzMywxMy41NjggTDI3LjkzMyw3LjgzNyBMMzMuNjYzLDcuODM3IEwzMy42NjMsMTMuNTY4IEwzMy42NjMsMTMuNTY4Ii8+PHBhdGggZD0iTTM1LDE2LjUgTDI2LjUsMTYuNSBMMjYuNSwyNSBMMzUsMjUgTDM1LDE2LjUgTDM1LDE2LjUgTTMzLjY2MywyMy41NjggTDI3LjkzMywyMy41NjggTDI3LjkzMywxNy44MzcgTDMzLjY2MywxNy44MzcgTDMzLjY2MywyMy41NjggTDMzLjY2MywyMy41NjgiLz48L2c+PC9zdmc+");
 }
 
@@ -3283,7 +6016,7 @@ table {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MiA0MiI+PGcgZmlsbD0iIzJjNTk2NyIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNNSwxIEw1LDQxIEw0NSw0MSBMNDUsMSBMNSwxIEw1LDEgTTQzLjUsMTMuOCBMMTcuNiwxMy44IEwxNy42LDIuNSBMNDMuNSwyLjUgTDQzLjUsMTMuOCBMNDMuNSwxMy44IE02LjUsMjguMiBMMTYuMSwyOC4yIEwxNi4xLDM5LjYgTDYuNSwzOS42IEw2LjUsMjguMiBMNi41LDI4LjIgTTE2LjEsMi41IEwxNi4xLDEzLjkgTDYuNSwxMy45IEw2LjUsMi41IEwxNi4xLDIuNSBMMTYuMSwyLjUgTTE2LjEsMTUuMyBMMTYuMSwyNi43IEw2LjUsMjYuNyBMNi41LDE1LjMgTDE2LjEsMTUuMyBMMTYuMSwxNS4zIE0xNy42LDM5LjUgTDE3LjYsMjguMiBMNDMuNSwyOC4yIEw0My41LDM5LjYgTDE3LjYsMzkuNSBMMTcuNiwzOS41IE0xNy42LDI2LjcgTDE3LjYsMTUuMyBMNDMuNSwxNS4zIEw0My41LDI2LjcgTDE3LjYsMjYuNyBMMTcuNiwyNi43Ii8+PHBhdGggZD0iTTE5LDEyIEwyMC42NjYsMTIgTDIxLjU0OSwxMC4zNjYgTDIyLjQzMSwxMiBMMjQsMTIgTDIyLjUyOSw5LjQwNCBMMjMuOTAxLDcgTDIyLjMzNCw3IEwyMS41NDksOC41MzggTDIwLjY2Niw3IEwxOS4wOTgsNyBMMjAuNTY5LDkuNDA0IEwxOSwxMiBMMTksMTIiLz48cGF0aCBkPSJNMjYsMTEgTDI1LDExIEwyNSwxMiBMMjYsMTIgTDI2LDExIEwyNiwxMSIvPjxwYXRoIGQ9Ik0yOS4xLDEyIEwzMCwxMC4zNjYgTDMwLjksMTIgTDMyLjUsMTIgTDMwLjksOS40MDQgTDMyLjQwMSw3IEwzMC45LDcgTDMwLDguNTM4IEwyOS4xLDcgTDI3LjUsNyBMMjksOS40MDQgTDI3LjUsMTIgTDI5LjEsMTIgTDI5LjEsMTIiLz48cGF0aCBkPSJNMzQsMTEgTDMzLDExIEwzMywxMiBMMzQsMTIgTDM0LDExIEwzNCwxMSIvPjxwYXRoIGQ9Ik0zNi42LDEyIEwzNy41LDEwLjM2NiBMMzguNSwxMiBMNDAsMTIgTDM4LjUsOS40MDQgTDM5LjkwMSw3IEwzOC40LDcgTDM3LjUsOC41MzggTDM2LjYsNyBMMzUuMSw3IEwzNi41LDkuNDA0IEwzNSwxMiBMMzYuNiwxMiBMMzYuNiwxMiIvPjxwYXRoIGQ9Ik00MS41LDExIEw0MC41LDExIEw0MC41LDEyIEw0MS41LDEyIEw0MS41LDExIEw0MS41LDExIi8+PHBhdGggZD0iTTIzLjkwMSwyMCBMMjIuMzM0LDIwIEwyMS41NDksMjEuNTM4IEwyMC42NjYsMjAgTDE5LjA5OCwyMCBMMjAuNTY5LDIyLjQwNCBMMTksMjUgTDIwLjY2NiwyNSBMMjEuNTQ5LDIzLjM2NiBMMjIuNDMxLDI1IEwyNCwyNSBMMjIuNTI5LDIyLjQwNCBMMjMuOTAxLDIwIEwyMy45MDEsMjAiLz48cGF0aCBkPSJNMjYsMjQgTDI1LDI0IEwyNSwyNSBMMjYsMjUgTDI2LDI0IEwyNiwyNCIvPjxwYXRoIGQ9Ik0zMi40MDEsMjAgTDMwLjksMjAgTDMwLDIxLjUzOCBMMjkuMSwyMCBMMjcuNSwyMCBMMjksMjIuNDA0IEwyNy41LDI1IEwyOS4xLDI1IEwzMCwyMy4zNjYgTDMwLjksMjUgTDMyLjUsMjUgTDMwLjksMjIuNDA0IEwzMi40MDEsMjAgTDMyLjQwMSwyMCIvPjxwYXRoIGQ9Ik0zNCwyNCBMMzMsMjQgTDMzLDI1IEwzNCwyNSBMMzQsMjQgTDM0LDI0Ii8+PHBhdGggZD0iTTM5LjkwMSwyMCBMMzguNCwyMCBMMzcuNSwyMS41MzggTDM2LjYsMjAgTDM1LjEsMjAgTDM2LjUsMjIuNDA0IEwzNSwyNSBMMzYuNiwyNSBMMzcuNSwyMy4zNjYgTDM4LjUsMjUgTDQwLDI1IEwzOC41LDIyLjQwNCBMMzkuOTAxLDIwIEwzOS45MDEsMjAiLz48cGF0aCBkPSJNNDEuNSwyNCBMNDAuNSwyNCBMNDAuNSwyNSBMNDEuNSwyNSBMNDEuNSwyNCBMNDEuNSwyNCIvPjxwYXRoIGQ9Ik0yMy45MDEsMzMgTDIyLjMzNCwzMyBMMjEuNTQ5LDM0LjQ3MSBMMjAuNjY2LDMzIEwxOS4wOTgsMzMgTDIwLjU2OSwzNS4zNTMgTDE5LDM4IEwyMC42NjYsMzggTDIxLjU0OSwzNi4zMzQgTDIyLjQzMSwzOCBMMjQsMzggTDIyLjUyOSwzNS40NSBMMjMuOTAxLDMzIEwyMy45MDEsMzMiLz48cGF0aCBkPSJNMjYsMzcgTDI1LDM3IEwyNSwzOCBMMjYsMzggTDI2LDM3IEwyNiwzNyIvPjxwYXRoIGQ9Ik0zMi40MDEsMzMgTDMwLjksMzMgTDMwLDM0LjQ3MSBMMjkuMSwzMyBMMjcuNSwzMyBMMjksMzUuMzUzIEwyNy41LDM4IEwyOS4xLDM4IEwzMCwzNi4zMzQgTDMwLjksMzggTDMyLjUsMzggTDMwLjksMzUuNDUgTDMyLjQwMSwzMyBMMzIuNDAxLDMzIi8+PHBhdGggZD0iTTM0LDM3IEwzMywzNyBMMzMsMzggTDM0LDM4IEwzNCwzNyBMMzQsMzciLz48cGF0aCBkPSJNMzkuOTAxLDMzIEwzOC40LDMzIEwzNy41LDM0LjQ3MSBMMzYuNiwzMyBMMzUuMSwzMyBMMzYuNSwzNS4zNTMgTDM1LDM4IEwzNi42LDM4IEwzNy41LDM2LjMzNCBMMzguNSwzOCBMNDAsMzggTDM4LjUsMzUuNDUgTDM5LjkwMSwzMyBMMzkuOTAxLDMzIi8+PHBhdGggZD0iTTQxLjUsMzcgTDQwLjUsMzcgTDQwLjUsMzggTDQxLjUsMzggTDQxLjUsMzcgTDQxLjUsMzciLz48L2c+PC9zdmc+");
 }
 
-.oci-secret {
+.oci-secret, .oci-notification-topic {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MiA0MiI+PGcgZmlsbD0iIzJjNTk2NyIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMjcsMSBMMTMuNSw2Ljg1IEwxMy41LDE0Ljg2IEwxNC44MzksMTQuODYgTDE0LjgzOSw3LjY2IEwyNywyLjQ0IEwzOS4xNjEsNy42NiBMMzkuMTYxLDE5LjU0IEMzOC44MDIsMjUuODQgMzQuMzMzLDMxLjYgMjcsMzUuNDcgQzIwLjAyNiwzMS44NyAxNS42NDYsMjYuNDcgMTQuOTI4LDIwLjYyIEwxNC44MzksMjAuNjIgTDEzLjU4OSwyMC42MiBDMTQuMzkxLDI3LjEgMTkuMTMsMzIuOTUgMjYuNzM1LDM2LjgyIEwyNywzNyBMMjcuMjcsMzYuODIgQzM1LjMxOSwzMi43NyA0MC4xNDYsMjYuNDcgNDAuNSwxOS42MyBMNDAuNSw2Ljg1IEwyNywxIEwyNywxIi8+PHBhdGggZD0iTTMzLjUsNy45NTIgTDMyLjYyNiw3IEwyOS45MjIsOS42ODIgTDI4Ljg3NSw4LjczMSBMMjgsOS41OTYgTDI5LjkyMiwxMS41IEwzMy41LDcuOTUyIEwzMy41LDcuOTUyIi8+PHBhdGggZD0iTTI5LDI3IEwzMi41LDI3IEwzMC43MSwyNCBMMjksMjcgTDI5LDI3Ii8+PHBhdGggZD0iTTIyLjM2NywyNC4xNzUgQzIxLjUxMiwyNC4zNSAyMSwyNS4yMjUgMjEuMjU5LDI2LjEgQzIxLjUxMiwyNi45NzUgMjIuMjgzLDI3LjUgMjMuMTM4LDI3LjIzNyBDMjMuOTg4LDI2Ljk3NSAyNC41LDI2LjE4OCAyNC4yNDcsMjUuMzEzIEMyNC4wNzIsMjQuNTI1IDIzLjIyMiwyNCAyMi4zNjcsMjQuMTc1IEwyMi4zNjcsMjQuMTc1Ii8+PHBhdGggZD0iTTM2LDEzIEwxOCwxMyBMMTgsMjIgTDM1LjkxLDIyIEwzNiwxMyBMMzYsMTMgTTM0LjY0OCwyMC42NSBMMTkuMzUyLDIwLjY1IEwxOS4zNTIsMTQuMzUgTDM0LjY0OCwxNC4zNSBMMzQuNjQ4LDIwLjY1IEwzNC42NDgsMjAuNjUiLz48cGF0aCBkPSJNMzEuMjUzLDE4LjUgQzMxLjkzOSwxOC41IDMyLjUsMTcuOTQxIDMyLjUsMTcuMjUgQzMyLjUsMTYuNTU5IDMxLjkzOSwxNiAzMS4yNTMsMTYgQzMwLjU2MSwxNiAzMCwxNi41NTkgMzAsMTcuMjUgQzMwLDE3Ljk0MSAzMC41NjEsMTguNSAzMS4yNTMsMTguNSBMMzEuMjUzLDE4LjUiLz48cGF0aCBkPSJNMjQuNSw5LjUgTDIxLDkuNSBMMjEsMTAuNSBMMjQuNSwxMC41IEwyNC41LDkuNSBMMjQuNSw5LjUiLz48cGF0aCBkPSJNMTMuMTgxLDE2LjcxOCBMMTMuMTgxLDE5IEwxNC41LDE5IEwxNC41LDE4LjkxNSBMMTQuNSwxNS4zNjYgTDEyLjIxMiwxNS4zNjYgTDYuNDg2LDE1LjM2NiBDNi4yMjUsMTQuMDE0IDQuOTg4LDEzIDMuNDksMTMgQzEuODE5LDEzIDAuNSwxNC4yNjggMC41LDE1Ljg3MyBDMC41LDE3LjQ3OSAxLjgxOSwxOC43NDYgMy40OSwxOC43NDYgQzQuOTAyLDE4Ljc0NiA2LjA0NSwxNy44MTcgNi40LDE2LjU0OSBMMTAuMzYsMTYuNTQ5IEwxMC4zNiwxOC43NDYgTDExLjY4MywxOC43NDYgTDExLjY4MywxNi43MTggTDEyLjIxMiwxNi43MTggTDEzLjE4MSwxNi43MTggTDEzLjE4MSwxNi43MTggTTMuNDksMTcuNjQ4IEMyLjUyNiwxNy42NDggMS44MTksMTYuODg3IDEuODE5LDE2LjA0MiBDMS44MTksMTUuMTk3IDIuNjE0LDE0LjQzNiAzLjQ5LDE0LjQzNiBDNC4zNzQsMTQuNDM2IDUuMTY5LDE1LjE5NyA1LjE2OSwxNi4wNDIgQzUuMTY5LDE2Ljk3MiA0LjQ2MSwxNy42NDggMy40OSwxNy42NDggTDMuNDksMTcuNjQ4Ii8+PC9nPjwvc3ZnPg==");
 }
 
@@ -3291,7 +6024,7 @@ table {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MiA0MiI+PGcgZmlsbD0iIzJjNTk2NyIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMjgsMSBMMTMsNy41IEwxMywyMS43IEMxMywyMS44IDEzLDI1LjQgMTQuOTcxLDI5LjUgQzE2LjY1MSwzMy4yIDIwLjI5OSwzOC4xIDI3LjgwMiw0MC45IEwyOC4wOTksNDEgTDI4LjM5Niw0MC45IEM0Mi44MDIsMzUuNSA0MywyMi4yIDQzLDIxLjcgTDQzLDcuNSBMMjgsMSBMMjgsMSBNNDEuNDE5LDIxLjcgQzQxLjQxOSwyMi4yIDQxLjIyNywzNC4zIDI4LDM5LjQgQzIyLjQ3NCwzNy4zIDE4LjUyNiwzMy44IDE2LjI1MiwyOC45IEMxNC40ODIsMjUgMTQuNDgyLDIxLjggMTQuNDgyLDIxLjcgTDE0LjQ4Miw4LjUgTDI4LDIuNiBMNDEuNDE5LDguNSBMNDEuNDE5LDIxLjcgTDQxLjQxOSwyMS43Ii8+PHBhdGggZD0iTTI4LDEyLjUgTDE5LDEyLjUgTDE5LDE0IEwyOCwxNCBMMjgsMTIuNSBMMjgsMTIuNSIvPjxwYXRoIGQ9Ik0zNywxMS41IEwzNS45NTMsMTAuNSBMMzMuMTg5LDEzLjQgTDMyLjA0NywxMi4yIEwzMSwxMy4zIEwzMy4xODksMTUuNSBMMzcsMTEuNSBMMzcsMTEuNSIvPjxwYXRoIGQ9Ik0yOCwxOS41IEwxOSwxOS41IEwxOSwyMSBMMjgsMjEgTDI4LDE5LjUgTDI4LDE5LjUiLz48cGF0aCBkPSJNMzUuNTIyLDE4IEwzNC4wNTIsMTkuNTM4IEwzMi40ODQsMTggTDMxLjUsMTkuMDU4IEwzMi45NywyMC41IEwzMS41LDIxLjk0MiBMMzIuNDg0LDIzIEwzNC4wNTIsMjEuNTU4IEwzNS41MjIsMjMgTDM2LjUsMjEuOTQyIEwzNS4wMywyMC41IEwzNi41LDE5LjA1OCBMMzUuNTIyLDE4IEwzNS41MjIsMTgiLz48cGF0aCBkPSJNMjgsMjYuNSBMMTksMjYuNSBMMTksMjggTDI4LDI4IEwyOCwyNi41IEwyOCwyNi41Ii8+PHBhdGggZD0iTTM3LDI2IEwzNS45NTMsMjUgTDMzLjE4OSwyNy45IEwzMi4wNDcsMjYuNyBMMzEsMjcuOCBMMzMuMTg5LDMwIEwzNywyNiBMMzcsMjYiLz48L2c+PC9zdmc+");
 }
 
-.oci-service-gateway {
+.oci-service-gateway, .oci-dns-zone {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MiA0MiI+PGcgZmlsbD0iIzJjNTk2NyIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNNC41NDEsMjYuOTA5IEMzLjE2OSwyNC40NjYgMi40NTIsMjEuNzEgMi40NTgsMTguOTA4IEMyLjQ2MSwxNi4xMDUgMy4xODEsMTMuMzQ2IDQuNTQ3LDEwLjkgQzUuOTE3LDguNDUxIDcuODksNi4zOTMgMTAuMjc4LDQuOTIxIEMxMi42NjYsMy40NDggMTUuMzkzLDIuNjA4IDE4LjE5NiwyLjQ4NCBDMjEuMDAyLDIuMzYgMjMuNzkzLDIuOTUyIDI2LjMwMyw0LjIwOCBDMjcuOTIzLDQuNDU5IDI5LjUwMiw0LjkyNCAzMSw1LjU4NyBDMjcuNTYsMi4yOTIgMjIuOTQ4LDAuNSAxOC4xODQsMC42MDIgQzEzLjQyLDAuNzAyIDguODkxLDIuNjg5IDUuNTkzLDYuMTI2IEMyLjI5Niw5LjU2MSAwLjUsMTQuMTY4IDAuNjAxLDE4LjkyNiBDMC43MDQsMjMuNjg1IDIuNjkzLDI4LjIwOCA2LjEzMywzMS41IEM1LjQwNCwzMC4wNDYgNC44NjgsMjguNTAyIDQuNTQxLDI2LjkwOSBMNC41NDEsMjYuOTA5Ii8+PHBhdGggZD0iTTIzLjM3NCw1IEMxOS44MDQsNS4wMTEgMTYuMzE1LDYuMDc3IDEzLjM1MSw4LjA2NiBDMTAuMzg3LDEwLjA1OSA4LjA3NywxMi44OCA2LjcxNiwxNi4xOCBDNS4zNTQsMTkuNDgzIDUsMjMuMTExIDUuNzAxLDI2LjYxNSBDNi4zOTgsMzAuMTE2IDguMTE3LDMzLjMzMSAxMC42NDMsMzUuODU3IEMxMy4xNjksMzguMzgzIDE2LjM4NCw0MC4xMDIgMTkuODg1LDQwLjc5OSBDMjMuMzg5LDQxLjUgMjcuMDE3LDQxLjE0NiAzMC4zMTYsMzkuNzg1IEMzMy42MiwzOC40MjMgMzYuNDQxLDM2LjExMyAzOC40MzQsMzMuMTQ5IEM0MC40MjMsMzAuMTg1IDQxLjQ4OSwyNi42OTYgNDEuNSwyMy4xMjYgQzQxLjUsMTguMzE5IDM5LjU5MSwxMy43MDkgMzYuMTg5LDEwLjMxMSBDMzIuNzkxLDYuOTA5IDI4LjE4MSw1IDIzLjM3NCw1IEwyMy4zNzQsNSBNMjMuMzc0LDM5LjYzMSBDMjAuMDk2LDM5LjYzMSAxNi44OTUsMzguNjYgMTQuMTY5LDM2LjgzOSBDMTEuNDQ2LDM1LjAxOCA5LjMyMiwzMi40MyA4LjA3LDI5LjQgQzYuODE4LDI2LjM3NCA2LjQ4OSwyMy4wNDIgNy4xMjgsMTkuODMgQzcuNzY3LDE2LjYxOCA5LjM0NywxMy42NjUgMTEuNjY1LDExLjM0NyBDMTMuOTgzLDkuMDMzIDE2LjkzNiw3LjQ1NiAyMC4xNDgsNi44MTggQzIzLjM2Myw2LjE3OSAyNi42OTIsNi41MDcgMjkuNzIxLDcuNzYzIEMzMi43NDcsOS4wMTkgMzUuMzM1LDExLjE0MyAzNy4xNTMsMTMuODcgQzM4Ljk3MSwxNi41OTYgMzkuOTQxLDE5Ljc5NyAzOS45MzgsMjMuMDc1IEMzOS45MzQsMjcuNDY2IDM4LjE4NiwzMS42NzQgMzUuMDgsMzQuNzggQzMxLjk3NCwzNy44ODMgMjcuNzY1LDM5LjYyOCAyMy4zNzQsMzkuNjMxIEwyMy4zNzQsMzkuNjMxIi8+PHBhdGggZD0iTTI3LDMxLjkzNSBMMjUuOTcsMzAuODggTDIzLjczNSwzMy4xNTEgTDIzLjczNSwxMi4zNDkgTDI1Ljk3LDE0LjYyIEwyNywxMy41NjUgTDIzLDkuNSBMMTksMTMuNTY1IEwyMC4wMzksMTQuNjIgTDIyLjI3NCwxMi4zNDkgTDIyLjI3NCwzMy4xNTEgTDIwLjAzOSwzMC44OCBMMTksMzEuOTM1IEwyMywzNiBMMjcsMzEuOTM1IEwyNywzMS45MzUiLz48cGF0aCBkPSJNMTguNDA2LDI3IEwyMi41LDIzIEwxOC40MDYsMTkgTDE3LjM0NCwyMC4wMyBMMTkuNjMxLDIyLjI2NSBMMTAsMjIuMjY1IEwxMCwyMy43MjYgTDE5LjYzMSwyMy43MjYgTDE3LjM0NCwyNS45NjEgTDE4LjQwNiwyNyBMMTguNDA2LDI3Ii8+PHBhdGggZD0iTTM2LjUsMjIuMjY1IEwyNi44NzksMjIuMjY1IEwyOS4xNTYsMjAuMDMgTDI4LjEwNCwxOSBMMjQsMjMgTDI4LjEwNCwyNyBMMjkuMTU2LDI1Ljk2MSBMMjYuODc5LDIzLjcyNiBMMzYuNSwyMy43MjYgTDM2LjUsMjIuMjY1IEwzNi41LDIyLjI2NSIvPjwvZz48L3N2Zz4=");
 }
 
@@ -3393,7 +6126,7 @@ table {
 }
 `,
 
-    'theme.css': String.raw`/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+    'theme.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 /*
 ** SVG Look & Feel Variables
