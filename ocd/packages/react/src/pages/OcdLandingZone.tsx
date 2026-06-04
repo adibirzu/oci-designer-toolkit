@@ -31,6 +31,7 @@
 
 import React, { useMemo, useState } from 'react'
 import { ConsolePageProps } from '../types/Console'
+import { OcdConsoleConfig } from '../components/OcdConsoleConfiguration'
 import { WizardProvider, useWizard } from '../landingzone/OcdLzWizardContext'
 import { downloadTar, downloadTextFile } from '../landingzone/OcdLzDownloads'
 import { generateLandingZone } from '../landingzone/OcdLzGenerator'
@@ -67,7 +68,7 @@ function friendlyError(message: string): string {
     return /bundled|setup-lz|not installed|not found|undefined/i.test(message) ? SETUP_NOTICE : message
 }
 
-function WizardBody(): JSX.Element {
+function WizardBody({ onExit }: { onExit: () => void }): JSX.Element {
     const { data, reset, setField } = useWizard()
     const [config, setConfig] = useState<LandingZoneConfig>(() => upgradeConfig(data.config ?? data.step1))
     const [title, setTitle] = useState<string>(() => (typeof data.title === 'string' && data.title ? data.title : DEFAULT_TITLE))
@@ -178,7 +179,7 @@ function WizardBody(): JSX.Element {
 
     return (
         <div className='ocd-lzng'>
-            <LzngHeader layout={layout} onLayoutChange={setLayout} />
+            <LzngHeader layout={layout} onLayoutChange={setLayout} onExit={onExit} />
 
             {anyUpdate && !bannerDismissed && (
                 <LzngUpdateBanner
@@ -296,9 +297,13 @@ function WizardBody(): JSX.Element {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig }: ConsolePageProps): JSX.Element => {
+    const onExit = () => {
+        ocdConsoleConfig.config.displayPage = 'designer'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
     return (
         <WizardProvider>
-            <WizardBody />
+            <WizardBody onExit={onExit} />
         </WizardProvider>
     )
 }
