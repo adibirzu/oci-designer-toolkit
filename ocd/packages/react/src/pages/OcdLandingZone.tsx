@@ -4,248 +4,234 @@
 */
 
 /*
-** Landing Zone Wizard page. Ports the LZNG WizardShell (WizardBody + DiagramPanel)
-** into OCD. Step 1 captures the minimal base config and generates Operating
-** Entities JSONs in-browser via the go-jsonnet WASM runtime; the diagram is built
-** from iam.json's compartments_configuration.
+** Landing Zone Next Gen (LZNG) wizard page. A modern, self-styled, 5-step product
+** shell rendered inside the OCD console body:
 **
-** Styling is delegated to the Redwood-NG theme via `ocd-lz-*` classNames (no
-** inline styles, no router). The theme agent owns those styles.
+**   - dark OCI header bar with layout toggles (LzngHeader)
+**   - editable title + Download .drawio / Download JSON / Reset actions
+**   - clickable 5-step stepper (LzngStepper)
+**   - two-column body: left = step content, right = live React-Flow network
+**     diagram derived from the Foundation config (LzngNetworkDiagram)
 **
-** `ocdDocument` is accepted but unused in v1 (reserved for the stretch
-** "Send to Designer" mapping of iam.json compartments -> OCD model).
+** The page is theme-independent: all styling lives in css/ocd-lzng.css scoped
+** under `.ocd-lzng` (the outer div here), with the Oracle Redwood tokens defined
+** in that scope. It does NOT depend on the redwood-ng console theme.
+**
+** Foundation (step 1) is fully wired; steps 2-5 are scaffolded with placeholder
+** cards and Back/Next navigation. Download JSON runs the jsonnet OE generation
+** and gracefully reports the setup-lz notice if the OE sources are absent.
 */
 
-import React, { useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { ConsolePageProps } from '../types/Console'
 import { WizardProvider, useWizard } from '../landingzone/OcdLzWizardContext'
-import { OcdLzDiagramPanel } from '../landingzone/OcdLzDiagramPanel'
 import { downloadTar, downloadTextFile } from '../landingzone/OcdLzDownloads'
-import { generateLandingZoneFiles, GeneratedResult } from '../landingzone/OcdLzGenerator'
-import { findRegion, getDefaultRegionForRealm, getRegionsForRealm, REALM_OPTIONS } from '../landingzone/OcdLzRegions'
-import { DEFAULT_STEP1, Environment, normalizeStep1, serializeStep1Config, Step1State, validateStep1 } from '../landingzone/OcdLzStep1Config'
+import { generateLandingZoneFiles } from '../landingzone/OcdLzGenerator'
+import {
+    DEFAULT_STEP1,
+    Step1State,
+    normalizeStep1,
+    serializeStep1Config,
+    validateStep1,
+} from '../landingzone/OcdLzStep1Config'
+import { LzngHeader, LzngLayout } from '../landingzone/ui/LzngHeader'
+import { LZNG_STEPS, LzngStepper } from '../landingzone/ui/LzngStepper'
+import { LzngFoundationStep } from '../landingzone/ui/LzngFoundationStep'
+import { LzngNetworkDiagram } from '../landingzone/ui/LzngNetworkDiagram'
+import { LzngPlaceholderStep, LzngReviewStep } from '../landingzone/ui/LzngStepStubs'
+import { buildDiagramModel } from '../landingzone/ui/LzngDiagramModel'
+import { buildDrawioXml } from '../landingzone/ui/LzngDrawioExport'
 
-interface EditingEnv {
-    index: number
-    name: string
+const SETUP_NOTICE = 'Run `npm run setup-lz` to enable Landing Zone generation.'
+const DEFAULT_TITLE = 'Untitled Landing Zone'
+
+function slugify(value: string): string {
+    return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'landing-zone'
 }
 
 function WizardBody(): JSX.Element {
     const { data, reset, setField } = useWizard()
-    const [draft, setDraft] = useState<Step1State>(() => normalizeStep1({ ...DEFAULT_STEP1, ...((data.step1 as Partial<Step1State>) || {}) }))
-    const [newEnvName, setNewEnvName] = useState('')
-    const [newEnvSecurityZone, setNewEnvSecurityZone] = useState(false)
-    const [editingEnv, setEditingEnv] = useState<EditingEnv | null>(null)
-    const [debugOpen, setDebugOpen] = useState(false)
-    const [result, setResult] = useState<GeneratedResult | null>(null)
-    const [error, setError] = useState<string | null>(null)
+    const [step1, setStep1] = useState<Step1State>(() =>
+        normalizeStep1({ ...DEFAULT_STEP1, ...((data.step1 as Partial<Step1State>) || {}) }),
+    )
+    const [title, setTitle] = useState<string>(() => (typeof data.title === 'string' && data.title ? data.title : DEFAULT_TITLE))
+    const [editingTitle, setEditingTitle] = useState(false)
+    const [layout, setLayout] = useState<LzngLayout>('split')
+    const [activeStep, setActiveStep] = useState(0)
+    const [notice, setNotice] = useState<{ kind: 'info' | 'error'; text: string } | null>(null)
     const [busy, setBusy] = useState(false)
 
-    useEffect(() => {
-        if (data.step1) {
-            setDraft(normalizeStep1({ ...DEFAULT_STEP1, ...(data.step1 as Partial<Step1State>) }))
-        }
-    }, [data.step1])
+    const validation = useMemo(() => validateStep1(step1), [step1])
+    const serializedConfig = useMemo(
+        () => (validation.errors.length === 0 ? serializeStep1Config(step1) : validation.errors.join('\n')),
+        [step1, validation],
+    )
 
-    const validation = validateStep1(draft)
-    const configPreview = validation.errors.length === 0
-        ? serializeStep1Config(draft)
-        : validation.errors.join('\n')
-    const regionOptions = getRegionsForRealm(draft.realm)
-
-    function commitDraft(next: Step1State): void {
+    function commitStep1(next: Step1State): void {
         const normalized = normalizeStep1(next)
-        setDraft(normalized)
+        setStep1(normalized)
         setField('step1', normalized)
-        setResult(null)
-        setError(null)
+        setNotice(null)
     }
 
-    function updateField(path: 'regionShortName', value: string): void {
-        commitDraft({ ...draft, [path]: value })
-    }
-
-    function updateRealm(realm: string): void {
-        const defaultRegion = getDefaultRegionForRealm(realm)
-        commitDraft({ ...draft, realm, region: defaultRegion?.id || '', regionShortName: defaultRegion?.shortName || '' })
-    }
-
-    function updateRegion(regionId: string): void {
-        const region = findRegion(draft.realm, regionId)
-        commitDraft({ ...draft, region: regionId, regionShortName: region?.shortName || draft.regionShortName })
-    }
-
-    function updateEnvironment(index: number, patch: Partial<Environment>): void {
-        const environments = draft.environments.map((env, idx) => (idx === index ? { ...env, ...patch } : env))
-        commitDraft({ ...draft, environments })
-    }
-
-    function addEnvironment(): void {
-        const name = newEnvName.trim()
-        if (!name) return
-        commitDraft({ ...draft, environments: [...draft.environments, { name, securityZone: newEnvSecurityZone }] })
-        setNewEnvName('')
-        setNewEnvSecurityZone(false)
-    }
-
-    function deleteEnvironment(index: number): void {
-        setEditingEnv(null)
-        commitDraft({ ...draft, environments: draft.environments.filter((_, idx) => idx !== index) })
-    }
-
-    function saveEdit(): void {
-        if (!editingEnv) return
-        updateEnvironment(editingEnv.index, { name: editingEnv.name })
-        setEditingEnv(null)
+    function commitTitle(next: string): void {
+        const value = next.trim() || DEFAULT_TITLE
+        setTitle(value)
+        setField('title', value)
+        setEditingTitle(false)
     }
 
     function resetWizard(): void {
-        if (!window.confirm('Clear wizard state?')) return
+        if (!window.confirm('Reset the wizard back to defaults?')) return
         reset()
-        setDraft(normalizeStep1(DEFAULT_STEP1))
-        setNewEnvName('')
-        setNewEnvSecurityZone(false)
-        setEditingEnv(null)
-        setResult(null)
-        setError(null)
+        setStep1(normalizeStep1(DEFAULT_STEP1))
+        setTitle(DEFAULT_TITLE)
+        setActiveStep(0)
+        setNotice(null)
     }
 
-    async function generate(): Promise<void> {
-        const checked = validateStep1(draft)
-        if (checked.errors.length > 0) {
-            setError(checked.errors.join(' '))
-            setResult(null)
+    async function downloadJson(): Promise<void> {
+        if (validation.errors.length > 0) {
+            setNotice({ kind: 'error', text: validation.errors.join(' ') })
             return
         }
         setBusy(true)
-        setError(null)
-        setResult(null)
+        setNotice(null)
         try {
-            const generated = await generateLandingZoneFiles(checked.value)
-            setField('step1', checked.value)
-            setResult(generated)
+            const generated = await generateLandingZoneFiles(validation.value)
+            setField('step1', validation.value)
+            downloadTar(`${slugify(title)}-landing-zone.tar`, [
+                { name: 'config.jsonnet', content: generated.configJsonnet },
+                ...generated.files,
+            ])
+            downloadTextFile(`${slugify(title)}-config.json`, JSON.stringify(validation.value, null, 2) + '\n')
+            setNotice({ kind: 'info', text: `Generated ${generated.files.length} Operating Entities JSON file(s).` })
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : String(err))
+            const message = err instanceof Error ? err.message : String(err)
+            const friendly = /bundled|setup-lz|not found|undefined/i.test(message) ? SETUP_NOTICE : message
+            setNotice({ kind: 'error', text: friendly })
         } finally {
             setBusy(false)
         }
     }
 
-    function downloadAll(): void {
-        if (!result) return
-        downloadTar('landing-zone-jsons.tar', [
-            { name: 'config.jsonnet', content: result.configJsonnet },
-            ...result.files,
-        ])
+    function downloadDrawio(): void {
+        const model = buildDiagramModel(step1)
+        downloadTextFile(`${slugify(title)}.drawio`, buildDrawioXml(model))
     }
 
-    const generateDisabled = busy || validation.errors.length > 0
+    const showLeft = layout === 'split' || layout === 'list' || layout === 'code'
+    const showRight = layout === 'split' || layout === 'diagram'
+    const showCode = layout === 'code'
+
+    function renderLeft(): JSX.Element {
+        if (showCode) {
+            return <LzngReviewStep config={serializedConfig} />
+        }
+        switch (activeStep) {
+            case 0:
+                return <LzngFoundationStep step1={step1} onChange={commitStep1} />
+            case 1:
+                return <LzngPlaceholderStep title='Hub Network' note='Hub VCN topology, gateways, and routing. Coming next.' />
+            case 2:
+                return <LzngPlaceholderStep title='Projects' note='Per-environment project compartments and quotas. Coming next.' />
+            case 3:
+                return <LzngPlaceholderStep title='Platform Templates' note='Reusable platform service templates. Coming next.' />
+            case 4:
+            default:
+                return <LzngReviewStep config={serializedConfig} />
+        }
+    }
 
     return (
-        <div className='ocd-lz-page'>
-            <div className='ocd-lz-header'>
-                <div>
-                    <div className='ocd-lz-title'>New Landing Zone</div>
-                    <div className='ocd-lz-subtitle'>Step 1 captures the minimal config and generates Operating Entities JSONs in your browser.</div>
-                </div>
-                <div className='ocd-lz-header-actions'>
-                    <button type='button' className='ocd-lz-button ocd-lz-button-debug' onClick={() => setDebugOpen(true)}>Config</button>
-                    <button type='button' className='ocd-lz-button ocd-lz-button-reset' onClick={resetWizard}>Reset</button>
-                </div>
-            </div>
+        <div className='ocd-lzng'>
+            <LzngHeader layout={layout} onLayoutChange={setLayout} />
 
-            <div className='ocd-lz-grid'>
-                <section className='ocd-lz-panel'>
-                    <div className='ocd-lz-panel-title'>Step 1 - Base config</div>
-
-                    <label className='ocd-lz-label' htmlFor='lz-realm'>Realm</label>
-                    <select id='lz-realm' className='ocd-lz-select' value={draft.realm} onChange={(event) => updateRealm(event.target.value)}>
-                        {REALM_OPTIONS.map((realm) => (<option key={realm.id} value={realm.id}>{realm.label}</option>))}
-                    </select>
-
-                    <label className='ocd-lz-label' htmlFor='lz-region'>Region</label>
-                    <select id='lz-region' className='ocd-lz-select' value={draft.region} onChange={(event) => updateRegion(event.target.value)}>
-                        {regionOptions.map((region) => (<option key={region.id} value={region.id}>{region.id} ({region.shortName.toUpperCase()})</option>))}
-                    </select>
-
-                    <label className='ocd-lz-label' htmlFor='lz-region-short'>Region short name</label>
-                    <input id='lz-region-short' className='ocd-lz-input' value={draft.regionShortName} onChange={(event) => updateField('regionShortName', event.target.value)} />
-
-                    <div className='ocd-lz-panel-title'>Environments</div>
-                    <div className='ocd-lz-env-list'>
-                        {draft.environments.map((env, index) => {
-                            const isEditing = editingEnv?.index === index
-                            return (
-                                <div key={`${env.name}-${index}`} className='ocd-lz-env-row'>
-                                    {isEditing ? (
-                                        <input aria-label='Environment name' className='ocd-lz-input ocd-lz-input-inline' value={editingEnv.name} onChange={(event) => setEditingEnv({ ...editingEnv, name: event.target.value })} />
-                                    ) : (
-                                        <span className='ocd-lz-env-name'>{env.name}</span>
-                                    )}
-                                    <label className='ocd-lz-checkbox-label'>
-                                        <input type='checkbox' checked={env.securityZone} onChange={(event) => updateEnvironment(index, { securityZone: event.target.checked })} />
-                                        Security zone
-                                    </label>
-                                    {isEditing ? (
-                                        <button type='button' className='ocd-lz-button ocd-lz-button-secondary' onClick={saveEdit}>Save</button>
-                                    ) : (
-                                        <button type='button' className='ocd-lz-button ocd-lz-button-secondary' onClick={() => setEditingEnv({ index, name: draft.environments[index].name })}>Edit</button>
-                                    )}
-                                    <button type='button' className='ocd-lz-button ocd-lz-button-danger' onClick={() => deleteEnvironment(index)}>Delete</button>
-                                </div>
-                            )
-                        })}
-                    </div>
-
-                    <div className='ocd-lz-add-row'>
-                        <input aria-label='New environment' className='ocd-lz-input ocd-lz-input-inline' placeholder='New environment' value={newEnvName} onChange={(event) => setNewEnvName(event.target.value)} />
-                        <label className='ocd-lz-checkbox-label'>
-                            <input type='checkbox' checked={newEnvSecurityZone} onChange={(event) => setNewEnvSecurityZone(event.target.checked)} />
-                            Security zone
-                        </label>
-                        <button type='button' className='ocd-lz-button ocd-lz-button-secondary' onClick={addEnvironment}>Add</button>
-                    </div>
-                    <div className='ocd-lz-help'>Hub is fixed to hub_a with VCN 10.100.0.0/21 for this MVP. Security-zone selections are emitted as config.security_targets.</div>
-
-                    <div className='ocd-lz-actions'>
-                        <button type='button' className={`ocd-lz-button ocd-lz-button-primary${generateDisabled ? ' ocd-lz-button-disabled' : ''}`} disabled={generateDisabled} onClick={generate}>
-                            {busy ? 'Generating...' : 'Generate JSONs'}
-                        </button>
-                        {result && <button type='button' className='ocd-lz-button ocd-lz-button-secondary' onClick={downloadAll}>Download all</button>}
-                        <span className='ocd-lz-status'>{result ? `${result.files.length} files generated` : 'No files generated yet'}</span>
-                    </div>
-
-                    {(error || validation.errors.length > 0) && (
-                        <div className='ocd-lz-error'>{error || validation.errors.join(' ')}</div>
-                    )}
-                </section>
-
-                <OcdLzDiagramPanel result={result} />
-            </div>
-
-            {debugOpen && (
-                <>
-                    <div className='ocd-lz-overlay' onClick={() => setDebugOpen(false)} aria-hidden />
-                    <aside className='ocd-lz-drawer'>
-                        <div className='ocd-lz-drawer-header'>
-                            <div className='ocd-lz-panel-title'>Debug Config And Files</div>
-                            <button type='button' className='ocd-lz-button ocd-lz-button-secondary' onClick={() => setDebugOpen(false)}>Close</button>
-                        </div>
-                        <pre className='ocd-lz-pre'>{configPreview}</pre>
-                        {result && (
-                            <div className='ocd-lz-file-list'>
-                                {result.files.map((file) => (
-                                    <div key={file.name} className='ocd-lz-file-row'>
-                                        <span className='ocd-lz-file-name'>{file.name}</span>
-                                        <span>{file.size} bytes</span>
-                                        <button type='button' className='ocd-lz-button ocd-lz-button-secondary' onClick={() => downloadTextFile(file.name, file.content)}>Download</button>
-                                    </div>
-                                ))}
-                            </div>
+            <div className='ocd-lzng-scroll'>
+                <div className='ocd-lzng-titlerow'>
+                    <div>
+                        {editingTitle ? (
+                            <input
+                                aria-label='Landing zone name'
+                                className='ocd-lzng-title-input'
+                                autoFocus
+                                defaultValue={title}
+                                onBlur={(event) => commitTitle(event.target.value)}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'Enter') commitTitle((event.target as HTMLInputElement).value)
+                                    if (event.key === 'Escape') setEditingTitle(false)
+                                }}
+                            />
+                        ) : (
+                            <button type='button' className='ocd-lzng-title' onClick={() => setEditingTitle(true)}>
+                                {title}
+                            </button>
                         )}
-                    </aside>
-                </>
-            )}
+                        <p className='ocd-lzng-subtitle'>
+                            Step {activeStep + 1} of {LZNG_STEPS.length} — {LZNG_STEPS[activeStep].label}. The diagram and JSON build up as you go.
+                        </p>
+                    </div>
+                    <div className='ocd-lzng-titlerow-actions'>
+                        <button type='button' className='ocd-lzng-btn' onClick={downloadDrawio}>Download .drawio</button>
+                        <button type='button' className='ocd-lzng-btn' disabled={busy} onClick={downloadJson}>
+                            {busy ? 'Generating…' : 'Download JSON'}
+                        </button>
+                        <button type='button' className='ocd-lzng-btn' onClick={resetWizard}>Reset</button>
+                    </div>
+                </div>
+
+                <LzngStepper activeIndex={activeStep} onSelect={setActiveStep} />
+
+                <div className='ocd-lzng-body' data-layout={layout}>
+                    {showLeft && (
+                        <div className='ocd-lzng-col-left'>
+                            {renderLeft()}
+
+                            {notice && (
+                                <div className={`ocd-lzng-notice${notice.kind === 'info' ? ' ocd-lzng-notice-info' : ''}`}>
+                                    {notice.text === SETUP_NOTICE ? (
+                                        <span>Run <code>npm run setup-lz</code> to enable Landing Zone generation.</span>
+                                    ) : (
+                                        notice.text
+                                    )}
+                                </div>
+                            )}
+
+                            <div className='ocd-lzng-step-footer'>
+                                <button
+                                    type='button'
+                                    className='ocd-lzng-btn'
+                                    disabled={activeStep === 0}
+                                    onClick={() => setActiveStep((index) => Math.max(0, index - 1))}
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    type='button'
+                                    className='ocd-lzng-btn ocd-lzng-btn-primary'
+                                    disabled={activeStep === LZNG_STEPS.length - 1}
+                                    onClick={() => setActiveStep((index) => Math.min(LZNG_STEPS.length - 1, index + 1))}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {showRight && (
+                        <div className='ocd-lzng-col-right'>
+                            <section className='ocd-lzng-card ocd-lzng-diagram-card'>
+                                <div className='ocd-lzng-card-head'>
+                                    <h2 className='ocd-lzng-card-title'>Network Diagram</h2>
+                                </div>
+                                <div className='ocd-lzng-diagram-canvas'>
+                                    <LzngNetworkDiagram step1={step1} />
+                                </div>
+                            </section>
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     )
 }
@@ -253,11 +239,9 @@ function WizardBody(): JSX.Element {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig }: ConsolePageProps): JSX.Element => {
     return (
-        <div className='ocd-lz-view'>
-            <WizardProvider>
-                <WizardBody />
-            </WizardProvider>
-        </div>
+        <WizardProvider>
+            <WizardBody />
+        </WizardProvider>
     )
 }
 

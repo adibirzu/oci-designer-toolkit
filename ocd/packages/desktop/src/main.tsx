@@ -11,6 +11,8 @@ import './css/google-theme.css'
 import './css/general-theme.css'
 import './css/ocd.css'
 import './css/ocd-svg.css'
+import './css/ocd-lzng.css'
+import '@xyflow/react/dist/style.css'
 import React from 'react'
 import { createRoot } from 'react-dom/client';
 
