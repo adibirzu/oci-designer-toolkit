@@ -9,6 +9,13 @@ export const palette = {
             "title": "OCI",
             "provider": "oci",
             "class": "oci-provider",
+            // NOTE: a resource's `class` is load-bearing — the drop handler
+            // (OcdDocument.addOciResource) PascalCases it to resolve the model
+            // resource (e.g. 'oci-instance' -> OciModelResources.OciInstance).
+            // The class MUST therefore match an exported OCI model resource name.
+            // Entries marked `// TODO icon` use the closest existing oci-* icon
+            // for display only and need a dedicated icon (roadmap A3); the class
+            // itself still resolves to the correct model resource.
             "groups": [
                 {
                     "title": "Containers",
@@ -34,26 +41,6 @@ export const palette = {
                             "container": false,
                             "title": "Instance",
                             "class": "oci-instance"
-                        },
-                        {
-                            "container": false,
-                            "title": "Analytics Instance",
-                            "class": "oci-analytics-instance"
-                        },
-                        {
-                            "container": false,
-                            "title": "Integration Instance",
-                            "class": "oci-integration-instance"
-                        },
-                        {
-                            "container": true,
-                            "title": "DataScience Project",
-                            "class": "oci-datascience-project"
-                        },
-                        {
-                            "container": false,
-                            "title": "DataScience Notebook Session",
-                            "class": "oci-datascience-notebook-session"
                         }
                     ]
                 },
@@ -70,28 +57,34 @@ export const palette = {
                             "container": false,
                             "title": "Bucket",
                             "class": "oci-bucket"
+                        }
+                    ]
+                },
+                {
+                    "title": "File Storage",
+                    "class": "oci-storage",
+                    "resources": [
+                        {
+                            "container": true,
+                            "title": "File System",
+                            "class": "oci-file-system"
                         },
-                        // {
-                        //     "container": false,
-                        //     "title": "File System",
-                        //     "class": "oci-file-system"
-                        // },
-                        // {
-                        //     "container": false,
-                        //     "title": "Mount Target",
-                        //     "class": "oci-mount-target"
-                        // }
+                        {
+                            "container": false,
+                            "title": "Mount Target",
+                            "class": "oci-mount-target"
+                        },
+                        {
+                            "container": false,
+                            "title": "File System Export Set",
+                            "class": "oci-file-system-export-set" // TODO icon: no dedicated oci-file-system-export-set
+                        }
                     ]
                 },
                 {
                     "title": "Networking",
                     "class": "oci-network",
                     "resources": [
-                        // {
-                        //     "container": true,
-                        //     "title": "Network Load Balancer",
-                        //     "class": "oci-network-load-balancer"
-                        // },
                         {
                             "container": true,
                             "title": "Vcn",
@@ -128,6 +121,22 @@ export const palette = {
                             "class": "oci-ipsec"
                         },
                         {
+                            "container": false,
+                            "title": "Customer Premise Equipment",
+                            "class": "oci-cpe"
+                        },
+                        {
+                            "container": false,
+                            "title": "Remote Peering Connection",
+                            "class": "oci-remote-peering-connection"
+                        }
+                    ]
+                },
+                {
+                    "title": "Load Balancing",
+                    "class": "oci-network",
+                    "resources": [
+                        {
                             "container": true,
                             "title": "Load Balancer",
                             "class": "oci-load-balancer"
@@ -142,15 +151,10 @@ export const palette = {
                             "title": "Load Balancer Listener",
                             "class": "oci-load-balancer-listener"
                         },
-                        // {
-                        //     "container": false,
-                        //     "title": "Remote Peering Connection",
-                        //     "class": "oci-remote-peering-connection"
-                        // },
                         {
-                            "container": false,
-                            "title": "Customer Premise Equipment",
-                            "class": "oci-cpe"
+                            "container": true,
+                            "title": "Network Load Balancer",
+                            "class": "oci-network-load-balancer"
                         }
                     ]
                 },
@@ -185,6 +189,16 @@ export const palette = {
                         },
                         {
                             "container": false,
+                            "title": "DRG Route Table",
+                            "class": "oci-drg-route-table" // TODO icon: no dedicated oci-drg-route-table (using drg icon)
+                        },
+                        {
+                            "container": false,
+                            "title": "DRG Route Distribution",
+                            "class": "oci-drg-route-distribution" // TODO icon: no dedicated oci-drg-route-distribution (using drg icon)
+                        },
+                        {
+                            "container": false,
                             "title": "Service Gateway",
                             "class": "oci-service-gateway"
                         }
@@ -204,16 +218,54 @@ export const palette = {
                             "title": "Database System",
                             "class": "oci-db-system"
                         },
-                        // {
-                        //     "container": false,
-                        //     "title": "MySQL Database System",
-                        //     "class": "oci-mysql-db-system"
-                        // },
-                        // {
-                        //     "container": false,
-                        //     "title": "NoSQL Database",
-                        //     "class": "oci-nosql-table"
-                        // }
+                        {
+                            "container": false,
+                            "title": "MySQL Database System",
+                            "class": "oci-mysql-db-system"
+                        },
+                        {
+                            "container": false,
+                            "title": "NoSQL Table",
+                            "class": "oci-nosql-table"
+                        }
+                    ]
+                },
+                {
+                    "title": "Analytics",
+                    "class": "oci-compute",
+                    "resources": [
+                        {
+                            "container": false,
+                            "title": "Analytics Instance",
+                            "class": "oci-analytics-instance"
+                        }
+                    ]
+                },
+                {
+                    "title": "Integration",
+                    "class": "oci-compute",
+                    "resources": [
+                        {
+                            "container": false,
+                            "title": "Integration Instance",
+                            "class": "oci-integration-instance"
+                        }
+                    ]
+                },
+                {
+                    "title": "Data Science",
+                    "class": "oci-compute",
+                    "resources": [
+                        {
+                            "container": true,
+                            "title": "DataScience Project",
+                            "class": "oci-datascience-project"
+                        },
+                        {
+                            "container": false,
+                            "title": "DataScience Notebook Session",
+                            "class": "oci-datascience-notebook-session"
+                        }
                     ]
                 },
                 {
@@ -224,21 +276,6 @@ export const palette = {
                             "container": false,
                             "title": "Bastion",
                             "class": "oci-bastion"
-                        },
-                        {
-                            "container": true,
-                            "title": "Vault",
-                            "class": "oci-vault"
-                        },
-                        {
-                            "container": false,
-                            "title": "Secret",
-                            "class": "oci-secret"
-                        },
-                        {
-                            "container": false,
-                            "title": "Key",
-                            "class": "oci-key"
                         },
                         {
                             "container": false,
@@ -254,6 +291,32 @@ export const palette = {
                             "container": false,
                             "title": "User",
                             "class": "oci-user"
+                        },
+                        {
+                            "container": false,
+                            "title": "Policy",
+                            "class": "oci-policy"
+                        }
+                    ]
+                },
+                {
+                    "title": "Vault / Security",
+                    "class": "oci-identity",
+                    "resources": [
+                        {
+                            "container": true,
+                            "title": "Vault",
+                            "class": "oci-vault"
+                        },
+                        {
+                            "container": false,
+                            "title": "Secret",
+                            "class": "oci-secret"
+                        },
+                        {
+                            "container": false,
+                            "title": "Key",
+                            "class": "oci-key"
                         }
                     ]
                 }
