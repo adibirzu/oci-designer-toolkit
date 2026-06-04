@@ -30,7 +30,7 @@
     "github-action-build-macos-x86": "npm run make-macos-x64 --workspace=packages/desktop --if-present",
     "github-action-build-react": "npm run build-react-scripts --workspace=packages/desktop",
     "github-action-build-electron": "npm run electron-pack --workspace=packages/desktop",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run test --workspace=packages/react",
     "install-and-codegen": "npm install --legacy-peer-deps && npm run compile-for-codegen && npm run import-and-generate && npm run build",
     "fresh-install": "npm run install-and-codegen",
     "new-install": "npm run github-action-install && npm run github-action-compile-for-codegen && npm run github-action-generate && npm run github-action-build",
