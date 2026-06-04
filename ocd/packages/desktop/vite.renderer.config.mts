@@ -16,6 +16,16 @@ export default defineConfig({
         changeOrigin: true,
         secure: true,
         rewrite: (p) => p.replace(/^\/api\/pricing/, '/pls/apex/cetools/api/v1/products')
+      },
+      // Proxy OCI discovery (import-from-OCI / Reference Data Query) to the local
+      // read-only backend (@ocd/web-server, default 127.0.0.1:5050) so the browser
+      // build can read ~/.oci/config and call the OCI SDK server-side without CORS.
+      // The Electron desktop build routes these through the main process instead.
+      // Override the backend port with the OCD_WEB_SERVER_PORT env var if it differs.
+      '/api/oci': {
+        target: process.env.OCD_WEB_SERVER_URL || 'http://127.0.0.1:5050',
+        changeOrigin: true,
+        secure: false
       }
     }
   }
