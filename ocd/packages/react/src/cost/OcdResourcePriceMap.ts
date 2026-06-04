@@ -21,14 +21,9 @@ import type {
     CostLineItemResult,
     PriceMap
 } from './OcdCostTypes'
+import { resolveShapeSkus } from './OcdComputeShapeSkus'
 
 // ---- Verified part numbers (see scripts/generate_oci_price_snapshot.py) ----
-// Compute - Standard - E5 (general purpose Flex default)
-const SKU_COMPUTE_E5_OCPU = 'B97384' // OCPU Per Hour
-const SKU_COMPUTE_E5_MEMORY = 'B97385' // Gigabytes Per Hour
-// Compute - Optimized - X9 (used to demonstrate a second verified shape family)
-const SKU_COMPUTE_X9_OCPU = 'B93311' // OCPU Per Hour
-const SKU_COMPUTE_X9_MEMORY = 'B93312' // Gigabyte Per Hour
 // Storage - Block Volume
 const SKU_BLOCK_VOLUME_STORAGE = 'B91961' // GB Capacity Per Month
 const SKU_BLOCK_VOLUME_PERFORMANCE = 'B91962' // Performance Units Per GB Per Month
@@ -58,6 +53,18 @@ interface ResourceCostMapping {
     components: CostComponent[]
     // Compute the billable quantity for a metric kind from a single resource item.
     quantity: (item: any, kind: MetricKind) => number
+    // Optional per-item resolver. When present, it overrides `components` and
+    // `confidence` for that specific item (used by compute instances, whose SKUs
+    // depend on the instance shape). Returns the components to bill, the
+    // per-item billable quantities, and the per-line confidence + note.
+    resolveItem?: (item: any) => ItemCostResolution
+    note?: string
+}
+
+interface ItemCostResolution {
+    components: CostComponent[]
+    quantity: (item: any, kind: MetricKind) => number
+    confidence: CostConfidence
     note?: string
 }
 
@@ -65,20 +72,61 @@ interface ResourceCostMapping {
 const num = (value: unknown, fallback: number): number =>
     typeof value === 'number' && Number.isFinite(value) ? value : fallback
 
-const shapeOcpus = (item: any): number => num(item?.shapeConfig?.ocpus, DEFAULT_OCPUS)
-const shapeMemory = (item: any): number => num(item?.shapeConfig?.memoryInGBs, DEFAULT_MEMORY_GBS)
+// OCPUs / memory for a Flex instance come from shapeConfig; non-Flex shapes
+// carry ocpus / memoryInGBs on the item itself (from the shape catalog).
+const instanceOcpus = (item: any): number =>
+    num(item?.shapeConfig?.ocpus, num(item?.ocpus, DEFAULT_OCPUS))
+const instanceMemory = (item: any): number =>
+    num(item?.shapeConfig?.memoryInGBs, num(item?.memoryInGBs, DEFAULT_MEMORY_GBS))
+
+// Map a SKU confidence (verified/approximate) to the line-item CostConfidence.
+const shapeConfidenceToCost = (c: 'verified' | 'approximate'): CostConfidence =>
+    c === 'verified' ? 'confident' : 'approximate'
+
+/*
+** Per-instance cost resolution: pick the OCPU + memory SKUs for the instance's
+** shape family (resolveShapeSkus), then bill the OCPUs/memory of that instance.
+** Always-free shapes (Micro) resolve to a zero-cost line.
+*/
+const resolveInstanceCost = (item: any): ItemCostResolution => {
+    const shape = typeof item?.shape === 'string' ? item.shape : ''
+    const skus = resolveShapeSkus(shape)
+
+    if (skus.alwaysFree || skus.ocpuSku.length === 0) {
+        return {
+            components: [],
+            quantity: () => 0,
+            confidence: 'confident',
+            note: skus.note ?? 'Always-free shape; no charge.'
+        }
+    }
+
+    const components: CostComponent[] = [{ partNumber: skus.ocpuSku, kind: 'hourly-ocpu' }]
+    if (skus.memSku && skus.memSku.length > 0) {
+        components.push({ partNumber: skus.memSku, kind: 'hourly-memory' })
+    }
+
+    const note = skus.memSku
+        ? `Costed with ${shape || 'shape'} OCPU + memory list rates (family ${skus.familyKey}).`
+        : `Costed with ${shape || 'shape'} bundled OCPU list rate (family ${skus.familyKey}; memory included).`
+
+    return {
+        components,
+        quantity: (it, kind) => (kind === 'hourly-ocpu' ? instanceOcpus(it) : instanceMemory(it)),
+        confidence: shapeConfidenceToCost(skus.confidence),
+        note: skus.note ? `${note} ${skus.note}` : note
+    }
+}
 
 // ---- Resource type -> cost mapping table ----
 export const OCI_RESOURCE_COST_MAPPINGS: Record<string, ResourceCostMapping> = {
     instance: {
         label: 'Compute Instance',
         confidence: 'approximate',
-        note: 'Estimated using Standard E5 Flex OCPU + memory list rates; actual shape pricing varies.',
-        components: [
-            { partNumber: SKU_COMPUTE_E5_OCPU, kind: 'hourly-ocpu' },
-            { partNumber: SKU_COMPUTE_E5_MEMORY, kind: 'hourly-memory' }
-        ],
-        quantity: (item, kind) => (kind === 'hourly-ocpu' ? shapeOcpus(item) : shapeMemory(item))
+        note: 'Per-shape OCPU + memory list rates resolved from the shape family.',
+        components: [],
+        quantity: (item, kind) => (kind === 'hourly-ocpu' ? instanceOcpus(item) : instanceMemory(item)),
+        resolveItem: resolveInstanceCost
     },
     volume: {
         label: 'Block Volume',
@@ -170,6 +218,32 @@ const metricUnitsPerMonth = (kind: MetricKind, hoursPerMonth: number): number =>
 }
 
 /*
+** Collect every part number a design's resources require, so the price-fetch
+** layer knows which SKUs to load. Includes static component SKUs AND the
+** per-shape SKUs resolved by mappings with a `resolveItem` (compute instances).
+*/
+export function collectRequiredPartNumbers(resources: Record<string, any[]>): string[] {
+    const parts = new Set<string>()
+    for (const [resourceType, items] of Object.entries(resources)) {
+        const list = Array.isArray(items) ? items : []
+        if (list.length === 0) continue
+        const mapping = OCI_RESOURCE_COST_MAPPINGS[resourceType]
+        if (!mapping) continue
+        for (const component of mapping.components) {
+            if (component.partNumber.length > 0) parts.add(component.partNumber)
+        }
+        if (mapping.resolveItem) {
+            for (const item of list) {
+                for (const component of mapping.resolveItem(item).components) {
+                    if (component.partNumber.length > 0) parts.add(component.partNumber)
+                }
+            }
+        }
+    }
+    return Array.from(parts)
+}
+
+/*
 ** Pure function. Walks the design resources and produces a monthly cost
 ** estimate from the supplied price map. Resource types not in the mapping table
 ** and not in FREE_RESOURCE_TYPES are reported as notCosted. Mapped SKUs missing
@@ -215,6 +289,48 @@ export function estimateMonthlyCost(
                     note: 'No pricing mapping available for this resource type.'
                 })
             }
+            continue
+        }
+
+        // Per-item resolver path (compute instances): each item may have a
+        // different SKU set / confidence depending on its shape.
+        if (mapping.resolveItem) {
+            let lineTotal = 0
+            const usedParts: string[] = []
+            const noteSet = new Set<string>()
+            // Track the weakest per-item confidence to report at line level.
+            let lineConfidence: CostConfidence = 'confident'
+            const weaken = (c: CostConfidence): void => {
+                if (c === 'approximate' && lineConfidence === 'confident') lineConfidence = 'approximate'
+            }
+
+            for (const item of items as any[]) {
+                const resolution = mapping.resolveItem(item)
+                weaken(resolution.confidence)
+                if (resolution.note) noteSet.add(resolution.note)
+                for (const component of resolution.components) {
+                    if (component.partNumber.length === 0) continue
+                    const entry = priceMap[component.partNumber]
+                    if (!entry) {
+                        missingPartsSet.add(component.partNumber)
+                        continue
+                    }
+                    if (!usedParts.includes(component.partNumber)) usedParts.push(component.partNumber)
+                    const quantity = resolution.quantity(item, component.kind)
+                    const unitsPerMonth = metricUnitsPerMonth(component.kind, hoursPerMonth)
+                    lineTotal += entry.unitPrice * quantity * unitsPerMonth
+                }
+            }
+
+            lineItems.push({
+                resourceType,
+                label: mapping.label,
+                count,
+                partNumbers: usedParts,
+                monthlyCost: round2(lineTotal),
+                confidence: lineConfidence,
+                note: noteSet.size > 0 ? Array.from(noteSet).join(' ') : mapping.note
+            })
             continue
         }
 
