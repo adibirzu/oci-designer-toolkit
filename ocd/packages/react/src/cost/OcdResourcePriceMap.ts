@@ -97,6 +97,7 @@ const ENTERPRISE_EDITIONS = new Set(['ENTERPRISE_EDITION', 'ENTERPRISE_EDITION_H
 type MetricKind =
     | 'hourly-ocpu'
     | 'hourly-memory'
+    | 'hourly-gpu'
     | 'hourly-ecpu'
     | 'hourly-cluster'
     | 'monthly-gb'
@@ -191,6 +192,19 @@ const resolveInstanceCost = (item: any): ItemCostResolution => {
     const shape = typeof item?.shape === 'string' ? item.shape : ''
     const skus = resolveShapeSkus(shape)
 
+    // GPU shapes bill an all-in per-GPU rate (OCPU/memory included). Bill the GPU
+    // SKU scaled by the shape's GPU count.
+    if (skus.gpuSku && skus.gpuSku.length > 0) {
+        const gpuCount = num(skus.gpuCount, 1)
+        const note = `Costed with ${shape || 'shape'} all-in per-GPU list rate (family ${skus.familyKey}; ${gpuCount} GPU(s), OCPU/memory included).`
+        return {
+            components: [{ partNumber: skus.gpuSku, kind: 'hourly-gpu' }],
+            quantity: (_it, kind) => (kind === 'hourly-gpu' ? gpuCount : 0),
+            confidence: shapeConfidenceToCost(skus.confidence),
+            note: skus.note ? `${note} ${skus.note}` : note
+        }
+    }
+
     if (skus.alwaysFree || skus.ocpuSku.length === 0) {
         return {
             components: [],
@@ -227,6 +241,19 @@ const resolveNodePoolCost = (item: any): ItemCostResolution => {
     const shape = typeof item?.nodeShape === 'string' ? item.nodeShape : ''
     const skus = resolveShapeSkus(shape)
     const size = num(item?.size, DEFAULT_NODE_POOL_SIZE)
+
+    // GPU worker shapes bill an all-in per-GPU rate (OCPU/memory included),
+    // scaled by GPU count and node-pool size.
+    if (skus.gpuSku && skus.gpuSku.length > 0) {
+        const gpuCount = num(skus.gpuCount, 1)
+        return {
+            components: [{ partNumber: skus.gpuSku, kind: 'hourly-gpu' }],
+            quantity: (it, kind) =>
+                kind === 'hourly-gpu' ? gpuCount * num(it?.size, DEFAULT_NODE_POOL_SIZE) : 0,
+            confidence: shapeConfidenceToCost(skus.confidence),
+            note: `OKE worker nodes costed with ${shape || 'shape'} all-in per-GPU list rate (family ${skus.familyKey}; ${gpuCount} GPU(s)/node, ${size} node(s)).`
+        }
+    }
 
     if (skus.alwaysFree || skus.ocpuSku.length === 0) {
         return {
@@ -444,6 +471,7 @@ const metricUnitsPerMonth = (kind: MetricKind, hoursPerMonth: number): number =>
     switch (kind) {
         case 'hourly-ocpu':
         case 'hourly-memory':
+        case 'hourly-gpu':
         case 'hourly-ecpu':
         case 'hourly-cluster':
         case 'flat': // flat (per-hour) SKUs such as LB base/bandwidth bill hourly
