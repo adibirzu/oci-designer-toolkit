@@ -22,6 +22,7 @@
 
         "desktop": "cd ocd && npm run desktop",
         "web": "cd ocd && npm run web",
+        "build:pages": "cd ocd && npm run build:pages",
         "install": "cd ocd && npm install",
         "compile": "cd ocd && npm run compile-for-codegen",
         "generate": "cd ocd && npm run import-and-generate",

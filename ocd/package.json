@@ -52,6 +52,7 @@
     "audit-observability-lz": "python ../scripts/audit_observability_lz_addon.py",
     "desktop": "npm run desktop --workspace=packages/desktop",
     "web": "npm run web --workspace=packages/desktop",
+    "build:pages": "npm run build:pages --workspace=packages/desktop",
     "web-server": "npm run start --workspace=packages/web-server",
     "web-server-dev": "npm run dev --workspace=packages/web-server",
     "dev-desktop": "npm run build && npm run desktop"
