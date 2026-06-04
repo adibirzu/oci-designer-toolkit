@@ -104,7 +104,7 @@ export function LzngPreviewDiagram({ config, focus }: LzngPreviewDiagramProps): 
     const hubFocused = focus === 'hub'
     const networkClassName = `ocd-lzng-prev-cmp ocd-lzng-prev-shared${hubFocused ? ' ocd-lzng-prev-shared-focus' : ''}`
     return (
-        <div className='ocd-lzng-prev' role='img' aria-label='Compartment structure preview'>
+        <div className='ocd-lzng-prev' role='img' aria-label='Compartment structure preview' data-testid='lzng-preview-diagram'>
             <div className='ocd-lzng-prev-region'>
                 <span className='ocd-lzng-prev-region-name'>OCI Region — {config.region || 'unset'}</span>
                 <div className='ocd-lzng-prev-tenancy'>

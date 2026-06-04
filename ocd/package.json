@@ -55,7 +55,8 @@
     "build:pages": "npm run build:pages --workspace=packages/desktop",
     "web-server": "npm run start --workspace=packages/web-server",
     "web-server-dev": "npm run dev --workspace=packages/web-server",
-    "dev-desktop": "npm run build && npm run desktop"
+    "dev-desktop": "npm run build && npm run desktop",
+    "test:e2e": "cd ../e2e && npm install --no-save && npx playwright test"
   },
   "workspaces": [
     "packages/core",

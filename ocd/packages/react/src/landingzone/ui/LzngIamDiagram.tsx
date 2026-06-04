@@ -122,19 +122,21 @@ export function LzngIamDiagram({ iamJson }: LzngIamDiagramProps): JSX.Element {
     }
 
     return (
-        <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            fitView
-            fitViewOptions={{ padding: 0.2 }}
-            nodesDraggable={false}
-            nodesConnectable={false}
-            elementsSelectable={false}
-            proOptions={{ hideAttribution: true }}
-        >
-            <Background variant={BackgroundVariant.Dots} gap={18} size={1} color='#d8d8d8' />
-            <Controls showInteractive={false} />
-            <MiniMap pannable zoomable nodeColor='#C74634' maskColor='rgba(245,245,245,0.7)' />
-        </ReactFlow>
+        <div data-testid='lzng-iam-diagram'>
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                fitView
+                fitViewOptions={{ padding: 0.2 }}
+                nodesDraggable={false}
+                nodesConnectable={false}
+                elementsSelectable={false}
+                proOptions={{ hideAttribution: true }}
+            >
+                <Background variant={BackgroundVariant.Dots} gap={18} size={1} color='#d8d8d8' />
+                <Controls showInteractive={false} />
+                <MiniMap pannable zoomable nodeColor='#C74634' maskColor='rgba(245,245,245,0.7)' />
+            </ReactFlow>
+        </div>
     )
 }

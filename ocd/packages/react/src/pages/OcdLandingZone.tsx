@@ -206,7 +206,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
     }
 
     return (
-        <div className='ocd-lzng'>
+        <div className='ocd-lzng' data-testid='lzng-wizard'>
             <LzngHeader layout={layout} onLayoutChange={setLayout} onExit={onExit} />
 
             {anyUpdate && !bannerDismissed && (
