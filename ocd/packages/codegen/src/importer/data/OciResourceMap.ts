@@ -86,7 +86,35 @@ export const resourceMap: OcdResourceMap = {
     "oci_events_rule": "events_rule",
     "oci_queue_queue": "queue",
     "oci_budget_budget": "budget",
-    "oci_waf_web_app_firewall": "web_app_firewall"
+    "oci_waf_web_app_firewall": "web_app_firewall",
+    // Logging
+    "oci_logging_log": "logging_log",
+    // Autoscaling
+    "oci_autoscaling_auto_scaling_configuration": "autoscaling_configuration",
+    // Compute scaling
+    "oci_core_instance_pool": "instance_pool",
+    "oci_core_instance_configuration": "instance_configuration",
+    // Networking
+    "oci_core_vlan": "vlan",
+    // Artifacts & Container Registry
+    "oci_artifacts_repository": "artifacts_repository",
+    "oci_artifacts_container_repository": "artifacts_container_repository",
+    // DevOps
+    "oci_devops_project": "devops_project",
+    // APM
+    "oci_apm_apm_domain": "apm_domain",
+    // Data / Analytics
+    "oci_opensearch_opensearch_cluster": "opensearch_cluster",
+    "oci_redis_redis_cluster": "redis_cluster",
+    // Email
+    "oci_email_email_domain": "email_domain",
+    // PostgreSQL
+    "oci_psql_db_system": "psql_db_system",
+    // Certificates
+    "oci_certificates_management_certificate": "certificates_certificate",
+    "oci_certificates_management_certificate_authority": "certificates_certificate_authority",
+    // Big Data
+    "oci_bds_bds_instance": "bds_instance"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -1050,5 +1078,187 @@ export const resourceAttributes: OcdIncludedElements = {
         "backend_type",
         "load_balancer_id",
         "web_app_firewall_policy_id"
+    ],
+    "oci_logging_log": [
+        "display_name",
+        "is_enabled",
+        "log_group_id",
+        "log_type",
+        "retention_duration",
+        "configuration",
+        "configuration.compartment_id",
+        "configuration.source",
+        "configuration.source.category",
+        "configuration.source.resource",
+        "configuration.source.service",
+        "configuration.source.source_type"
+    ],
+    "oci_autoscaling_auto_scaling_configuration": [
+        "cool_down_in_seconds",
+        "display_name",
+        "is_enabled",
+        "auto_scaling_resources",
+        "auto_scaling_resources.id",
+        "auto_scaling_resources.type",
+        "policies",
+        "policies.display_name",
+        "policies.is_enabled",
+        "policies.policy_type"
+    ],
+    "oci_core_instance_pool": [
+        "display_name",
+        "instance_configuration_id",
+        "instance_display_name_formatter",
+        "instance_hostname_formatter",
+        "size",
+        "load_balancers",
+        "load_balancers.backend_set_name",
+        "load_balancers.load_balancer_id",
+        "load_balancers.port",
+        "load_balancers.vnic_selection",
+        "placement_configurations",
+        "placement_configurations.availability_domain",
+        "placement_configurations.fault_domains",
+        "placement_configurations.primary_subnet_id"
+    ],
+    "oci_core_instance_configuration": [
+        "display_name",
+        "instance_id",
+        "source"
+    ],
+    "oci_core_vlan": [
+        "availability_domain",
+        "cidr_block",
+        "display_name",
+        "nsg_ids",
+        "route_table_id",
+        "vcn_id",
+        "vlan_tag"
+    ],
+    "oci_artifacts_repository": [
+        "description",
+        "display_name",
+        "is_immutable",
+        "repository_type"
+    ],
+    "oci_artifacts_container_repository": [
+        "display_name",
+        "is_immutable",
+        "is_public"
+    ],
+    "oci_devops_project": [
+        "description",
+        "name",
+        "notification_config",
+        "notification_config.topic_id"
+    ],
+    "oci_apm_apm_domain": [
+        "description",
+        "display_name",
+        "is_free_tier"
+    ],
+    "oci_opensearch_opensearch_cluster": [
+        "data_node_count",
+        "data_node_host_memory_gb",
+        "data_node_host_ocpu_count",
+        "data_node_host_type",
+        "data_node_storage_gb",
+        "display_name",
+        "master_node_count",
+        "master_node_host_memory_gb",
+        "master_node_host_ocpu_count",
+        "master_node_host_type",
+        "opendashboard_node_count",
+        "opendashboard_node_host_memory_gb",
+        "opendashboard_node_host_ocpu_count",
+        "security_mode",
+        "software_version",
+        "subnet_compartment_id",
+        "subnet_id",
+        "vcn_compartment_id",
+        "vcn_id"
+    ],
+    "oci_redis_redis_cluster": [
+        "display_name",
+        "node_count",
+        "node_memory_in_gbs",
+        "nsg_ids",
+        "software_version",
+        "subnet_id"
+    ],
+    "oci_email_email_domain": [
+        "description",
+        "name"
+    ],
+    "oci_psql_db_system": [
+        "admin_username",
+        "config_id",
+        "db_version",
+        "description",
+        "display_name",
+        "instance_count",
+        "instance_memory_size_in_gbs",
+        "instance_ocpu_count",
+        "shape",
+        "system_type",
+        "network_details",
+        "network_details.nsg_ids",
+        "network_details.primary_db_endpoint_private_ip",
+        "network_details.subnet_id",
+        "storage_details",
+        "storage_details.is_regionally_durable",
+        "storage_details.system_type"
+    ],
+    "oci_certificates_management_certificate": [
+        "config_type",
+        "description",
+        "issuer_certificate_authority_id",
+        "name",
+        "certificate_config",
+        "certificate_config.certificate_profile_type",
+        "certificate_config.config_type",
+        "certificate_config.key_algorithm",
+        "certificate_config.signature_algorithm",
+        "certificate_config.subject",
+        "certificate_config.subject.common_name",
+        "certificate_config.subject.country",
+        "certificate_config.subject.organization"
+    ],
+    "oci_certificates_management_certificate_authority": [
+        "config_type",
+        "description",
+        "issuer_certificate_authority_id",
+        "kms_key_id",
+        "name",
+        "certificate_authority_config",
+        "certificate_authority_config.config_type",
+        "certificate_authority_config.signing_algorithm",
+        "certificate_authority_config.subject",
+        "certificate_authority_config.subject.common_name",
+        "certificate_authority_config.subject.country",
+        "certificate_authority_config.subject.organization"
+    ],
+    "oci_bds_bds_instance": [
+        "cluster_admin_password",
+        "cluster_profile",
+        "cluster_version",
+        "display_name",
+        "is_cloud_sql_configured",
+        "is_high_availability",
+        "is_kafka_configured",
+        "is_secure",
+        "master_node",
+        "master_node.number_of_nodes",
+        "master_node.shape",
+        "master_node.subnet_id",
+        "util_node",
+        "util_node.number_of_nodes",
+        "util_node.shape",
+        "util_node.subnet_id",
+        "worker_node",
+        "worker_node.number_of_nodes",
+        "worker_node.shape",
+        "worker_node.subnet_id",
+        "worker_node.block_volume_size_in_gbs"
     ],
 }
