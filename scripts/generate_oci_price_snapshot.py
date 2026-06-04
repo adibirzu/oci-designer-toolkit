@@ -75,10 +75,33 @@ PART_NUMBERS: tuple[str, ...] = (
     # ---- Storage / networking / object storage ----
     "B91961",  # Storage - Block Volume - Storage (GB Capacity Per Month)
     "B91962",  # Storage - Block Volume - Performance Units (Perf Unit/GB/Month)
+    "B89057",  # Storage - File Storage - Storage (GB Capacity Per Month)
     "B93030",  # Load Balancer Base (Load Balancer)
     "B93031",  # Load Balancer Bandwidth (Mbps Per Hour)
     "B91628",  # Object Storage - Storage (GB Capacity Per Month)
     "B91627",  # Object Storage - Requests (10,000 Requests per Month)
+    # ---- Database services (roadmap B2) ----
+    "B95702",  # Autonomous AI Database - Transaction Processing - ECPU (ECPU Per Hour)
+    "B95754",  # Autonomous AI Database Storage (GB Capacity Per Month)
+    "B90569",  # Base Database Service - Standard (OCPU Per Hour)
+    "B90570",  # Base Database Service - Enterprise (OCPU Per Hour)
+    "B111584",  # Base Database Service - Database Storage (GB Capacity Per Month)
+    "B108030",  # MySQL Database - ECPU (ECPU Per Hour)
+    "B92426",  # MySQL Database - Storage (GB Capacity Per Month)
+    # ---- OKE / security (roadmap B2) ----
+    "B96545",  # OCI Kubernetes Engine - Enhanced Cluster (Cluster Per Hour)
+    "B92092",  # Key Management Service - Key Versions (Key Version Per Month, list 0)
+    # ---- Usage-based / serverless follow-ups (no design-time quantity yet) ----
+    # Verified part numbers recorded for when the model adds these resources.
+    "B88525",  # Networking - DNS (1,000,000 Queries)
+    "B92593",  # Logging - Storage (GB Log Storage Per Month, list 0)
+    "B90925",  # Monitoring - Ingestion (Million Datapoints, list 0)
+    "B90940",  # Notifications - HTTPS Delivery (Million Delivery Operations, list 0)
+    "B90939",  # Streaming - Storage (GB Per Hour)
+    "B90938",  # Streaming - PUT or GET (GB Transferred)
+    "B90618",  # Oracle Functions - Invocations (1MIL Invocations, list 0)
+    "B90617",  # Oracle Functions - Execution Time (10,000 GB Memory-Seconds, list 0)
+    "B92072",  # API Gateway - 1,000,000 API Calls Per Month
 )
 
 DEFAULT_CURRENCIES = ("USD", "EUR", "GBP", "JPY", "AUD", "CAD")
