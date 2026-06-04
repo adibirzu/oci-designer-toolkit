@@ -16,6 +16,9 @@
 **
 **   iam.json:
 **     compartments_configuration.compartments.*          -> compartment (recursive, parent links)
+**     identity_domain_groups_configuration.groups.*      -> group (name + description)
+**     identity_domain_groups_configuration.dynamic_groups.* -> dynamic_group (name + description + matching_rule)
+**     policies_configuration.supplied_policies.*         -> policy (name + statements[], compartment_id -> resolved compartment)
 **   network.json:
 **     ...network_configuration_categories.*.vcns.*       -> vcn
 **       .subnets.*                                       -> subnet  (vcnId + routeTableId + securityListIds)
@@ -26,6 +29,9 @@
 **       .vcn_specific_gateways.nat_gateways.*            -> nat_gateway (vcnId)
 **       .vcn_specific_gateways.service_gateways.*        -> service_gateway (vcnId)
 **     ...network_configuration_categories.*.non_vcn_specific_gateways.dynamic_routing_gateways.* -> drg
+**       .drg_attachments.*                               -> drg_attachment (drgId + vcnId via attached_resource_key)
+**       .drg_route_tables.*                              -> drg_route_table (drgId)
+**       .drg_route_distributions.*                       -> drg_route_distribution (drgId + distributionType)
 **
 ** Everything is defensive: unknown sections are skipped, missing fields never
 ** throw, and a structured report records what was mapped vs skipped.
@@ -53,9 +59,29 @@ interface RawCompartment {
     description?: string
     children?: Record<string, RawCompartment>
 }
+interface RawGroup {
+    name?: string
+    description?: string
+}
+interface RawDynamicGroup extends RawGroup {
+    matching_rule?: string
+}
+interface RawPolicy {
+    name?: string
+    description?: string
+    compartment_id?: string
+    statements?: string[]
+}
 interface IamContent {
     compartments_configuration?: {
         compartments?: Record<string, RawCompartment>
+    }
+    identity_domain_groups_configuration?: {
+        groups?: Record<string, RawGroup>
+        dynamic_groups?: Record<string, RawDynamicGroup>
+    }
+    policies_configuration?: {
+        supplied_policies?: Record<string, RawPolicy>
     }
 }
 
@@ -84,11 +110,32 @@ interface RawVcn extends RawNamed {
         service_gateways?: Record<string, RawNamed>
     }
 }
+interface RawDrgAttachmentNetworkDetails {
+    type?: string
+    attached_resource_key?: string
+    route_table_key?: string
+}
+interface RawDrgAttachment extends RawNamed {
+    drg_route_table_key?: string
+    network_details?: RawDrgAttachmentNetworkDetails
+}
+interface RawDrgRouteTable extends RawNamed {
+    import_drg_route_distribution_key?: string
+    is_ecmp_enabled?: boolean
+}
+interface RawDrgRouteDistribution extends RawNamed {
+    distribution_type?: string
+}
+interface RawDrg extends RawNamed {
+    drg_attachments?: Record<string, RawDrgAttachment>
+    drg_route_tables?: Record<string, RawDrgRouteTable>
+    drg_route_distributions?: Record<string, RawDrgRouteDistribution>
+}
 interface RawCategory {
     category_compartment_id?: string
     vcns?: Record<string, RawVcn>
     non_vcn_specific_gateways?: {
-        dynamic_routing_gateways?: Record<string, RawNamed>
+        dynamic_routing_gateways?: Record<string, RawDrg>
     }
 }
 interface NetworkContent {
@@ -101,6 +148,9 @@ interface NetworkContent {
 // byOeKind lookup resolves the OCD model type + palette class authoritatively).
 const NET_VCN = 'network.network_configuration.network_configuration_categories.*.vcns.*'
 const KIND_COMPARTMENT = 'iam.compartments_configuration.compartments'
+const KIND_GROUP = 'iam.identity_domain_groups_configuration.groups'
+const KIND_DYNAMIC_GROUP = 'iam.identity_domain_groups_configuration.dynamic_groups'
+const KIND_POLICY = 'iam.policies_configuration.supplied_policies'
 const KIND_VCN = 'network.network_configuration.network_configuration_categories.*.vcns'
 const KIND_SUBNET = `${NET_VCN}.subnets`
 const KIND_ROUTE_TABLE = `${NET_VCN}.route_tables`
@@ -111,6 +161,9 @@ const KIND_IGW = `${NET_VCN}.vcn_specific_gateways.internet_gateways`
 const KIND_NGW = `${NET_VCN}.vcn_specific_gateways.nat_gateways`
 const KIND_SGW = `${NET_VCN}.vcn_specific_gateways.service_gateways`
 const KIND_DRG = `${NET_VCN}.non_vcn_specific_gateways.dynamic_routing_gateways`
+const KIND_DRG_ATTACHMENT = `${KIND_DRG}.*.drg_attachments`
+const KIND_DRG_ROUTE_TABLE = `${KIND_DRG}.*.drg_route_tables`
+const KIND_DRG_ROUTE_DISTRIBUTION = `${KIND_DRG}.*.drg_route_distributions`
 
 /**
  * Per-OCD-model-type factory. Each entry returns a freshly constructed model
@@ -182,6 +235,9 @@ export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zo
     const compartments = iam?.compartments_configuration?.compartments ?? {}
     const compartmentModelType = modelTypeFor(KIND_COMPARTMENT)
     let compartmentRootId = ''
+    // OE compartment KEY (the map key, e.g. 'CMP-LANDINGZONE-KEY') -> generated id.
+    // Policies reference a compartment by this key in `compartment_id`.
+    const compartmentKeyToId = new Map<string, string>()
 
     const walkCompartment = (key: string, raw: RawCompartment, parentId: string, depth: number): void => {
         const resource = OciModelResources.OciCompartment.newResource('compartment')
@@ -190,6 +246,7 @@ export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zo
         if (parentId) resource.compartmentId = parentId
         push('compartment', resource)
         bump(counts, 'compartment')
+        compartmentKeyToId.set(key, resource.id)
         if (depth === 0) {
             topCompartmentIds.push(resource.id)
             if (!compartmentRootId) compartmentRootId = resource.id
@@ -220,6 +277,78 @@ export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zo
         topCompartmentIds.push(root.id)
         compartmentRootId = root.id
         notes.push('Synthesized a root compartment (none found in iam.json).')
+    }
+
+    // Resolve an OE compartment key to a generated compartment id, falling back
+    // to the root compartment when the key is missing / unknown.
+    const resolveCompartmentId = (key: string | undefined): string => {
+        if (key && compartmentKeyToId.has(key)) return compartmentKeyToId.get(key) as string
+        return compartmentRootId
+    }
+
+    // --- IAM: groups, dynamic groups, policies ---
+    const idGroups = iam?.identity_domain_groups_configuration ?? {}
+
+    const groups = idGroups.groups ?? {}
+    if (modelTypeFor(KIND_GROUP)) {
+        let groupCount = 0
+        Object.keys(groups)
+            .sort()
+            .forEach((key) => {
+                const raw = groups[key] ?? {}
+                const group = OciModelResources.OciGroup.newResource('group')
+                group.displayName = raw.name || key
+                group.description = raw.description || ''
+                group.compartmentId = compartmentRootId
+                push('group', group)
+                bump(counts, 'group')
+                groupCount += 1
+            })
+        notes.push(`Mapped ${groupCount} group(s) from iam.json.`)
+    } else {
+        notes.push(`Skipped ${KIND_GROUP}: not in OcdLzResourceMap.`)
+    }
+
+    const dynamicGroups = idGroups.dynamic_groups ?? {}
+    if (modelTypeFor(KIND_DYNAMIC_GROUP)) {
+        let dynamicGroupCount = 0
+        Object.keys(dynamicGroups)
+            .sort()
+            .forEach((key) => {
+                const raw = dynamicGroups[key] ?? {}
+                const dynamicGroup = OciModelResources.OciDynamicGroup.newResource('dynamic_group')
+                dynamicGroup.displayName = raw.name || key
+                dynamicGroup.description = raw.description || ''
+                if (typeof raw.matching_rule === 'string') dynamicGroup.matchingRule = raw.matching_rule
+                dynamicGroup.compartmentId = compartmentRootId
+                push('dynamic_group', dynamicGroup)
+                bump(counts, 'dynamic_group')
+                dynamicGroupCount += 1
+            })
+        if (dynamicGroupCount > 0) notes.push(`Mapped ${dynamicGroupCount} dynamic group(s) from iam.json.`)
+    } else {
+        notes.push(`Skipped ${KIND_DYNAMIC_GROUP}: not in OcdLzResourceMap.`)
+    }
+
+    const suppliedPolicies = iam?.policies_configuration?.supplied_policies ?? {}
+    if (modelTypeFor(KIND_POLICY)) {
+        let policyCount = 0
+        Object.keys(suppliedPolicies)
+            .sort()
+            .forEach((key) => {
+                const raw = suppliedPolicies[key] ?? {}
+                const policy = OciModelResources.OciPolicy.newResource('policy')
+                policy.displayName = raw.name || key
+                if (raw.description) policy.description = raw.description
+                policy.statements = Array.isArray(raw.statements) ? raw.statements : []
+                policy.compartmentId = resolveCompartmentId(raw.compartment_id)
+                push('policy', policy)
+                bump(counts, 'policy')
+                policyCount += 1
+            })
+        notes.push(`Mapped ${policyCount} policy/policies from iam.json.`)
+    } else {
+        notes.push(`Skipped ${KIND_POLICY}: not in OcdLzResourceMap.`)
     }
 
     // --- Network: VCNs and contained resources ---
@@ -270,6 +399,9 @@ export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zo
     const vcnModelType = modelTypeFor(KIND_VCN)
     let categoryCount = 0
     let vcnCount = 0
+    // OE VCN KEY (the map key) -> generated VCN id, so DRG attachments can
+    // resolve their `network_details.attached_resource_key` to a real vcnId.
+    const vcnKeyToId = new Map<string, string>()
 
     Object.keys(categories)
         .sort()
@@ -293,6 +425,7 @@ export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zo
                         bump(counts, 'vcn')
                         vcnCount += 1
                         vcnId = vcn.id
+                        vcnKeyToId.set(vcnKey, vcnId)
                     } else {
                         notes.push('Skipped VCNs: no OcdLzResourceMap entry for VCN.')
                     }
@@ -352,6 +485,9 @@ export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zo
             if (drgs) {
                 const drgModelType = modelTypeFor(KIND_DRG)
                 if (drgModelType) {
+                    const drgAttachmentMapped = Boolean(modelTypeFor(KIND_DRG_ATTACHMENT))
+                    const drgRouteTableMapped = Boolean(modelTypeFor(KIND_DRG_ROUTE_TABLE))
+                    const drgRouteDistributionMapped = Boolean(modelTypeFor(KIND_DRG_ROUTE_DISTRIBUTION))
                     Object.keys(drgs)
                         .sort()
                         .forEach((drgKey) => {
@@ -361,6 +497,69 @@ export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zo
                             setNetworkParent(drg)
                             push('drg', drg)
                             bump(counts, 'drg')
+                            const drgId = drg.id
+
+                            // DRG attachments: link to the DRG, and resolve the
+                            // attached VCN via network_details.attached_resource_key.
+                            const attachments = rawDrg.drg_attachments ?? {}
+                            if (drgAttachmentMapped) {
+                                Object.keys(attachments)
+                                    .sort()
+                                    .forEach((attKey) => {
+                                        const rawAtt = attachments[attKey] ?? {}
+                                        const att = OciModelResources.OciDrgAttachment.newResource('drg_attachment')
+                                        att.displayName = rawAtt.display_name || attKey
+                                        att.drgId = drgId
+                                        att.compartmentId = compartmentRootId
+                                        const details = rawAtt.network_details
+                                        if (details?.type === 'VCN' && details.attached_resource_key) {
+                                            const attachedVcnId = vcnKeyToId.get(details.attached_resource_key)
+                                            if (attachedVcnId) att.vcnId = attachedVcnId
+                                        }
+                                        push('drg_attachment', att)
+                                        bump(counts, 'drg_attachment')
+                                    })
+                            } else if (Object.keys(attachments).length > 0) {
+                                notes.push(`Skipped ${KIND_DRG_ATTACHMENT}: not in OcdLzResourceMap.`)
+                            }
+
+                            // DRG route tables: link to the DRG.
+                            const routeTables = rawDrg.drg_route_tables ?? {}
+                            if (drgRouteTableMapped) {
+                                Object.keys(routeTables)
+                                    .sort()
+                                    .forEach((rtKey) => {
+                                        const rawRt = routeTables[rtKey] ?? {}
+                                        const rt = OciModelResources.OciDrgRouteTable.newResource('drg_route_table')
+                                        rt.displayName = rawRt.display_name || rtKey
+                                        rt.drgId = drgId
+                                        rt.compartmentId = compartmentRootId
+                                        if (typeof rawRt.is_ecmp_enabled === 'boolean') rt.isEcmpEnabled = rawRt.is_ecmp_enabled
+                                        push('drg_route_table', rt)
+                                        bump(counts, 'drg_route_table')
+                                    })
+                            } else if (Object.keys(routeTables).length > 0) {
+                                notes.push(`Skipped ${KIND_DRG_ROUTE_TABLE}: not in OcdLzResourceMap.`)
+                            }
+
+                            // DRG route distributions: link to the DRG.
+                            const routeDistributions = rawDrg.drg_route_distributions ?? {}
+                            if (drgRouteDistributionMapped) {
+                                Object.keys(routeDistributions)
+                                    .sort()
+                                    .forEach((rdKey) => {
+                                        const rawRd = routeDistributions[rdKey] ?? {}
+                                        const rd = OciModelResources.OciDrgRouteDistribution.newResource('drg_route_distribution')
+                                        rd.displayName = rawRd.display_name || rdKey
+                                        rd.drgId = drgId
+                                        rd.compartmentId = compartmentRootId
+                                        if (rawRd.distribution_type) rd.distributionType = rawRd.distribution_type
+                                        push('drg_route_distribution', rd)
+                                        bump(counts, 'drg_route_distribution')
+                                    })
+                            } else if (Object.keys(routeDistributions).length > 0) {
+                                notes.push(`Skipped ${KIND_DRG_ROUTE_DISTRIBUTION}: not in OcdLzResourceMap.`)
+                            }
                         })
                 } else {
                     notes.push(`Skipped ${KIND_DRG}: not in OcdLzResourceMap.`)
