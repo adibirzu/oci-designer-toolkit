@@ -10,7 +10,10 @@ import OcdConsoleMenuBar from '../components/OcdConsoleMenuBar'
 import { OcdConsoleConfig } from '../components/OcdConsoleConfiguration'
 import { ConsoleHeaderProps, ConsolePageProps, ConsoleToolbarProps, OcdSelectedResource } from '../types/Console'
 import OcdBom from './OcdBom'
-import OcdLandingZone from './OcdLandingZone'
+// Lazy-loaded: the Landing Zone wizard pulls in React Flow + the jsonnet-WASM
+// generator and is a distinct, mutually-exclusive page. Code-splitting it keeps
+// it out of the initial entry chunk (it loads only when the wizard is opened).
+const OcdLandingZone = React.lazy(() => import('./OcdLandingZone'))
 import OcdMarkdown, { OcdMarkdownLeftToolbar } from './OcdMarkdown'
 import OcdTabular, { OcdTabularLeftToolbar } from './OcdTabular'
 import OcdTerraform, { OcdTerraformLeftToolbar } from './OcdTerraform'
@@ -270,7 +273,9 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
     const showReferenceDataQueryDialog = ocdConsoleConfig.queryReferenceData
     const showExportToResourceManagerDialog = ocdDocument.dialog.resourceManager
     console.debug('OcdConsoleBody: Dialogs: Query', showQueryDialog, 'ReferenceData', showReferenceDataQueryDialog, 'Resource Manager', showExportToResourceManagerDialog)
-    let DisplayPage = OcdDesigner
+    // Widened so an eager page component and the lazy-loaded OcdLandingZone
+    // (a LazyExoticComponent) are both assignable.
+    let DisplayPage: React.ComponentType<ConsolePageProps> = OcdDesigner
     switch (ocdConsoleConfig.config.displayPage) {
         case 'bom':
             DisplayPage = OcdBom
@@ -313,13 +318,15 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
     return (
         <div className='ocd-console-body ocd-console-body-theme'>
             {/* <OcdDesigner ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig:any) => setOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} /> */}
-            <DisplayPage 
-                ocdConsoleConfig={ocdConsoleConfig} 
-                setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)} 
-                ocdDocument={ocdDocument} 
-                setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} 
-                key={`${ocdConsoleConfig.config.displayPage}-page`}
-                />
+            <React.Suspense fallback={<div className='ocd-console-loading' aria-busy='true'>Loading…</div>}>
+                <DisplayPage
+                    ocdConsoleConfig={ocdConsoleConfig}
+                    setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)}
+                    ocdDocument={ocdDocument}
+                    setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)}
+                    key={`${ocdConsoleConfig.config.displayPage}-page`}
+                    />
+            </React.Suspense>
             {/* <OcdPropertiesPanel ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument) => setOcdDocument(ocdDocument)} ocdResource={resource} /> */}
             {showQueryDialog && <OcdQueryDialog 
                 ocdDocument={ocdDocument} 
