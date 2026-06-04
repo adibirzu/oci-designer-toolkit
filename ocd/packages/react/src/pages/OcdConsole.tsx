@@ -10,6 +10,7 @@ import OcdConsoleMenuBar from '../components/OcdConsoleMenuBar'
 import { OcdConsoleConfig } from '../components/OcdConsoleConfiguration'
 import { ConsoleHeaderProps, ConsolePageProps, ConsoleToolbarProps, OcdSelectedResource } from '../types/Console'
 import OcdBom from './OcdBom'
+import OcdLandingZone from './OcdLandingZone'
 import OcdMarkdown, { OcdMarkdownLeftToolbar } from './OcdMarkdown'
 import OcdTabular, { OcdTabularLeftToolbar } from './OcdTabular'
 import OcdTerraform, { OcdTerraformLeftToolbar } from './OcdTerraform'
@@ -197,6 +198,10 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         ocdConsoleConfig.config.displayPage = 'bom'
         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
     }
+    const onLandingZoneClick = () => {
+        ocdConsoleConfig.config.displayPage = 'landingzone'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
     let PageLeftToolbar = OcdEmptyLeftRightToolbar
     let PageRightToolbar = OcdEmptyLeftRightToolbar
     switch (ocdConsoleConfig.config.displayPage) {
@@ -250,6 +255,7 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                         setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} 
                         />
                     <div className={validateClassName} title={validateTitle} onClick={onValidateClick} aria-hidden></div>
+                    <div className='landing-zone ocd-console-toolbar-icon' title='Landing Zone Wizard' onClick={onLandingZoneClick} aria-hidden></div>
                     <div className='cost-estimate ocd-console-toolbar-icon' title='BoM and Cost Estimate' onClick={onEstimateClick} aria-hidden></div>
                 </div>
             </div>
@@ -274,6 +280,9 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
             break;
         case 'documentation':
             DisplayPage = OcdDocumentation
+            break;
+        case 'landingzone':
+            DisplayPage = OcdLandingZone
             break;
         case 'markdown':
             DisplayPage = OcdMarkdown

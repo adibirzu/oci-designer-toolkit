@@ -32,6 +32,8 @@
         "package-observability-lz": "python scripts/package_observability_lz_addon.py",
         "estimate-observability-lz-costs": "python scripts/estimate_observability_lz_costs.py",
         "audit-observability-lz": "python scripts/audit_observability_lz_addon.py",
-        "build": "cd ocd && npm run build"
+        "build": "cd ocd && npm run build",
+        "generate-lz-jsonnet": "node scripts/generate_lz_jsonnet_sources.mjs",
+    "setup-lz": "node scripts/setup_landing_zone.mjs"
     }
 }
