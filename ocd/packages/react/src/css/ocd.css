@@ -1992,6 +1992,28 @@ table {
     padding-left: 5px;
 }
 
+/* Properties Terraform HCL Preview Panel (A4) */
+.ocd-properties-terraform-preview-panel {
+    display: block;
+    overflow: auto;
+    height: 100%;
+}
+
+.ocd-terraform-preview-hcl {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    white-space: pre;
+    margin: 0;
+    padding: 6px;
+}
+
+.ocd-terraform-preview-placeholder {
+    display: block;
+    padding: 8px;
+    font-style: italic;
+    color: #888;
+}
+
 /* Properties Arragement Panel */
 .ocd-properties-arrangement-panel {
     display: flex;
