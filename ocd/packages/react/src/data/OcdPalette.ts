@@ -319,6 +319,49 @@ export const palette = {
                             "class": "oci-key"
                         }
                     ]
+                },
+                {
+                    "title": "DNS",
+                    "class": "oci-network",
+                    "resources": [
+                        {
+                            "container": false,
+                            "title": "DNS Zone",
+                            "class": "oci-dns-zone"
+                        }
+                    ]
+                },
+                {
+                    "title": "Observability",
+                    "class": "oci-identity",
+                    "resources": [
+                        {
+                            "container": false,
+                            "title": "Log Group",
+                            "class": "oci-log-group"
+                        },
+                        {
+                            "container": false,
+                            "title": "Monitoring Alarm",
+                            "class": "oci-monitoring-alarm"
+                        },
+                        {
+                            "container": false,
+                            "title": "Notification Topic",
+                            "class": "oci-notification-topic"
+                        }
+                    ]
+                },
+                {
+                    "title": "Functions / Serverless",
+                    "class": "oci-compute",
+                    "resources": [
+                        {
+                            "container": false,
+                            "title": "Functions Application",
+                            "class": "oci-functions-application"
+                        }
+                    ]
                 }
             ]
         },

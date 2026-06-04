@@ -57,6 +57,16 @@ const SKU_MYSQL_STORAGE = 'B92426' // MySQL Database - Storage (GB Capacity Per 
 const SKU_OKE_ENHANCED_CLUSTER = 'B96545' // OCI Kubernetes Engine - Enhanced Cluster (Cluster Per Hour)
 // Security - Key Management (key versions, list 0 for software keys)
 const SKU_KMS_KEY_VERSIONS = 'B92092' // Key Management Service - Key Versions (Key Version Per Month)
+// Networking - DNS (usage-based: per 1,000,000 queries; queries not derivable from the design)
+const SKU_DNS_QUERIES = 'B88525' // Networking - DNS (1,000,000 Queries)
+// Logging - Storage (usage-based: GB Log Storage Per Month; first tier list 0)
+const SKU_LOGGING_STORAGE = 'B92593' // OCI - Logging - Storage (GB Log Storage Per Month)
+// Monitoring - Ingestion (usage-based: Million Datapoints; first tier list 0)
+const SKU_MONITORING_INGESTION = 'B90925' // Monitoring - Ingestion (Million Datapoints)
+// Notifications - HTTPS Delivery (usage-based: Million Delivery Operations; first tier list 0)
+const SKU_NOTIFICATIONS_HTTPS = 'B90940' // Notifications - HTTPS Delivery (Million Delivery Operations)
+// Oracle Functions - Invocations (usage-based: 1MIL Invocations; first tier list 0)
+const SKU_FUNCTIONS_INVOCATIONS = 'B90618' // Oracle Functions - Invocations (1MIL Function Invocations)
 /*
 ** Usage-based / serverless services the toolkit does NOT yet model as distinct
 ** resource types, so they have no design-time quantity and are not in the cost
@@ -428,6 +438,46 @@ export const OCI_RESOURCE_COST_MAPPINGS: Record<string, ResourceCostMapping> = {
         confidence: 'approximate',
         note: 'KMS software-backed key versions list at 0; HSM-protected keys are usage-based — requires assumptions.',
         components: [{ partNumber: SKU_KMS_KEY_VERSIONS, kind: 'flat' }],
+        quantity: () => 0
+    },
+    dns_zone: {
+        label: 'DNS Zone',
+        confidence: 'approximate',
+        note: 'Networking DNS billed per 1,000,000 queries; query volume is not derivable from the design so usage-based — requires assumptions.',
+        components: [{ partNumber: SKU_DNS_QUERIES, kind: 'flat' }],
+        // No query-volume attribute on a DNS zone resource, so billable quantity
+        // is 0 (pay-per-use). The mapping still resolves the SKU so the line
+        // renders as a costed-but-zero entry rather than "not costed".
+        quantity: () => 0
+    },
+    log_group: {
+        label: 'Log Group',
+        confidence: 'approximate',
+        note: 'OCI Logging billed per GB log storage per month (first tier lists at 0); ingested volume is not in the design so usage-based — requires assumptions.',
+        components: [{ partNumber: SKU_LOGGING_STORAGE, kind: 'monthly-gb' }],
+        // Log groups have no design-time storage attribute; bill 0 and surface
+        // the SKU as a usage-based, costed-but-zero line.
+        quantity: () => 0
+    },
+    monitoring_alarm: {
+        label: 'Monitoring Alarm',
+        confidence: 'approximate',
+        note: 'Monitoring ingestion billed per million datapoints (first tier lists at 0); datapoint volume is not in the design so usage-based — requires assumptions.',
+        components: [{ partNumber: SKU_MONITORING_INGESTION, kind: 'flat' }],
+        quantity: () => 0
+    },
+    notification_topic: {
+        label: 'Notification Topic',
+        confidence: 'approximate',
+        note: 'Notifications HTTPS delivery billed per million delivery operations (first tier lists at 0); delivery volume is not in the design so usage-based — requires assumptions.',
+        components: [{ partNumber: SKU_NOTIFICATIONS_HTTPS, kind: 'flat' }],
+        quantity: () => 0
+    },
+    functions_application: {
+        label: 'Functions Application',
+        confidence: 'approximate',
+        note: 'Oracle Functions billed per 1M invocations (first tier lists at 0); invocation volume is not in the design so usage-based — requires assumptions.',
+        components: [{ partNumber: SKU_FUNCTIONS_INVOCATIONS, kind: 'flat' }],
         quantity: () => 0
     }
 }
