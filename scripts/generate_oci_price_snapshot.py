@@ -29,13 +29,50 @@ SNAPSHOT_PATH = ROOT / "ocd" / "packages" / "react" / "src" / "data" / "OciPrice
 CETOOLS_BASE_URL = "https://apexapps.oracle.com/pls/apex/cetools/api/v1/products/"
 
 # Part numbers consumed by ocd/packages/react/src/cost/OcdResourcePriceMap.ts.
-# Keep this list in sync with OCI_RESOURCE_COST_MAPPINGS. Only verified SKUs are
-# listed; mappings whose SKU could not be verified use '' and are skipped here.
+# Keep this list in sync with OCI_RESOURCE_COST_MAPPINGS and
+# OcdComputeShapeSkus.ts. Only verified SKUs are listed; mappings whose SKU could
+# not be verified use '' and are skipped here.
+#
+# Compute shape-family SKUs (roadmap B1) verified live against the cetools API on
+# 2026-06-04. Modern Flex families bill OCPU + memory separately; older fixed
+# families (E2/B1/X5/X7) bill a single bundled OCPU SKU (memory included).
 PART_NUMBERS: tuple[str, ...] = (
-    "B97384",  # Compute - Standard - E5 - OCPU (OCPU Per Hour)
-    "B97385",  # Compute - Standard - E5 - Memory (Gigabytes Per Hour)
-    "B93311",  # Compute - Optimized - X9 - OCPU (OCPU Per Hour)
-    "B93312",  # Compute - Optimized - X9 - Memory (Gigabyte Per Hour)
+    # ---- Compute: AMD EPYC Standard E-series ----
+    "B90425",  # Compute - Standard - E2 (OCPU Per Hour, bundled)
+    "B92306",  # Compute - Standard - E3 - OCPU
+    "B92307",  # Compute - Standard - E3 - Memory
+    "B93113",  # Compute - Standard - E4 - OCPU
+    "B93114",  # Compute - Standard - E4 - Memory
+    "B97384",  # Compute - Standard - E5 - OCPU
+    "B97385",  # Compute - Standard - E5 - Memory
+    "B111129",  # OCI - Compute - Standard - E6 - OCPU
+    "B111130",  # OCI - Compute - Standard - E6 - Memory
+    # ---- Compute: Ampere (Arm) ----
+    "B93297",  # Compute - Standard - A1 - OCPU (always free; $0)
+    "B93298",  # Compute - Standard - A1 - Memory ($0)
+    "B109529",  # Compute - Standard - A2 OCPU
+    "B109530",  # Compute - Standard - A2 Memory
+    # ---- Compute: Intel X-series Standard ----
+    "B94176",  # Compute - Standard - X9 - OCPU (Standard3)
+    "B94177",  # Compute - Standard - X9 - Memory
+    "B93311",  # Compute - Optimized - X9 - OCPU (Optimized3)
+    "B93312",  # Compute - Optimized - X9 - Memory
+    "B88317",  # Compute - Virtual Machine Standard - X5 (Standard1, bundled)
+    "B88315",  # Compute - Bare Metal Standard - X5
+    "B88514",  # Compute - Virtual Machine Standard - X7 (Standard2, bundled)
+    "B88513",  # Compute - Bare Metal Standard - X7
+    "B91120",  # Compute - Virtual Machine Standard - B1 (bundled)
+    "B91119",  # Compute - Bare Metal Standard - B1
+    # ---- Compute: Dense I/O ----
+    "B93121",  # Compute - Dense I/O - E4 - OCPU
+    "B93122",  # Compute - Dense I/O - E4 - Memory
+    "B98202",  # OCI - Compute - Dense I/O - E5 OCPU
+    "B98203",  # OCI - Compute - Dense I/O - E5 Memory
+    "B112556",  # OCI - Compute - Dense IO - E6 Ax - OCPU
+    "B112557",  # OCI - Compute - Dense IO - E6 Ax - Memory
+    "B88516",  # Compute - Virtual Machine Dense I/O - X7 (DenseIO2, bundled)
+    "B88515",  # Compute - Bare Metal Dense I/O - X7
+    # ---- Storage / networking / object storage ----
     "B91961",  # Storage - Block Volume - Storage (GB Capacity Per Month)
     "B91962",  # Storage - Block Volume - Performance Units (Perf Unit/GB/Month)
     "B93030",  # Load Balancer Base (Load Balancer)

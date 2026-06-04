@@ -6,7 +6,7 @@
 import { useMemo, useState } from "react"
 import { ConsolePageProps } from "../types/Console"
 import { HOURS_PER_MONTH } from "../cost/OcdCostTypes"
-import { OCI_RESOURCE_COST_MAPPINGS, estimateMonthlyCost } from "../cost/OcdResourcePriceMap"
+import { collectRequiredPartNumbers, estimateMonthlyCost } from "../cost/OcdResourcePriceMap"
 import { useOciPriceList } from "../cost/useOciPriceList"
 
 type CostLineItem = { id: string; label: string; estimated_usd?: number; enabled: boolean }
@@ -29,16 +29,12 @@ const OcdBom = ({ ocdDocument }: ConsolePageProps): JSX.Element => {
         .sort((a, b) => a.label.localeCompare(b.label))
     const resourceCount = resourceRows.reduce((total, row) => total + row.count, 0)
 
-    // Required SKUs = mapped resource types present in this design, deduped, '' dropped.
-    const requiredPartNumbers = useMemo(() => {
-        const parts = new Set<string>()
-        for (const row of resourceRows) {
-            const mapping = OCI_RESOURCE_COST_MAPPINGS[row.type]
-            if (mapping) mapping.components.forEach((c) => c.partNumber && parts.add(c.partNumber))
-        }
-        return Array.from(parts)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [resourceRows.map((r) => r.type).join(',')])
+    // Required SKUs = static mapping SKUs + per-shape compute SKUs for the
+    // instances actually in this design, deduped, '' dropped.
+    const requiredPartNumbers = useMemo(
+        () => collectRequiredPartNumbers(resources),
+        [resources]
+    )
 
     const { priceMap, loading, error, source } = useOciPriceList(requiredPartNumbers, currency)
     const estimate = useMemo(
