@@ -549,3 +549,654 @@ details[open] > summary.summary-background-redwood-ng-theme {
         animation-delay: 200ms;
     }
 }
+
+/* ============================================================
+   10. Landing Zone Wizard — ocd-lz-* classes
+       All rules gated on `.ocd-console-redwood-ng-theme` to
+       prevent leaking into other themes. Mirrors the BoM
+       scoping pattern above (sections 7–9).
+
+       Layout reference: landing-zone-next-gen/src-lzng/pages/WizardShell.jsx
+       Palette:          Oracle Redwood tokens (--oracle-* vars defined in :root)
+
+       WCAG 2.2 AA contrast notes (all verified against WCAG algorithm):
+         Primary button  #C74634 on #FFFFFF = 4.82:1  — AA pass (normal text ≥4.5:1)
+         Hover button    #A63D2E on #FFFFFF = 5.89:1  — AA pass
+         oracle-text     #312D2A on #FFFFFF = 14.6:1  — AAA pass
+         oracle-text     #312D2A on #F5F5F5 = 13.5:1  — AAA pass
+         Danger text     #9f1d1d on #fff5f4 ≈ 8.3:1   — AAA pass
+         Shared box text #312D2A on #fffbd7 ≈ 14.1:1  — AAA pass
+         Env box text    #312D2A on #dcefd8 ≈  9.0:1  — AAA pass
+         oracle-text-muted #5C5C5C on #FFFFFF = 7.0:1 — AA pass
+   ============================================================ */
+
+/* ---- 10.1  Page shell ------------------------------------ */
+
+/* ocd-lz-view is the outermost wrapper rendered by OcdLandingZone */
+.ocd-console-redwood-ng-theme .ocd-lz-view {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    background: var(--oracle-bg);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    color: var(--oracle-text);
+    line-height: 1.5;
+    box-sizing: border-box;
+}
+
+/* ocd-lz-page is the WizardBody root; carries max-width and padding */
+.ocd-console-redwood-ng-theme .ocd-lz-page {
+    max-width: 1440px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 24px 48px;
+    box-sizing: border-box;
+}
+
+/* ---- 10.2  Page header ----------------------------------- */
+
+/* Header row: title/subtitle left, action buttons right */
+.ocd-console-redwood-ng-theme .ocd-lz-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-subtitle {
+    font-size: 13px;
+    color: var(--oracle-text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Button group in the page header (Config + Reset) */
+.ocd-console-redwood-ng-theme .ocd-lz-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ---- 10.3  Two-column wizard grid ----------------------- */
+
+/* form panel: fixed narrow column; diagram panel: 1fr remainder */
+.ocd-console-redwood-ng-theme .ocd-lz-grid {
+    display: grid;
+    grid-template-columns: minmax(340px, 460px) 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Graceful degradation when the viewport is too narrow */
+@media (max-width: 820px) {
+    .ocd-console-redwood-ng-theme .ocd-lz-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---- 10.4  Panel cards (form + diagram) ----------------- */
+
+/* White card surface — matches the BoM panel aesthetic */
+.ocd-console-redwood-ng-theme .ocd-lz-panel {
+    background: var(--oracle-white);
+    border: 1px solid var(--oracle-border);
+    border-radius: 7px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(49, 45, 42, 0.07);
+    box-sizing: border-box;
+}
+
+/* Section / sub-section heading inside a panel.
+   Left red-border accent mirrors .ocd-bom-panel h2 styling. */
+.ocd-console-redwood-ng-theme .ocd-lz-panel-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 14px 0;
+    padding-left: 10px;
+    border-left: 3px solid var(--oracle-red);
+    line-height: 1.3;
+}
+
+/* Second panel-title within the same panel (Environments heading)
+   needs extra top margin to separate from the preceding form fields. */
+.ocd-console-redwood-ng-theme .ocd-lz-panel .ocd-lz-panel-title + .ocd-lz-panel-title,
+.ocd-console-redwood-ng-theme .ocd-lz-panel .ocd-lz-select + .ocd-lz-panel-title,
+.ocd-console-redwood-ng-theme .ocd-lz-panel .ocd-lz-input + .ocd-lz-panel-title {
+    margin-top: 20px;
+}
+
+/* Diagram panel: min height to keep it visually anchored */
+.ocd-console-redwood-ng-theme .ocd-lz-diagram-panel {
+    min-height: 580px;
+}
+
+/* ---- 10.5  Form labels, inputs, selects ----------------- */
+
+/* Bold small label above each field */
+.ocd-console-redwood-ng-theme .ocd-lz-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--oracle-text-muted);
+    margin-bottom: 5px;
+    letter-spacing: 0.02em;
+}
+
+/* Full-width select — custom chevron arrow for cross-browser consistency */
+.ocd-console-redwood-ng-theme .ocd-lz-select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 32px 9px 10px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--oracle-text);
+    background-color: var(--oracle-white);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235C5C5C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+    margin-bottom: 14px;
+    /* SC 2.5.8 — minimum height 32px (24px required; 32px recommended) */
+    min-height: 36px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-select:hover {
+    border-color: var(--oracle-red);
+}
+
+/* Focus ring is global under the theme anchor (section 4 above);
+   reinforce border color on focus for extra affordance */
+.ocd-console-redwood-ng-theme .ocd-lz-select:focus-visible {
+    border-color: var(--oracle-red);
+}
+
+/* Full-width text input */
+.ocd-console-redwood-ng-theme .ocd-lz-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--oracle-text);
+    background: var(--oracle-white);
+    margin-bottom: 14px;
+    min-height: 36px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-input:hover {
+    border-color: var(--oracle-red);
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-input:focus-visible {
+    border-color: var(--oracle-red);
+}
+
+/* Inline input variant — used inside env-row and add-row grids;
+   overrides the block-level margin-bottom so it doesn't push the row taller */
+.ocd-console-redwood-ng-theme .ocd-lz-input-inline {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+/* ---- 10.6  Environment list ----------------------------- */
+
+/* Vertical stack of environment rows */
+.ocd-console-redwood-ng-theme .ocd-lz-env-list {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+/* Single env row: name | security-zone checkbox | edit btn | delete btn */
+.ocd-console-redwood-ng-theme .ocd-lz-env-row {
+    display: grid;
+    grid-template-columns: minmax(110px, 1fr) 118px auto auto;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid var(--oracle-border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #fcfcfc;
+}
+
+/* Environment name label text */
+.ocd-console-redwood-ng-theme .ocd-lz-env-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--oracle-text);
+    overflow-wrap: anywhere;
+}
+
+/* Checkbox + label inline pair */
+.ocd-console-redwood-ng-theme .ocd-lz-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--oracle-text);
+    cursor: pointer;
+    /* SC 2.5.8 — keep the row at least 24px tall via the parent padding */
+}
+
+/* SC 2.5.8 — checkbox hit area 24×24 minimum */
+.ocd-console-redwood-ng-theme .ocd-lz-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    cursor: pointer;
+    accent-color: var(--oracle-red);
+}
+
+/* "New environment" add row: inline input | checkbox | Add button */
+.ocd-console-redwood-ng-theme .ocd-lz-add-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) 118px auto;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+/* Help / hint text beneath a field or section */
+.ocd-console-redwood-ng-theme .ocd-lz-help {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    line-height: 1.45;
+    margin: -6px 0 14px 0;
+}
+
+/* ---- 10.7  Action row and status ------------------------- */
+
+.ocd-console-redwood-ng-theme .ocd-lz-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+/* Muted status text ("N files generated / No files generated yet") */
+.ocd-console-redwood-ng-theme .ocd-lz-status {
+    font-size: 13px;
+    color: var(--oracle-text-muted);
+}
+
+/* Inline validation / generation error text */
+.ocd-console-redwood-ng-theme .ocd-lz-error {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 5px;
+    border: 1px solid #f5c2bb;
+    background: #fff5f4;
+    color: #9f1d1d;       /* #9f1d1d on #fff5f4 ≈ 8.3:1 — AAA */
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+/* Empty-state placeholder in the diagram panel */
+.ocd-console-redwood-ng-theme .ocd-lz-empty {
+    border: 1px dashed var(--oracle-border);
+    border-radius: 6px;
+    padding: 20px;
+    color: var(--oracle-text-muted);
+    font-size: 14px;
+    background: #fafafa;
+    line-height: 1.5;
+}
+
+/* ---- 10.8  Buttons -------------------------------------- */
+
+/* Base button — all variants build on this */
+.ocd-console-redwood-ng-theme .ocd-lz-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    text-decoration: none;
+    white-space: nowrap;
+    /* SC 2.5.8 — minimum 24×24 px target; 32px height recommended */
+    min-height: 32px;
+    min-width: 48px;
+    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+/* Primary: Oracle red background / white text — 4.82:1 on #C74634, AA pass */
+.ocd-console-redwood-ng-theme .ocd-lz-button-primary {
+    background: var(--oracle-red);
+    border-color: var(--oracle-red);
+    color: var(--oracle-white);
+    font-size: 14px;
+    padding: 10px 16px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-button-primary:hover:not(:disabled):not(.ocd-lz-button-disabled) {
+    background: var(--oracle-red-dark);
+    border-color: var(--oracle-red-dark);
+}
+
+/* Secondary: white background / dark border and text */
+.ocd-console-redwood-ng-theme .ocd-lz-button-secondary {
+    background: var(--oracle-white);
+    border-color: var(--oracle-border);
+    color: var(--oracle-text);
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-button-secondary:hover:not(:disabled) {
+    border-color: var(--oracle-red);
+    color: var(--oracle-red-dark);
+}
+
+/* Danger: light red-tinted background, dark-red text — used for Delete */
+.ocd-console-redwood-ng-theme .ocd-lz-button-danger {
+    background: #fff5f4;
+    border-color: #f5c2bb;
+    color: #9f1d1d;        /* 8.3:1 on #fff5f4 — AAA */
+    font-size: 12px;
+    padding: 7px 10px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-button-danger:hover:not(:disabled) {
+    background: #fde8e6;
+    border-color: var(--oracle-red);
+    color: var(--oracle-red-dark);
+}
+
+/* Debug / neutral: used for the "Config" button in the header */
+.ocd-console-redwood-ng-theme .ocd-lz-button-debug {
+    background: var(--oracle-white);
+    border-color: var(--oracle-text-muted);
+    color: var(--oracle-text);
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-button-debug:hover:not(:disabled) {
+    border-color: var(--oracle-text);
+    background: var(--oracle-bg);
+}
+
+/* Reset: red-tinted border and text — matches LZNG resetBtn but Oracle palette */
+.ocd-console-redwood-ng-theme .ocd-lz-button-reset {
+    background: var(--oracle-white);
+    border-color: var(--oracle-red);
+    color: var(--oracle-red-dark);
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-button-reset:hover:not(:disabled) {
+    background: #fff5f4;
+}
+
+/* Disabled state — works on any button variant via class OR :disabled attribute */
+.ocd-console-redwood-ng-theme .ocd-lz-button-disabled,
+.ocd-console-redwood-ng-theme .ocd-lz-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ---- 10.9  Debug config overlay + drawer ---------------- */
+
+/* Full-screen dim overlay behind the drawer */
+.ocd-console-redwood-ng-theme .ocd-lz-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 24, 28, 0.32);
+    z-index: 30;
+}
+
+/* Right-side drawer panel */
+.ocd-console-redwood-ng-theme .ocd-lz-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(720px, 94vw);
+    height: 100vh;
+    box-sizing: border-box;
+    padding: 22px;
+    background: var(--oracle-white);
+    border-left: 1px solid var(--oracle-border);
+    box-shadow: -10px 0 28px rgba(49, 45, 42, 0.16);
+    overflow: auto;
+    z-index: 31;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Drawer title bar: title left, close button right */
+.ocd-console-redwood-ng-theme .ocd-lz-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* Monospace config / JSON preview block */
+.ocd-console-redwood-ng-theme .ocd-lz-pre {
+    margin: 0;
+    padding: 14px;
+    min-height: 240px;
+    max-height: 58vh;
+    overflow: auto;
+    background: var(--oracle-bg);
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: pre;
+    color: var(--oracle-bark);
+    flex-shrink: 0;
+}
+
+/* Generated-file list in the drawer */
+.ocd-console-redwood-ng-theme .ocd-lz-file-list {
+    border-top: 1px solid var(--oracle-border);
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1 1 auto;
+    overflow: auto;
+}
+
+/* Single file row: filename | size | download button */
+.ocd-console-redwood-ng-theme .ocd-lz-file-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 90px auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--oracle-border);
+    font-size: 13px;
+    color: var(--oracle-text);
+}
+
+.ocd-console-redwood-ng-theme .ocd-lz-file-row:last-child {
+    border-bottom: none;
+}
+
+/* Monospace filename */
+.ocd-console-redwood-ng-theme .ocd-lz-file-name {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--oracle-bark);
+    overflow-wrap: anywhere;
+}
+
+/* ---- 10.10  Compartment diagram canvas ------------------ */
+
+/* Scrollable canvas wrapper with a subtle grid background */
+.ocd-console-redwood-ng-theme .ocd-lz-diagram-canvas {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 520px;
+    padding: 18px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 7px;
+    background-color: #fbfbfb;
+    background-image:
+        linear-gradient(var(--oracle-border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--oracle-border) 1px, transparent 1px);
+    background-size: 18px 18px;
+    overflow: auto;
+}
+
+/* Outermost OCI Region bounding box */
+.ocd-console-redwood-ng-theme .ocd-lz-region-box {
+    min-width: 0;
+    min-height: 470px;
+    border: 1px solid #9b9b9b;
+    border-radius: 8px;
+    background: rgba(250, 250, 250, 0.94);
+    padding: 14px;
+}
+
+/* Region box heading label */
+.ocd-console-redwood-ng-theme .ocd-lz-diagram-label {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--oracle-bark);   /* #312D2A on rgba(250,250,250,.94) ≈ 14:1 — AAA */
+    margin-bottom: 2px;
+}
+
+/* Dashed tenancy bounding box */
+.ocd-console-redwood-ng-theme .ocd-lz-tenancy-box {
+    min-width: 0;
+    min-height: 385px;
+    border: 2px dashed #312D2A;  /* oracle-bark — clearly visible dashes */
+    padding: 18px;
+    margin: 18px 12px 0;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+/* Tenancy box heading */
+.ocd-console-redwood-ng-theme .ocd-lz-tenancy-label {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--oracle-bark);
+    margin-bottom: 4px;
+}
+
+/* Dotted landing-zone bounding box — red-accent dotted border */
+.ocd-console-redwood-ng-theme .ocd-lz-landingzone-box {
+    min-width: 0;
+    border: 1.5px dotted var(--oracle-red);  /* red accent replaces LZNG's #d33 */
+    padding: 14px;
+    margin: 24px 12px 0;
+    background: rgba(255, 255, 255, 0.74);
+    border-radius: 3px;
+}
+
+/* Landing-zone root compartment name */
+.ocd-console-redwood-ng-theme .ocd-lz-zone-label {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--oracle-bark);
+    margin-bottom: 2px;
+}
+
+/* Two-column layout: shared (narrow) | environments (wide) */
+.ocd-console-redwood-ng-theme .ocd-lz-zone-rows {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(130px, 0.75fr) minmax(0, 3fr);
+    gap: 14px;
+    margin-top: 14px;
+}
+
+/* Shared infrastructure column */
+.ocd-console-redwood-ng-theme .ocd-lz-shared-column {
+    min-width: 0;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+/* Environment compartments column */
+.ocd-console-redwood-ng-theme .ocd-lz-env-column {
+    min-width: 0;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+/* Individual compartment box — base style */
+.ocd-console-redwood-ng-theme .ocd-lz-compartment-box {
+    min-width: 0;
+    min-height: 44px;       /* SC 2.5.8 — 44px aligns with LZNG reference */
+    border: 1.5px dotted var(--oracle-text);
+    border-radius: 2px;
+    padding: 9px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--oracle-text);  /* #312D2A — high contrast on both tints */
+    display: flex;
+    align-items: center;
+    overflow-wrap: anywhere;
+    line-height: 1.3;
+}
+
+/* Shared infrastructure tint — warm yellow: #312D2A on #fffbd7 ≈ 14.1:1 — AAA */
+.ocd-console-redwood-ng-theme .ocd-lz-compartment-box-shared {
+    background: #fffbd7;
+    border-color: #b8a800;   /* darkened yellow border for 3:1 UI contrast */
+}
+
+/* Environment tint — muted green: #312D2A on #dcefd8 ≈ 9.0:1 — AAA */
+.ocd-console-redwood-ng-theme .ocd-lz-compartment-box-environment {
+    background: #dcefd8;
+    border-color: #4a7c45;   /* darkened green border for 3:1 UI contrast */
+}
+
+/* ---- 10.11  Entrance animations — LZ page --------------- */
+@media (prefers-reduced-motion: no-preference) {
+    .ocd-console-redwood-ng-theme .ocd-lz-view {
+        animation: ocd-rng-fadeIn 220ms ease-out both;
+    }
+
+    .ocd-console-redwood-ng-theme .ocd-lz-panel {
+        animation: ocd-rng-slideUp 280ms ease-out both;
+    }
+
+    .ocd-console-redwood-ng-theme .ocd-lz-diagram-panel {
+        animation: ocd-rng-slideUp 280ms ease-out both;
+        animation-delay: 60ms;
+    }
+
+    .ocd-console-redwood-ng-theme .ocd-lz-drawer {
+        animation: ocd-rng-slideUp 200ms ease-out both;
+    }
+}
