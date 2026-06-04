@@ -592,13 +592,23 @@
 }
 
 .ocd-lzng-diagram-canvas {
-    flex: 1 1 auto;
-    min-height: 480px;
+    /* Explicit (definite) height: React-Flow's root is height:100% and a
+       percentage height only resolves against a parent with a definite height
+       (min-height/flex-grow do NOT count). position:relative + the absolute-fill
+       rule below then guarantee the React-Flow pane fills this box. */
+    height: 560px;
+    flex-shrink: 0;
     margin: 14px 16px 16px;
     border: 1px solid var(--oracle-border);
     border-radius: 8px;
     overflow: hidden;
     background: var(--oracle-white);
+    position: relative;
+}
+
+.ocd-lzng-diagram-canvas .react-flow {
+    position: absolute;
+    inset: 0;
 }
 
 /* React-Flow node styling (scoped). */
