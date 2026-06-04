@@ -28,6 +28,7 @@
     --oracle-focus: #C74634;
     --oracle-shadow: 0 1px 4px rgba(49, 45, 42, 0.07);
 
+    position: relative;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -634,6 +635,231 @@
     gap: 10px;
     margin-top: 16px;
     flex-wrap: wrap;
+}
+
+/* ============================================================
+   Title-row action separator
+   ============================================================ */
+.ocd-lzng-action-sep {
+    width: 1px;
+    height: 22px;
+    background: var(--oracle-border);
+    margin: 0 2px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   Structural compartment preview (steps 1-4, no jsonnet run)
+   ============================================================ */
+.ocd-lzng-prev-canvas {
+    margin: 14px 16px 16px;
+    padding: 14px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    background: var(--oracle-bg);
+    overflow: auto;
+}
+
+.ocd-lzng-prev-region {
+    border: 1px solid var(--oracle-border);
+    border-radius: 10px;
+    padding: 10px 12px 14px;
+    background: var(--oracle-white);
+}
+
+.ocd-lzng-prev-region-name,
+.ocd-lzng-prev-tenancy-name,
+.ocd-lzng-prev-lz-name,
+.ocd-lzng-prev-cmp-name {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.ocd-lzng-prev-region-name {
+    color: var(--oracle-text-muted);
+    margin-bottom: 10px;
+}
+
+.ocd-lzng-prev-tenancy {
+    border: 1.5px dashed var(--oracle-text-muted);
+    border-radius: 9px;
+    padding: 10px 12px 12px;
+    background: rgba(245, 245, 245, 0.5);
+}
+
+.ocd-lzng-prev-tenancy-name {
+    color: var(--oracle-text-muted);
+    margin-bottom: 10px;
+}
+
+.ocd-lzng-prev-lz {
+    border: 2px dotted var(--oracle-red);
+    border-radius: 9px;
+    padding: 10px 12px 12px;
+    background: var(--oracle-white);
+}
+
+.ocd-lzng-prev-lz-name {
+    color: var(--oracle-red-dark);
+    margin-bottom: 10px;
+}
+
+.ocd-lzng-prev-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.ocd-lzng-prev-cmp {
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    padding: 10px;
+    background: var(--oracle-white);
+}
+
+/* Shared infra compartments — yellow. */
+.ocd-lzng-prev-shared {
+    background: #fffbd7;
+    border-color: #e6dca0;
+}
+
+.ocd-lzng-prev-shared-focus {
+    border-color: var(--oracle-red);
+    box-shadow: 0 0 0 2px rgba(199, 70, 52, 0.18);
+}
+
+/* Environment compartments — green when its security zone is on. */
+.ocd-lzng-prev-env-secure {
+    background: #dcefd8;
+    border-color: #a9d3a0;
+}
+
+.ocd-lzng-prev-cmp-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.ocd-lzng-prev-cmp-name {
+    color: var(--oracle-bark);
+}
+
+.ocd-lzng-prev-tag {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--oracle-text-muted);
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    background: var(--oracle-white);
+    white-space: nowrap;
+}
+
+.ocd-lzng-prev-tag-secure {
+    color: var(--oracle-success);
+    border-color: #a9d3a0;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.ocd-lzng-prev-sub {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(49, 45, 42, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ocd-lzng-prev-sub-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--oracle-text-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    overflow-wrap: anywhere;
+}
+
+.ocd-lzng-prev-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.ocd-lzng-prev-chip {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--oracle-bark);
+    background: var(--oracle-white);
+    border: 1px solid var(--oracle-border);
+    border-radius: 4px;
+    padding: 1px 6px;
+}
+
+.ocd-lzng-prev-empty {
+    font-size: 11px;
+    font-style: italic;
+    color: var(--oracle-text-muted);
+}
+
+/* ============================================================
+   Debug slide-over drawer
+   ============================================================ */
+.ocd-lzng-drawer-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(49, 45, 42, 0.4);
+    display: flex;
+    justify-content: flex-end;
+    z-index: 40;
+}
+
+.ocd-lzng-drawer {
+    width: min(560px, 92%);
+    height: 100%;
+    background: var(--oracle-white);
+    border-left: 3px solid var(--oracle-red);
+    box-shadow: -4px 0 16px rgba(49, 45, 42, 0.18);
+    display: flex;
+    flex-direction: column;
+    animation: ocd-lzng-drawer-in 180ms ease;
+}
+
+@keyframes ocd-lzng-drawer-in {
+    from { transform: translateX(16px); opacity: 0.6; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.ocd-lzng-drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--oracle-border);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-drawer-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--oracle-bark);
+    margin: 0;
+}
+
+.ocd-lzng-drawer-body {
+    padding: 16px 20px;
+    overflow: auto;
+}
+
+.ocd-lzng-drawer-body .ocd-lzng-pre {
+    max-height: none;
 }
 
 /* ============================================================

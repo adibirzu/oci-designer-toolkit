@@ -8,10 +8,14 @@
 ** shell rendered inside the OCD console body:
 **
 **   - dark OCI header bar with layout toggles (LzngHeader)
-**   - editable title + Download .drawio / Download JSON / Reset actions
+**   - editable title + Save draft / Debug / Sources / Download .drawio /
+**     Download JSON / Reset actions
 **   - clickable 5-step stepper (LzngStepper)
-**   - two-column body: left = step content, right = live React-Flow network
-**     diagram derived from the full Landing Zone config (LzngNetworkDiagram)
+**   - two-column body: left = step content (Back/Continue footer), right = a
+**     lightweight structural compartment preview (LzngPreviewDiagram) built
+**     directly from config — NO jsonnet run per step. The full generated IAM
+**     diagram is shown only on the Review step (LzngIamDiagram).
+**   - a Debug slide-over drawer (LzngDebugDrawer) showing config.jsonnet
 **
 ** The page is theme-independent: all styling lives in css/ocd-lzng.css scoped
 ** under `.ocd-lzng` (the outer div here), with the Oracle Redwood tokens defined
@@ -40,6 +44,7 @@ import { buildOcdDesignFromLz } from '../landingzone/OcdLzToModel'
 import {
     DEFAULT_CONFIG,
     LandingZoneConfig,
+    isStepValid,
     normalizeConfig,
     serializeLandingZoneConfig,
     upgradeConfig,
@@ -52,7 +57,12 @@ import { LzngHubStep } from '../landingzone/ui/LzngHubStep'
 import { LzngProjectsStep } from '../landingzone/ui/LzngProjectsStep'
 import { LzngTemplatesStep } from '../landingzone/ui/LzngTemplatesStep'
 import { LzngReviewStep } from '../landingzone/ui/LzngReviewStep'
-import { LzngNetworkDiagram } from '../landingzone/ui/LzngNetworkDiagram'
+import { LzngPreviewDiagram, LzngPreviewFocus } from '../landingzone/ui/LzngPreviewDiagram'
+// LzngNetworkDiagram (full React-Flow resource view) is intentionally no longer
+// used on steps 1-4 — those now show the lightweight structural preview. The full
+// generated IAM diagram lives in the Review step (LzngIamDiagram).
+import { LzngStepFooter } from '../landingzone/ui/LzngStepFooter'
+import { LzngDebugDrawer } from '../landingzone/ui/LzngDebugDrawer'
 import { buildDiagramModel } from '../landingzone/ui/LzngDiagramModel'
 import { buildDrawioXml } from '../landingzone/ui/LzngDrawioExport'
 import { LzngUpdateBanner } from '../landingzone/ui/LzngUpdateBanner'
@@ -87,12 +97,22 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
     const { statuses, loading: updatesLoading, anyUpdate, refresh: refreshUpdates } = useLzUpdateCheck()
     const [bannerDismissed, setBannerDismissed] = useState(false)
     const [showSources, setShowSources] = useState(false)
+    const [showDebug, setShowDebug] = useState(false)
 
     const validation = useMemo(() => validateConfig(config), [config])
     const serializedConfig = useMemo(
         () => (validation.errors.length === 0 ? serializeLandingZoneConfig(config) : validation.errors.join('\n')),
         [config, validation],
     )
+    const stepCanContinue = useMemo(() => isStepValid(activeStep, config), [activeStep, config])
+
+    function saveDraft(): void {
+        // The context auto-persists on every setField, but Save draft is an
+        // explicit, user-visible action: re-commit config + title and confirm.
+        setField('config', config)
+        setField('title', title)
+        setNotice({ kind: 'info', text: 'Draft saved.' })
+    }
 
     function commitConfig(next: LandingZoneConfig): void {
         const normalized = normalizeConfig(next)
@@ -146,23 +166,23 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         downloadTextFile(`${slugify(title)}.drawio`, buildDrawioXml(model))
     }
 
-    const showLeft = layout === 'split' || layout === 'list' || layout === 'code'
-    const showRight = layout === 'split' || layout === 'diagram'
-    const showCode = layout === 'code'
+    const isReview = activeStep === LZNG_STEPS.length - 1
+    // The Review step renders the full generated IAM diagram in its own (left)
+    // column, so the structural preview panel only applies to steps 1-4.
+    // On Review, always render the left column (it carries the full generated
+    // diagram + downloads), regardless of the split/list/diagram layout toggle.
+    const showLeft = isReview || layout === 'split' || layout === 'list'
+    const showRight = (layout === 'split' || layout === 'diagram') && !isReview
+
+    const PREVIEW_FOCUS: LzngPreviewFocus[] = ['foundation', 'hub', 'projects', 'templates']
+    const previewFocus = PREVIEW_FOCUS[activeStep] ?? 'foundation'
+
+    function goToStep(index: number): void {
+        setActiveStep(Math.max(0, Math.min(LZNG_STEPS.length - 1, index)))
+        setNotice(null)
+    }
 
     function renderLeft(): JSX.Element {
-        if (showCode) {
-            return (
-                <section className='ocd-lzng-card'>
-                    <div className='ocd-lzng-card-head'>
-                        <h2 className='ocd-lzng-card-title'>config.jsonnet</h2>
-                    </div>
-                    <div className='ocd-lzng-card-body'>
-                        <pre className='ocd-lzng-pre'>{serializedConfig}</pre>
-                    </div>
-                </section>
-            )
-        }
         switch (activeStep) {
             case 0:
                 return <LzngFoundationStep config={config} onChange={commitConfig} />
@@ -218,10 +238,22 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                             </button>
                         )}
                         <p className='ocd-lzng-subtitle'>
-                            Step {activeStep + 1} of {LZNG_STEPS.length} — {LZNG_STEPS[activeStep].label}. The diagram and JSON build up as you go.
+                            Step {activeStep + 1} of {LZNG_STEPS.length} — {LZNG_STEPS[activeStep].label}. The preview and JSON build up as you go.
                         </p>
                     </div>
                     <div className='ocd-lzng-titlerow-actions'>
+                        <button type='button' className='ocd-lzng-btn ocd-lzng-btn-primary' onClick={saveDraft}>
+                            Save draft
+                        </button>
+                        <button
+                            type='button'
+                            className='ocd-lzng-btn'
+                            aria-pressed={showDebug}
+                            onClick={() => setShowDebug(true)}
+                        >
+                            Debug
+                        </button>
+                        <span className='ocd-lzng-action-sep' aria-hidden />
                         <button
                             type='button'
                             className='ocd-lzng-btn'
@@ -238,7 +270,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                     </div>
                 </div>
 
-                <LzngStepper activeIndex={activeStep} onSelect={setActiveStep} />
+                <LzngStepper activeIndex={activeStep} onSelect={goToStep} />
 
                 {showSources && (
                     <LzngSourcesPanel
@@ -264,24 +296,13 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                                 </div>
                             )}
 
-                            <div className='ocd-lzng-step-footer'>
-                                <button
-                                    type='button'
-                                    className='ocd-lzng-btn'
-                                    disabled={activeStep === 0}
-                                    onClick={() => setActiveStep((index) => Math.max(0, index - 1))}
-                                >
-                                    Back
-                                </button>
-                                <button
-                                    type='button'
-                                    className='ocd-lzng-btn ocd-lzng-btn-primary'
-                                    disabled={activeStep === LZNG_STEPS.length - 1}
-                                    onClick={() => setActiveStep((index) => Math.min(LZNG_STEPS.length - 1, index + 1))}
-                                >
-                                    Next
-                                </button>
-                            </div>
+                            <LzngStepFooter
+                                isFirst={activeStep === 0}
+                                isLast={isReview}
+                                canContinue={stepCanContinue}
+                                onBack={() => goToStep(activeStep - 1)}
+                                onContinue={() => goToStep(activeStep + 1)}
+                            />
                         </div>
                     )}
 
@@ -289,16 +310,18 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                         <div className='ocd-lzng-col-right'>
                             <section className='ocd-lzng-card ocd-lzng-diagram-card'>
                                 <div className='ocd-lzng-card-head'>
-                                    <h2 className='ocd-lzng-card-title'>Network Diagram</h2>
+                                    <h2 className='ocd-lzng-card-title'>Preview from generated iam.json</h2>
                                 </div>
-                                <div className='ocd-lzng-diagram-canvas'>
-                                    <LzngNetworkDiagram config={config} />
+                                <div className='ocd-lzng-prev-canvas'>
+                                    <LzngPreviewDiagram config={config} focus={previewFocus} />
                                 </div>
                             </section>
                         </div>
                     )}
                 </div>
             </div>
+
+            <LzngDebugDrawer open={showDebug} content={serializedConfig} onClose={() => setShowDebug(false)} />
         </div>
     )
 }
