@@ -50,6 +50,30 @@ export default defineConfig({
     // `.vite/` / `out/` directories or the desktop `dist`.
     outDir: 'web-dist',
     emptyOutDir: true,
+    // Split heavy vendors into separate chunks so the static deploy ships a smaller
+    // initial payload and browsers can cache vendor code across app deploys. Without
+    // this the whole renderer collapses into one ~5MB chunk (Vite warns >500kB).
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (!id.includes('node_modules')) return undefined
+          // Normalise to the top-level package name (handles scoped packages).
+          const pkgPath = id.split('node_modules/').pop() as string
+          const pkg = pkgPath.startsWith('@')
+            ? pkgPath.split('/').slice(0, 2).join('/')
+            : pkgPath.split('/')[0]
+          // Heavy, independently-cacheable vendors get their own chunks.
+          if (pkg === 'exceljs') return 'vendor-exceljs'        // xlsx export, large
+          if (pkg === 'oci-sdk') return 'vendor-oci-sdk'         // OCI SDK, large
+          if (pkg === '@xyflow/react') return 'vendor-reactflow' // wizard diagram
+          if (pkg === 'react' || pkg === 'react-dom' || pkg === 'scheduler') return 'vendor-react'
+          if (pkg === 'react-markdown' || pkg.startsWith('remark') || pkg.startsWith('rehype') ||
+              pkg.startsWith('micromark') || pkg.startsWith('mdast') || pkg.startsWith('hast') ||
+              pkg.startsWith('unist') || pkg === 'unified') return 'vendor-markdown'
+          return 'vendor' // everything else
+        },
+      },
+    },
   },
   server: {
     // Mirror the dev proxy so `vite preview --config vite.web.config.mts` behaves
