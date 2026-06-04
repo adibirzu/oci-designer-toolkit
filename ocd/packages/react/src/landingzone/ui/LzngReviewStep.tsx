@@ -179,7 +179,7 @@ export function LzngReviewStep({ config, title, onError, onOpenInDesigner }: Lzn
                     <h2 className='ocd-lzng-card-title'>config.jsonnet</h2>
                 </div>
                 <div className='ocd-lzng-card-body'>
-                    <pre className='ocd-lzng-pre'>{configJsonnet}</pre>
+                    <pre className='ocd-lzng-pre' data-testid='lzng-config-jsonnet'>{configJsonnet}</pre>
                 </div>
             </section>
         </>

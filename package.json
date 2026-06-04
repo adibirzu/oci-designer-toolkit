@@ -37,6 +37,9 @@
         "generate-lz-jsonnet": "node scripts/generate_lz_jsonnet_sources.mjs",
         "setup-lz": "node scripts/setup_landing_zone.mjs",
         "setup-lz:latest": "node scripts/setup_landing_zone.mjs --latest",
-        "hooks:install": "git config core.hooksPath .githooks && echo 'Git hooks enabled (.githooks): pre-commit redaction gate + pre-push chain.'"
+        "hooks:install": "git config core.hooksPath .githooks && echo 'Git hooks enabled (.githooks): pre-commit redaction gate + pre-push chain.'",
+        "test:e2e": "cd e2e && npm install --no-save && npx playwright test",
+        "test:e2e:headed": "cd e2e && npm install --no-save && npx playwright test --headed",
+        "test:e2e:build-first": "cd ocd/packages/react && npm run build && cd ../.. && OCD_PAGES_BASE=/ npm run build:pages && npm run test:e2e"
     }
 }
