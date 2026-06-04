@@ -14,6 +14,36 @@
 > - **Expanded OCI resource coverage & reliability** — OKE node pools, NSG-to-NSG rules, LB listeners, and Resource Manager export hardening.
 >
 > See [`docs/observability-landing-zone-enhancements.md`](docs/observability-landing-zone-enhancements.md) for the detailed enhancement log and upstream-issue coverage.
+>
+> **Building & running the desktop (Electron) app**
+>
+> The desktop renderer reuses `@ocd/react`, so all of the fork features above (Redwood-NG theme, Landing Zone wizard with React-Flow + jsonnet-WASM, cost estimator, expanded OCI stencil palette, the DNS/Logging/Monitoring/Notifications/Functions model types, Terraform import, OCI discovery, LZ update notifications) are bundled into the packaged app. Desktop routes OCI discovery, Terraform import, and pricing through the Electron main process (IPC) rather than the web `@ocd/web-server` backend.
+>
+> Run these from the **repo root** unless noted:
+>
+> ```bash
+> npm run setup-lz        # one-time: fetch the OE Landing Zone sources the wizard needs (no OCIDs committed)
+> npm run setup-lz:latest # same, but pin to the latest upstream OE release
+> ```
+>
+> Then, from the `ocd/` directory:
+>
+> ```bash
+> npm run build                                   # build all workspaces (incl. desktop renderer/main/preload)
+> npm run dev-desktop                             # build + launch the desktop app in dev
+> npm run package --workspace=packages/desktop    # produce an unsigned .app (no DMG) under ocd/dist/ocd-darwin-arm64/ocd.app
+> npm run make-macos-arm64 --workspace=packages/desktop  # build the macOS arm64 DMG installer
+> ```
+>
+> The wizard's `libjsonnet.wasm` is asar-**unpacked** (`forge.config.ts` `asar: { unpack: '*.wasm' }`) so the renderer can `fetch()` it under `file://`. A `prebuild` step copies the React CSS themes and the wasm into the desktop package (`src/css` + `public`). It auto-runs before `npm run build` (npm lifecycle), but **not** before `package`/`make` — so when running those directly, first run the prebuild once:
+>
+> ```bash
+> npm run prebuild --workspace=packages/desktop      # copy CSS themes + libjsonnet.wasm into the desktop package
+> npm run package  --workspace=packages/desktop      # then produce the .app
+> ```
+>
+> > [!NOTE]
+> > The DMG maker (`make-macos-arm64`) requires the optional `appdmg` native dependency. If you only need a runnable `.app` (not an installer), use `npm run package` instead, which skips the DMG maker and avoids the `appdmg` requirement. To build the DMG, first install it: `npm i -D appdmg` (from `ocd/packages/desktop`).
 
 > [!IMPORTANT]  
 > ___As of June 2025 OKIT-Classic and OKIT-Desktop will drop full OCI and Multi-Cloud support and become a pure Oracle Edge Cloud tool.___ 
