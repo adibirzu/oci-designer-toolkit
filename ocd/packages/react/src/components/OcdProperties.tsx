@@ -734,7 +734,10 @@ const OcdResourceTerraformPreview = ({ocdDocument, setOcdDocument}: DesignerReso
             const msg = err instanceof Error ? err.message : String(err)
             return `# Terraform HCL preview unavailable\n# ${msg}`
         }
-    }, [selectedResource])
+        // Depend on ocdDocument (recreated immutably on every design edit) so the
+        // preview refreshes when the selected resource's properties change, not
+        // only when a different resource is selected.
+    }, [selectedResource, ocdDocument])
 
     const divClassNames = `ocd-properties-panel ocd-properties-terraform-preview-panel ocd-properties-panel-default-theme ocd-properties-panel-${theme}-theme`
     return (
