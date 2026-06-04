@@ -13,6 +13,7 @@ import * as ociResources from './properties/provider/oci/resources'
 import * as azureResources from './properties/provider/azure/resources'
 import * as googleResources from './properties/provider/google/resources'
 import { RgbaStringColorPicker } from 'react-colorful'
+import { getResourceTerraformHcl } from '@ocd/export'
 import Markdown from 'react-markdown'
 import { SelectedResourceContext } from '../pages/OcdConsole'
 // import { CacheContext, SelectedResourceContext } from '../pages/OcdConsole'
@@ -27,7 +28,7 @@ const getResourceTabs = (modelId: string, coordsId: string): string[] => {
         'Documentation',
         ...modelId && modelId !== '' ? ['Style'] : [],
         ...coordsId && coordsId !== '' ? ['Arrange'] : [],
-        ...modelId && modelId !== '' ? ['Validation'] : [],
+        ...modelId && modelId !== '' ? ['Terraform', 'Validation'] : [],
     ]
     console.debug('OcdPropertiesTabbar: getResourceTabs:', tabs)
     return tabs
@@ -711,6 +712,41 @@ const OcdColourPicker = ({colour, setColour}: DesignerColourPicker): JSX.Element
     )
 }
 
+// ---------------------------------------------------------------------------
+// Terraform HCL preview tab (A4 — per-resource Terraform preview)
+// ---------------------------------------------------------------------------
+
+/**
+ * Read-only panel that shows the Terraform HCL the selected resource would
+ * generate.  It delegates entirely to the existing OciExporter/AzureExporter
+ * generators via the `getResourceTerraformHcl` helper from @ocd/export.
+ */
+const OcdResourceTerraformPreview = ({ocdDocument, setOcdDocument}: DesignerResourceProperties): JSX.Element => {
+    const {selectedResource} = useContext(SelectedResourceContext)
+    const theme = useTheme()
+    const selectedModelResource: OcdResource = ocdDocument.getResource(selectedResource.modelId)
+
+    const hcl = useMemo((): string => {
+        if (!selectedModelResource) return ''
+        try {
+            return getResourceTerraformHcl(ocdDocument.design, selectedModelResource.id)
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err)
+            return `# Terraform HCL preview unavailable\n# ${msg}`
+        }
+    }, [selectedResource])
+
+    const divClassNames = `ocd-properties-panel ocd-properties-terraform-preview-panel ocd-properties-panel-default-theme ocd-properties-panel-${theme}-theme`
+    return (
+        <div className={divClassNames}>
+            {selectedModelResource
+                ? <pre className='ocd-terraform-preview-hcl'>{hcl}</pre>
+                : <span className='ocd-terraform-preview-placeholder'>Select a resource to view its Terraform HCL.</span>
+            }
+        </div>
+    )
+}
+
 const getResourceValidationResults = (ocdDocument: OcdDocument, selectedModelResource: OcdResource): OcdValidationResult[] => {
     const provider = selectedModelResource ? selectedModelResource.provider : ''
     switch (provider) {
@@ -840,6 +876,9 @@ const getActiveTabJMX = (availableTabs: string[], activeTab: string, ocdDocument
         case 'style': {
             if (isLayer) return <OcdLayerStyle ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} key={`ResourceActiveTab`}/>
             else return <OcdResourceStyle ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} key={`ResourceActiveTab`}/>
+        }
+        case 'terraform': {
+            return <OcdResourceTerraformPreview ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} key={`ResourceActiveTab`}/>
         }
         case 'validation': {
             return <OcdResourceValidation ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} key={`ResourceActiveTab`}/>
