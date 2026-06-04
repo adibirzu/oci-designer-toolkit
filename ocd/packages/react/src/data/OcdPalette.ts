@@ -249,6 +249,21 @@ export const palette = {
                             "container": false,
                             "title": "Integration Instance",
                             "class": "oci-integration-instance"
+                        },
+                        {
+                            "container": false,
+                            "title": "Queue",
+                            "class": "oci-queue"
+                        },
+                        {
+                            "container": true,
+                            "title": "API Gateway",
+                            "class": "oci-api-gateway"
+                        },
+                        {
+                            "container": false,
+                            "title": "API Deployment",
+                            "class": "oci-api-deployment"
                         }
                     ]
                 },
@@ -317,6 +332,11 @@ export const palette = {
                             "container": false,
                             "title": "Key",
                             "class": "oci-key"
+                        },
+                        {
+                            "container": false,
+                            "title": "Web Application Firewall",
+                            "class": "oci-web-app-firewall"
                         }
                     ]
                 },
@@ -349,6 +369,21 @@ export const palette = {
                             "container": false,
                             "title": "Notification Topic",
                             "class": "oci-notification-topic"
+                        },
+                        {
+                            "container": false,
+                            "title": "Streaming Stream",
+                            "class": "oci-streaming-stream"
+                        },
+                        {
+                            "container": false,
+                            "title": "Service Connector",
+                            "class": "oci-service-connector"
+                        },
+                        {
+                            "container": false,
+                            "title": "Events Rule",
+                            "class": "oci-events-rule"
                         }
                     ]
                 },
@@ -360,6 +395,17 @@ export const palette = {
                             "container": false,
                             "title": "Functions Application",
                             "class": "oci-functions-application"
+                        }
+                    ]
+                },
+                {
+                    "title": "Governance",
+                    "class": "oci-identity",
+                    "resources": [
+                        {
+                            "container": false,
+                            "title": "Budget",
+                            "class": "oci-budget"
                         }
                     ]
                 }

@@ -67,6 +67,14 @@ const SKU_MONITORING_INGESTION = 'B90925' // Monitoring - Ingestion (Million Dat
 const SKU_NOTIFICATIONS_HTTPS = 'B90940' // Notifications - HTTPS Delivery (Million Delivery Operations)
 // Oracle Functions - Invocations (usage-based: 1MIL Invocations; first tier list 0)
 const SKU_FUNCTIONS_INVOCATIONS = 'B90618' // Oracle Functions - Invocations (1MIL Function Invocations)
+// Streaming - PUT or GET (usage-based: GB of Data Transferred; volume not in design)
+const SKU_STREAMING_PUTGET = 'B90938' // Streaming - PUT or GET (Gigabytes of Data Transferred)
+// OCI Queue (usage-based: 1,000,000 Requests; request volume not in design)
+const SKU_QUEUE_REQUESTS = 'B95697' // OCI Queue (1,000,000 Requests)
+// API Gateway (usage-based: 1,000,000 API Calls Per Month; call volume not in design)
+const SKU_API_GATEWAY_CALLS = 'B92072' // API Gateway - 1,000,000 API Calls Per Month
+// Web Application Firewall - Requests (usage-based: 1M Incoming Requests Per Month)
+const SKU_WAF_REQUESTS = 'B94277' // Web Application Firewall - Requests (1,000,000 Incoming Requests Per Month)
 /*
 ** Usage-based / serverless services the toolkit does NOT yet model as distinct
 ** resource types, so they have no design-time quantity and are not in the cost
@@ -479,6 +487,34 @@ export const OCI_RESOURCE_COST_MAPPINGS: Record<string, ResourceCostMapping> = {
         note: 'Oracle Functions billed per 1M invocations (first tier lists at 0); invocation volume is not in the design so usage-based — requires assumptions.',
         components: [{ partNumber: SKU_FUNCTIONS_INVOCATIONS, kind: 'flat' }],
         quantity: () => 0
+    },
+    streaming_stream: {
+        label: 'Streaming Stream',
+        confidence: 'approximate',
+        note: 'OCI Streaming billed per GB of data transferred (PUT/GET) plus storage; transfer volume is not in the design so usage-based — requires assumptions.',
+        components: [{ partNumber: SKU_STREAMING_PUTGET, kind: 'flat' }],
+        quantity: () => 0
+    },
+    queue: {
+        label: 'Queue',
+        confidence: 'approximate',
+        note: 'OCI Queue billed per 1,000,000 requests; request volume is not in the design so usage-based — requires assumptions.',
+        components: [{ partNumber: SKU_QUEUE_REQUESTS, kind: 'flat' }],
+        quantity: () => 0
+    },
+    api_gateway: {
+        label: 'API Gateway',
+        confidence: 'approximate',
+        note: 'API Gateway billed per 1,000,000 API calls per month; call volume is not in the design so usage-based — requires assumptions.',
+        components: [{ partNumber: SKU_API_GATEWAY_CALLS, kind: 'flat' }],
+        quantity: () => 0
+    },
+    web_app_firewall: {
+        label: 'Web Application Firewall',
+        confidence: 'approximate',
+        note: 'Web Application Firewall billed per 1,000,000 incoming requests per month; request volume is not in the design so usage-based — requires assumptions.',
+        components: [{ partNumber: SKU_WAF_REQUESTS, kind: 'flat' }],
+        quantity: () => 0
     }
 }
 
@@ -512,7 +548,15 @@ export const FREE_RESOURCE_TYPES: ReadonlySet<string> = new Set([
     'mount_target',
     'file_system_export',
     'file_system_export_set',
-    'secret'
+    'secret',
+    // Events Rule, Service Connector Hub and Budgets have no direct OCI charge
+    // (you pay only for the downstream services they drive / measure).
+    'events_rule',
+    'service_connector',
+    'budget',
+    // API Deployment is billed via its parent API Gateway (per-call), not as a
+    // separate line item — no standalone charge.
+    'api_deployment'
 ])
 
 const round2 = (value: number): number => Math.round(value * 100) / 100

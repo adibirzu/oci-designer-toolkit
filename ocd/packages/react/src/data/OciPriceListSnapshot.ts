@@ -88,6 +88,8 @@ export const OCI_PRICE_SNAPSHOT: Record<string, PriceMap> = {
         'B90618': { unitPrice: 0, metricName: "1MIL Function Invocations", currency: "USD", displayName: "Oracle Functions - Invocations" },
         'B90617': { unitPrice: 0, metricName: "10,000 GB Memory-Seconds", currency: "USD", displayName: "Oracle Functions - Execution Time" },
         'B92072': { unitPrice: 3, metricName: "1,000,000 API Calls Per Month", currency: "USD", displayName: "API Gateway  - 1,000,000 API Calls" },
+        'B95697': { unitPrice: 0, metricName: "1,000,000 Requests", currency: "USD", displayName: "OCI Queue" },
+        'B94277': { unitPrice: 0, metricName: "1,000,000 Incoming Requests Per Month", currency: "USD", displayName: "Web Application Firewall - Requests" },
     },
     EUR: {
         'B90425': { unitPrice: 0.0279, metricName: "OCPU Per Hour", currency: "EUR", displayName: "Compute - Standard - E2" },
@@ -160,6 +162,8 @@ export const OCI_PRICE_SNAPSHOT: Record<string, PriceMap> = {
         'B90618': { unitPrice: 0, metricName: "1MIL Function Invocations", currency: "EUR", displayName: "Oracle Functions - Invocations" },
         'B90617': { unitPrice: 0, metricName: "10,000 GB Memory-Seconds", currency: "EUR", displayName: "Oracle Functions - Execution Time" },
         'B92072': { unitPrice: 2.79, metricName: "1,000,000 API Calls Per Month", currency: "EUR", displayName: "API Gateway  - 1,000,000 API Calls" },
+        'B95697': { unitPrice: 0, metricName: "1,000,000 Requests", currency: "EUR", displayName: "OCI Queue" },
+        'B94277': { unitPrice: 0, metricName: "1,000,000 Incoming Requests Per Month", currency: "EUR", displayName: "Web Application Firewall - Requests" },
     },
     GBP: {
         'B90425': { unitPrice: 0.023961, metricName: "OCPU Per Hour", currency: "GBP", displayName: "Compute - Standard - E2" },
@@ -232,6 +236,8 @@ export const OCI_PRICE_SNAPSHOT: Record<string, PriceMap> = {
         'B90618': { unitPrice: 0, metricName: "1MIL Function Invocations", currency: "GBP", displayName: "Oracle Functions - Invocations" },
         'B90617': { unitPrice: 0, metricName: "10,000 GB Memory-Seconds", currency: "GBP", displayName: "Oracle Functions - Execution Time" },
         'B92072': { unitPrice: 2.3961, metricName: "1,000,000 API Calls Per Month", currency: "GBP", displayName: "API Gateway  - 1,000,000 API Calls" },
+        'B95697': { unitPrice: 0, metricName: "1,000,000 Requests", currency: "GBP", displayName: "OCI Queue" },
+        'B94277': { unitPrice: 0, metricName: "1,000,000 Incoming Requests Per Month", currency: "GBP", displayName: "Web Application Firewall - Requests" },
     },
     JPY: {
         'B90425': { unitPrice: 4.65, metricName: "OCPU Per Hour", currency: "JPY", displayName: "Compute - Standard - E2" },
@@ -304,6 +310,8 @@ export const OCI_PRICE_SNAPSHOT: Record<string, PriceMap> = {
         'B90618': { unitPrice: 0, metricName: "1MIL Function Invocations", currency: "JPY", displayName: "Oracle Functions - Invocations" },
         'B90617': { unitPrice: 0, metricName: "10,000 GB Memory-Seconds", currency: "JPY", displayName: "Oracle Functions - Execution Time" },
         'B92072': { unitPrice: 465, metricName: "1,000,000 API Calls Per Month", currency: "JPY", displayName: "API Gateway  - 1,000,000 API Calls" },
+        'B95697': { unitPrice: 0, metricName: "1,000,000 Requests", currency: "JPY", displayName: "OCI Queue" },
+        'B94277': { unitPrice: 0, metricName: "1,000,000 Incoming Requests Per Month", currency: "JPY", displayName: "Web Application Firewall - Requests" },
     },
     AUD: {
         'B90425': { unitPrice: 0.045, metricName: "OCPU Per Hour", currency: "AUD", displayName: "Compute - Standard - E2" },
@@ -376,6 +384,8 @@ export const OCI_PRICE_SNAPSHOT: Record<string, PriceMap> = {
         'B90618': { unitPrice: 0, metricName: "1MIL Function Invocations", currency: "AUD", displayName: "Oracle Functions - Invocations" },
         'B90617': { unitPrice: 0, metricName: "10,000 GB Memory-Seconds", currency: "AUD", displayName: "Oracle Functions - Execution Time" },
         'B92072': { unitPrice: 4.5, metricName: "1,000,000 API Calls Per Month", currency: "AUD", displayName: "API Gateway  - 1,000,000 API Calls" },
+        'B95697': { unitPrice: 0, metricName: "1,000,000 Requests", currency: "AUD", displayName: "OCI Queue" },
+        'B94277': { unitPrice: 0, metricName: "1,000,000 Incoming Requests Per Month", currency: "AUD", displayName: "Web Application Firewall - Requests" },
     },
     CAD: {
         'B90425': { unitPrice: 0.039318, metricName: "OCPU Per Hour", currency: "CAD", displayName: "Compute - Standard - E2" },
@@ -448,6 +458,8 @@ export const OCI_PRICE_SNAPSHOT: Record<string, PriceMap> = {
         'B90618': { unitPrice: 0, metricName: "1MIL Function Invocations", currency: "CAD", displayName: "Oracle Functions - Invocations" },
         'B90617': { unitPrice: 0, metricName: "10,000 GB Memory-Seconds", currency: "CAD", displayName: "Oracle Functions - Execution Time" },
         'B92072': { unitPrice: 3.9318, metricName: "1,000,000 API Calls Per Month", currency: "CAD", displayName: "API Gateway  - 1,000,000 API Calls" },
+        'B95697': { unitPrice: 0, metricName: "1,000,000 Requests", currency: "CAD", displayName: "OCI Queue" },
+        'B94277': { unitPrice: 0, metricName: "1,000,000 Incoming Requests Per Month", currency: "CAD", displayName: "Web Application Firewall - Requests" },
     },
 }
 
