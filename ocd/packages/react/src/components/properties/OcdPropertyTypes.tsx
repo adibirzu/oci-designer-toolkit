@@ -175,10 +175,17 @@ export const OcdTextProperty = ({ ocdDocument, setOcdDocument, resource, config,
     if (rootResource.editLocked || rootResource.locked) properties.readOnly = true
     console.debug(`>>>> OcdPropertyTypes: OcdTextProperty: ${attribute.id} Render(${value}) - ${JSON.stringify(properties)}`)
     // const readOnly = rootResource.editLocked || rootResource.locked
+    // When a config supplies options (e.g. Cloud Agent plugin names, see Issue #563), render them as a
+    // per-field suggestion datalist; otherwise fall back to the shared Terraform variables datalist.
+    const options = config && config.options ? config.options : []
+    const listId = options.length > 0 ? `${id}-options` : 'variables'
     return (
         <div className={className}>
             <div><label htmlFor={id}>{attribute.label}</label></div>
-            <div><input type='text' id={id} value={value} {...properties} list='variables' onChange={onChange} onBlur={onBlur}></input></div>
+            <div>
+                <input type='text' id={id} value={value} {...properties} list={listId} onChange={onChange} onBlur={onBlur}></input>
+                {options.length > 0 && <datalist id={listId}>{options.map((o) => <option value={o.id} key={o.id}>{o.displayName}</option>)}</datalist>}
+            </div>
         </div>
     )
 }
