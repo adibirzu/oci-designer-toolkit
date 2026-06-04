@@ -508,6 +508,59 @@ export class OcdDocument {
         // console.debug('OcdDocument: Coords', coords, 'Clone', cloneCoords)
         return cloneCoords
     }
+    // Clone a coords node preserving its position relative to its parent (used for
+    // nested children so they are not double-offset like the cloned root is).
+    cloneChildCoords(coords: OcdViewCoords): OcdViewCoords {
+        let cloneCoords = this.newCoords()
+        cloneCoords.pgid = coords.pgid
+        cloneCoords.ocid = coords.ocid
+        cloneCoords.pocid = coords.pocid
+        cloneCoords.x = coords.x
+        cloneCoords.y = coords.y
+        cloneCoords.w = coords.w
+        cloneCoords.h = coords.h
+        cloneCoords.title = coords.title
+        cloneCoords.class = coords.class
+        cloneCoords.container = coords.container
+        return cloneCoords
+    }
+    // Recursively deep-clone a coords sub-tree AND its backing model resources.
+    // Returns a new (in-memory, not yet added) coords root whose nested children
+    // each reference freshly cloned model resources and are re-parented to the
+    // newly cloned parent resource.
+    //
+    // For the root call (isChild=false) the returned coords keeps the SOURCE's
+    // pgid/pocid so the caller can re-attach it to the same parent on the page,
+    // and inherits cloneCoords' positional nudge. For nested children the caller
+    // passes the new parent's coords id (newPgid) and model id (newPocid) so the
+    // child is re-parented onto the freshly cloned parent, preserving its relative
+    // position.
+    cloneResourceTree(sourceCoords: OcdViewCoords, newPgid?: string, newPocid?: string): OcdViewCoords | undefined {
+        const isChild = newPgid !== undefined && newPocid !== undefined
+        // Clone THIS model resource
+        const newModelResource = this.cloneResource(sourceCoords.ocid)
+        if (!newModelResource) {
+            console.warn('OcdDocument: cloneResourceTree could not clone model resource for', sourceCoords.ocid)
+            return undefined
+        }
+        // Re-point the new child resource's parent link to the new parent resource.
+        // setResourceParent guards with allowedParentTypes, so unsupported child types
+        // are left unchanged rather than crashing.
+        if (isChild && newPocid) this.setResourceParent(newModelResource.id, newPocid)
+        // The root keeps cloneCoords' nudge so it does not sit exactly on top of the
+        // source; children keep their relative position within the parent.
+        const newCoords = isChild ? this.cloneChildCoords(sourceCoords) : this.cloneCoords(sourceCoords)
+        newCoords.ocid = newModelResource.id
+        if (isChild) {
+            newCoords.pgid = newPgid as string
+            newCoords.pocid = newPocid as string
+        }
+        const children = sourceCoords.coords ?? []
+        newCoords.coords = children
+            .map((child) => this.cloneResourceTree(child, newCoords.id, newModelResource.id))
+            .filter((c): c is OcdViewCoords => c !== undefined)
+        return newCoords
+    }
     setCoordsRelativeToCanvas = (coords: OcdViewCoords) => {
         const parent = this.getCoords(coords.pgid)
         const relativeXY = this.getRelativeXY(parent ? parent : this.newCoords())
