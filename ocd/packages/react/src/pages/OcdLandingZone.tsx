@@ -52,6 +52,9 @@ import { LzngReviewStep } from '../landingzone/ui/LzngReviewStep'
 import { LzngNetworkDiagram } from '../landingzone/ui/LzngNetworkDiagram'
 import { buildDiagramModel } from '../landingzone/ui/LzngDiagramModel'
 import { buildDrawioXml } from '../landingzone/ui/LzngDrawioExport'
+import { LzngUpdateBanner } from '../landingzone/ui/LzngUpdateBanner'
+import { LzngSourcesPanel } from '../landingzone/ui/LzngSourcesPanel'
+import { useLzUpdateCheck } from '../landingzone/useLzUpdateCheck'
 
 const SETUP_NOTICE = 'Run `npm run setup-lz` to enable Landing Zone generation.'
 const DEFAULT_TITLE = 'Untitled Landing Zone'
@@ -73,6 +76,9 @@ function WizardBody(): JSX.Element {
     const [activeStep, setActiveStep] = useState(0)
     const [notice, setNotice] = useState<{ kind: 'info' | 'error'; text: string } | null>(null)
     const [busy, setBusy] = useState(false)
+    const { statuses, loading: updatesLoading, anyUpdate, refresh: refreshUpdates } = useLzUpdateCheck()
+    const [bannerDismissed, setBannerDismissed] = useState(false)
+    const [showSources, setShowSources] = useState(false)
 
     const validation = useMemo(() => validateConfig(config), [config])
     const serializedConfig = useMemo(
@@ -174,6 +180,14 @@ function WizardBody(): JSX.Element {
         <div className='ocd-lzng'>
             <LzngHeader layout={layout} onLayoutChange={setLayout} />
 
+            {anyUpdate && !bannerDismissed && (
+                <LzngUpdateBanner
+                    statuses={statuses}
+                    onDismiss={() => setBannerDismissed(true)}
+                    onOpenPanel={() => setShowSources(true)}
+                />
+            )}
+
             <div className='ocd-lzng-scroll'>
                 <div className='ocd-lzng-titlerow'>
                     <div>
@@ -199,6 +213,14 @@ function WizardBody(): JSX.Element {
                         </p>
                     </div>
                     <div className='ocd-lzng-titlerow-actions'>
+                        <button
+                            type='button'
+                            className='ocd-lzng-btn'
+                            aria-pressed={showSources}
+                            onClick={() => setShowSources((value) => !value)}
+                        >
+                            Sources &amp; Updates{anyUpdate ? ' •' : ''}
+                        </button>
                         <button type='button' className='ocd-lzng-btn' onClick={downloadDrawio}>Download .drawio</button>
                         <button type='button' className='ocd-lzng-btn' disabled={busy} onClick={downloadJson}>
                             {busy ? 'Generating…' : 'Download JSON'}
@@ -208,6 +230,15 @@ function WizardBody(): JSX.Element {
                 </div>
 
                 <LzngStepper activeIndex={activeStep} onSelect={setActiveStep} />
+
+                {showSources && (
+                    <LzngSourcesPanel
+                        statuses={statuses}
+                        loading={updatesLoading}
+                        onRefresh={() => refreshUpdates(true)}
+                        onClose={() => setShowSources(false)}
+                    />
+                )}
 
                 <div className='ocd-lzng-body' data-layout={layout}>
                     {showLeft && (

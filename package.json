@@ -34,6 +34,7 @@
         "audit-observability-lz": "python scripts/audit_observability_lz_addon.py",
         "build": "cd ocd && npm run build",
         "generate-lz-jsonnet": "node scripts/generate_lz_jsonnet_sources.mjs",
-    "setup-lz": "node scripts/setup_landing_zone.mjs"
+        "setup-lz": "node scripts/setup_landing_zone.mjs",
+        "setup-lz:latest": "node scripts/setup_landing_zone.mjs --latest"
     }
 }

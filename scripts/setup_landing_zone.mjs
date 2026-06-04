@@ -34,17 +34,32 @@ const lzRoot = path.join(repoRoot, 'ocd', 'packages', 'react', 'src', 'landingzo
 const genDir = path.join(lzRoot, 'gen')
 const sourcesFile = path.join(lzRoot, 'OcdLandingZoneJsonnetSources.ts')
 
+const useLatest = process.argv.includes('--latest')
+
 function run(cmd, args, opts = {}) {
     return execFileSync(cmd, args, { stdio: 'inherit', ...opts })
 }
 
+function capture(cmd, args, opts = {}) {
+    return execFileSync(cmd, args, { encoding: 'utf8', ...opts }).trim()
+}
+
 function main() {
-    console.log(`[setup-lz] Fetching OCI Operating Entities @ ${UPSTREAM_SHA}`)
     const tmp = mkdtempSync(path.join(tmpdir(), 'oci-oe-'))
     try {
-        // Clone then checkout the pinned commit (robust across server fetch policies).
+        // Clone the full default branch so we can either checkout the pinned SHA
+        // or resolve the current default-branch HEAD (--latest).
         run('git', ['clone', '--quiet', UPSTREAM_URL, tmp])
-        run('git', ['-C', tmp, 'checkout', '--quiet', UPSTREAM_SHA])
+
+        let resolvedSha = UPSTREAM_SHA
+        if (useLatest) {
+            // Default-branch HEAD after a fresh clone.
+            resolvedSha = capture('git', ['-C', tmp, 'rev-parse', 'HEAD'])
+            console.log(`[setup-lz] --latest: using default-branch HEAD @ ${resolvedSha}`)
+        } else {
+            console.log(`[setup-lz] Fetching OCI Operating Entities @ ${UPSTREAM_SHA}`)
+            run('git', ['-C', tmp, 'checkout', '--quiet', UPSTREAM_SHA])
+        }
 
         const upstreamGen = path.join(tmp, 'gen')
         if (!existsSync(upstreamGen)) {
@@ -69,6 +84,17 @@ function main() {
         }
 
         console.log('[setup-lz] Done. The Landing Zone Wizard is ready to use locally.')
+
+        if (useLatest && resolvedSha !== UPSTREAM_SHA) {
+            console.log('')
+            console.log('========================================================================')
+            console.log(`[setup-lz] NEW upstream SHA: ${resolvedSha}`)
+            console.log('[setup-lz] To pin this version, update BOTH:')
+            console.log('[setup-lz]   1. UPSTREAM_SHA in scripts/setup_landing_zone.mjs')
+            console.log("[setup-lz]   2. pinnedRef for 'operating-entities' in")
+            console.log('[setup-lz]      ocd/packages/react/src/landingzone/OcdLzSources.ts')
+            console.log('========================================================================')
+        }
     } finally {
         rmSync(tmp, { recursive: true, force: true })
     }

@@ -1012,6 +1012,229 @@
     font-weight: 700;
 }
 
+/* ============================================================
+   Update banner (below the dark header)
+   ============================================================ */
+.ocd-lzng-update-banner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 10px 20px;
+    background: #fff5f4;
+    border-bottom: 1px solid #f5c2bb;
+    color: var(--oracle-text);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-update-banner-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+}
+
+.ocd-lzng-update-banner-dot {
+    width: 9px;
+    height: 9px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: var(--oracle-red);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-update-banner-text {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.ocd-lzng-update-banner-text code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    background: rgba(199, 70, 52, 0.08);
+    border-radius: 3px;
+    padding: 1px 5px;
+}
+
+.ocd-lzng-update-banner-more {
+    color: var(--oracle-text-muted);
+}
+
+.ocd-lzng-update-banner-how {
+    margin: 8px 0 0;
+    color: var(--oracle-text-muted);
+    max-width: 70ch;
+}
+
+.ocd-lzng-update-banner-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.ocd-lzng-update-banner-dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--oracle-text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease;
+}
+
+.ocd-lzng-update-banner-dismiss:hover {
+    background: rgba(199, 70, 52, 0.08);
+    color: var(--oracle-red-dark);
+}
+
+/* ============================================================
+   Sources & Updates panel
+   ============================================================ */
+.ocd-lzng-sources-card {
+    margin-bottom: 18px;
+}
+
+.ocd-lzng-sources-head-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ocd-lzng-sources-intro {
+    margin: 0 0 12px;
+    color: var(--oracle-text-muted);
+    font-size: 13px;
+}
+
+.ocd-lzng-sources-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.ocd-lzng-source-row {
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: var(--oracle-white);
+}
+
+.ocd-lzng-source-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.ocd-lzng-source-label {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.ocd-lzng-source-repo {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    text-decoration: none;
+}
+
+.ocd-lzng-source-repo:hover {
+    color: var(--oracle-red-dark);
+    text-decoration: underline;
+}
+
+.ocd-lzng-source-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 10px 0 0;
+}
+
+.ocd-lzng-source-meta > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ocd-lzng-source-meta dt {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--oracle-text-muted);
+}
+
+.ocd-lzng-source-meta dd {
+    margin: 0;
+    font-size: 13px;
+}
+
+.ocd-lzng-source-meta code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+}
+
+.ocd-lzng-source-meta a {
+    color: var(--oracle-red-dark);
+    text-decoration: none;
+}
+
+.ocd-lzng-source-meta a:hover {
+    text-decoration: underline;
+}
+
+.ocd-lzng-source-unavailable {
+    color: var(--oracle-text-muted);
+    font-style: italic;
+}
+
+/* Status badges */
+.ocd-lzng-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.ocd-lzng-badge-ok {
+    background: #e7f4e8;
+    color: var(--oracle-success);
+    border-color: #bfe0c1;
+}
+
+.ocd-lzng-badge-update {
+    background: #fbeae7;
+    color: var(--oracle-red-dark);
+    border-color: #f5c2bb;
+}
+
+.ocd-lzng-badge-unpinned {
+    background: var(--oracle-bg);
+    color: var(--oracle-text-muted);
+    border-color: var(--oracle-border);
+}
+
+.ocd-lzng-badge-error {
+    background: #fdf6e3;
+    color: #8a6d3b;
+    border-color: #ead9a5;
+}
+
 @media (max-width: 1024px) {
     .ocd-lzng-body {
         grid-template-columns: 1fr;
