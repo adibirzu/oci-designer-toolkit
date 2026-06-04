@@ -82,6 +82,14 @@ containers/ssh/*
 **/desktop/src/css/*.css
 **/web/src/css/*.css
 
+# Copied wasm (Landing Zone Wizard) — prebuild copies from react/src/landingzone/wasm
+**/desktop/public/libjsonnet.wasm
+
+# Landing Zone Wizard — vendored OCI Operating Entities sources are fetched
+# locally via `npm run setup-lz` and NOT committed (they embed upstream OCI
+# reference OCIDs). Keep this repo free of any OCIDs / environment identifiers.
+**/landingzone/oe/gen/
+
 # Runtime Generated Files
 okitclassic/okitserver/static/okit/json/dropdown_data/*
 okitclassic/okitserver/static/okit/templates/user/*

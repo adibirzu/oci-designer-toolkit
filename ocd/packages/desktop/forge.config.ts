@@ -24,7 +24,7 @@ console.info('Args:', process.argv, archPos, arch)
 const config: ForgeConfig = {
   outDir: '../../dist',
   packagerConfig: {
-    asar: true,
+    asar: { unpack: '**/*.wasm' },
     executableName: 'ocd',
     icon: './public/assets/icon',
     // osxSign: {}, // Appears to break the MacOS App I assume because it's empty

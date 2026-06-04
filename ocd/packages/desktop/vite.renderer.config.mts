@@ -2,6 +2,10 @@ import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config
 export default defineConfig({
+  assetsInclude: ['**/*.wasm'],
+  build: {
+    target: 'esnext'
+  },
   server: {
     proxy: {
       // Proxy the unauthenticated OCI list-pricing API so the renderer (web /
