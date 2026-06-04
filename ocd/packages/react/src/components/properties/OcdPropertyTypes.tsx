@@ -308,6 +308,32 @@ export const OcdLookupProperty = ({ ocdDocument, setOcdDocument, resource, confi
     const className = isPropertyDisplayConditionTrue(attribute.conditional, attribute.condition, resource, rootResource) ? `ocd-property-row ocd-simple-property-row` : `collapsed hidden`
     if (rootResource.editLocked || rootResource.locked) properties.readOnly = true
     console.debug(`>>>> OcdPropertyTypes: OcdLookupProperty: ${attribute.id} Render(${value})`)
+    // Issue #369: when a config opts in via `properties.editable`, render an editable combobox (text input
+    // backed by a datalist of the same grouped lookup options) so the user can either pick a known resource
+    // or type a free-text OCID (e.g. a private-IP route target OCD does not model as a selectable resource).
+    // The default rendering remains a strict <select> for every other lookup field.
+    const {editable, ...inputProperties} = properties
+    const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        resource[attribute.key] = e.target.value
+        setValue(e.target.value)
+        setOcdDocument(OcdDocument.clone(ocdDocument))
+        if (!activeFile.modified) activeFile.modified = true
+    }
+    if (editable) {
+        const datalistId = `${id}-options`
+        return (
+            <div className={className}>
+                <div><label htmlFor={id}>{attribute.label}</label></div>
+                <div>
+                    <input type='text' id={id} value={value} {...inputProperties} list={datalistId} onChange={onInputChange}></input>
+                    <datalist id={datalistId}>
+                        {lookupGroups.length === 0 ? resources.map((r: OcdResource) => <OcdLookupOption id={r.id} displayName={r.displayName} key={r.id} />)
+                                                   : lookupGroups.flatMap((g: ResourceElementConfigLookupGroup) => (g.resources ?? []).map((r: OcdResource) => <OcdLookupOption id={r.id} displayName={r.displayName} key={r.id} />))}
+                    </datalist>
+                </div>
+            </div>
+        )
+    }
     return (
         <div className={className}>
             <div><label htmlFor={id}>{attribute.label}</label></div>
@@ -318,7 +344,7 @@ export const OcdLookupProperty = ({ ocdDocument, setOcdDocument, resource, confi
                     <option value='' key={`${attribute.lookupResource}-empty-option`}></option>
                     {/* {lookupGroups.length === 0 ? resources.map((r: OcdResource) => {
                         return <option value={r.id} key={r.id}>{r.displayName}</option> */}
-                    {lookupGroups.length === 0 ? resources.map((r: OcdResource) => <OcdLookupOption id={r.id} displayName={r.displayName} key={r.id} />) 
+                    {lookupGroups.length === 0 ? resources.map((r: OcdResource) => <OcdLookupOption id={r.id} displayName={r.displayName} key={r.id} />)
                                                : lookupGroups.map((g: ResourceElementConfigLookupGroup) => <OcdLookupGroupOption group={g} key={g.displayName}/>)}
                 </select>
             </div>
