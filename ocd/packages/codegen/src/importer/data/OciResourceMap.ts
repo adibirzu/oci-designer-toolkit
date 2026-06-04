@@ -71,8 +71,7 @@ export const resourceMap: OcdResourceMap = {
     "oci_load_balancer_listener": "load_balancer_listener",
     "oci_mysql_mysql_db_system": "mysql_db_system",
     "oci_network_load_balancer_network_load_balancer": "network_load_balancer",
-    // "oci_network_load_balancer_backend_set": "network_load_balancer_backend_set",
-    // "oci_network_load_balancer_listener": "network_load_balancer_listener",
+    // Moved to batch 3 explicit entries below
     "oci_nosql_index": "nosql_index",
     "oci_nosql_table": "nosql_table",
     "oci_objectstorage_bucket": "bucket",
@@ -114,7 +113,32 @@ export const resourceMap: OcdResourceMap = {
     "oci_certificates_management_certificate": "certificates_certificate",
     "oci_certificates_management_certificate_authority": "certificates_certificate_authority",
     // Big Data
-    "oci_bds_bds_instance": "bds_instance"
+    "oci_bds_bds_instance": "bds_instance",
+    // Container Instances
+    "oci_container_instances_container_instance": "container_instance",
+    // Data Flow
+    "oci_dataflow_application": "dataflow_application",
+    // Network Firewall
+    "oci_network_firewall_network_firewall": "network_firewall",
+    "oci_network_firewall_network_firewall_policy": "network_firewall_policy",
+    // Service Mesh
+    "oci_service_mesh_mesh": "service_mesh",
+    // Health Checks
+    "oci_health_checks_http_monitor": "health_checks_http_monitor",
+    // Log Analytics
+    "oci_log_analytics_log_analytics_log_group": "log_analytics_log_group",
+    // Management Agent
+    "oci_management_agent_management_agent_install_key": "management_agent_install_key",
+    // Identity Tags
+    "oci_identity_tag_namespace": "tag_namespace",
+    "oci_identity_tag": "tag",
+    // Network Load Balancer sub-resources
+    "oci_network_load_balancer_backend_set": "network_load_balancer_backend_set",
+    "oci_network_load_balancer_listener": "network_load_balancer_listener",
+    // Functions
+    "oci_functions_function": "functions_function",
+    // Bastion Session
+    "oci_bastion_session": "bastion_session"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -1260,5 +1284,163 @@ export const resourceAttributes: OcdIncludedElements = {
         "worker_node.shape",
         "worker_node.subnet_id",
         "worker_node.block_volume_size_in_gbs"
+    ],
+    "oci_container_instances_container_instance": [
+        "availability_domain",
+        "container_restart_policy",
+        "display_name",
+        "fault_domain",
+        "graceful_shutdown_timeout_in_seconds",
+        "shape",
+        "containers",
+        "containers.display_name",
+        "containers.image_url",
+        "containers.command",
+        "containers.arguments",
+        "containers.working_directory",
+        "containers.environment_variables",
+        "containers.is_resource_principal_disabled",
+        "shape_config",
+        "shape_config.ocpus",
+        "shape_config.memory_in_gbs",
+        "vnics",
+        "vnics.subnet_id",
+        "vnics.display_name",
+        "vnics.is_public_ip_assigned",
+        "vnics.nsg_ids",
+        "vnics.private_ip"
+    ],
+    "oci_dataflow_application": [
+        "display_name",
+        "description",
+        "language",
+        "driver_shape",
+        "executor_shape",
+        "num_executors",
+        "file_uri",
+        "class_name",
+        "execute",
+        "archive_uri",
+        "logs_bucket_uri",
+        "idle_timeout_in_minutes",
+        "max_duration_in_minutes",
+        "metastore_id",
+        "driver_shape_config",
+        "driver_shape_config.ocpus",
+        "driver_shape_config.memory_in_gbs",
+        "executor_shape_config",
+        "executor_shape_config.ocpus",
+        "executor_shape_config.memory_in_gbs"
+    ],
+    "oci_network_firewall_network_firewall": [
+        "availability_domain",
+        "display_name",
+        "network_firewall_policy_id",
+        "subnet_id",
+        "ipv4address",
+        "ipv6address",
+        "network_security_group_ids"
+    ],
+    "oci_network_firewall_network_firewall_policy": [
+        "display_name"
+    ],
+    "oci_service_mesh_mesh": [
+        "display_name",
+        "description",
+        "certificate_authorities",
+        "certificate_authorities.id",
+        "mtls"
+    ],
+    "oci_health_checks_http_monitor": [
+        "display_name",
+        "protocol",
+        "targets",
+        "port",
+        "path",
+        "method",
+        "interval_in_seconds",
+        "timeout_in_seconds",
+        "is_enabled",
+        "vantage_point_names"
+    ],
+    "oci_log_analytics_log_analytics_log_group": [
+        "display_name",
+        "description",
+        "namespace"
+    ],
+    "oci_management_agent_management_agent_install_key": [
+        "display_name",
+        "allowed_key_install_count",
+        "is_unlimited",
+        "time_expires"
+    ],
+    "oci_identity_tag_namespace": [
+        "name",
+        "description",
+        "is_retired"
+    ],
+    "oci_identity_tag": [
+        "name",
+        "description",
+        "tag_namespace_id",
+        "is_cost_tracking",
+        "is_retired"
+    ],
+    "oci_network_load_balancer_backend_set": [
+        "name",
+        "network_load_balancer_id",
+        "policy",
+        "ip_version",
+        "is_fail_open",
+        "is_instant_failover_enabled",
+        "is_preserve_source",
+        "health_checker",
+        "health_checker.protocol",
+        "health_checker.port",
+        "health_checker.url_path",
+        "health_checker.return_code",
+        "health_checker.retries",
+        "health_checker.timeout_in_millis",
+        "health_checker.interval_in_millis",
+        "health_checker.response_body_regex"
+    ],
+    "oci_network_load_balancer_listener": [
+        "name",
+        "network_load_balancer_id",
+        "default_backend_set_name",
+        "port",
+        "protocol",
+        "ip_version",
+        "tcp_idle_timeout",
+        "udp_idle_timeout"
+    ],
+    "oci_functions_function": [
+        "application_id",
+        "display_name",
+        "image",
+        "image_digest",
+        "memory_in_mbs",
+        "timeout_in_seconds",
+        "shape",
+        "config",
+        "source_details",
+        "source_details.source_type",
+        "source_details.pbf_listing_id",
+        "trace_config"
+    ],
+    "oci_bastion_session": [
+        "bastion_id",
+        "display_name",
+        "key_type",
+        "session_ttl_in_seconds",
+        "key_details",
+        "key_details.public_key_content",
+        "target_resource_details",
+        "target_resource_details.session_type",
+        "target_resource_details.target_resource_id",
+        "target_resource_details.target_resource_port",
+        "target_resource_details.target_resource_operating_system_user_name",
+        "target_resource_details.target_resource_private_ip_address",
+        "target_resource_details.target_resource_fqdn"
     ],
 }
