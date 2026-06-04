@@ -307,6 +307,32 @@
     border-color: transparent;
 }
 
+/* Review-step action cluster (Open in Designer + Download all). */
+.ocd-lzng-review-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* "Open in Designer" bridge action — distinct accent from the primary red. */
+.ocd-lzng-btn-open-designer {
+    background: #1a4b8c;
+    border-color: #1a4b8c;
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-btn-open-designer:hover {
+    background: #143a6e;
+    border-color: #143a6e;
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-btn-open-designer:disabled:hover {
+    background: #1a4b8c;
+    border-color: #1a4b8c;
+    color: var(--oracle-white);
+}
+
 /* ============================================================
    Stepper
    ============================================================ */

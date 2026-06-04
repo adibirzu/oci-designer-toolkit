@@ -30,6 +30,11 @@ export interface LzngReviewStepProps {
     config: LandingZoneConfig
     title: string
     onError: (message: string) => void
+    /**
+     * Opens the generated Landing Zone on the OCD drag-drop canvas. Receives the
+     * already-generated OE files so the bridge does not have to regenerate.
+     */
+    onOpenInDesigner?: (files: GeneratedFile[]) => void
 }
 
 function formatBytes(size: number): string {
@@ -37,7 +42,7 @@ function formatBytes(size: number): string {
     return `${(size / 1024).toFixed(1)} KB`
 }
 
-export function LzngReviewStep({ config, title, onError }: LzngReviewStepProps): JSX.Element {
+export function LzngReviewStep({ config, title, onError, onOpenInDesigner }: LzngReviewStepProps): JSX.Element {
     const [result, setResult] = useState<GeneratedResult | null>(null)
     const [busy, setBusy] = useState(false)
 
@@ -125,14 +130,27 @@ export function LzngReviewStep({ config, title, onError }: LzngReviewStepProps):
             <section className='ocd-lzng-card'>
                 <div className='ocd-lzng-card-head'>
                     <h2 className='ocd-lzng-card-title'>Generated Files</h2>
-                    <button
-                        type='button'
-                        className='ocd-lzng-btn ocd-lzng-btn-primary'
-                        disabled={!result || result.files.length === 0}
-                        onClick={downloadAll}
-                    >
-                        Download all (tar)
-                    </button>
+                    <div className='ocd-lzng-review-actions'>
+                        {onOpenInDesigner && (
+                            <button
+                                type='button'
+                                className='ocd-lzng-btn ocd-lzng-btn-open-designer'
+                                disabled={!result || result.files.length === 0}
+                                onClick={() => result && onOpenInDesigner(result.files)}
+                                title='Open the generated Landing Zone on the drag-drop canvas'
+                            >
+                                Open in Designer
+                            </button>
+                        )}
+                        <button
+                            type='button'
+                            className='ocd-lzng-btn ocd-lzng-btn-primary'
+                            disabled={!result || result.files.length === 0}
+                            onClick={downloadAll}
+                        >
+                            Download all (tar)
+                        </button>
+                    </div>
                 </div>
                 <div className='ocd-lzng-card-body'>
                     {!result && !busy && <p className='ocd-lzng-placeholder'>Nothing generated yet.</p>}
