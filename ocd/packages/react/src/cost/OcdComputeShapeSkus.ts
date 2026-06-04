@@ -23,17 +23,33 @@
 **  - Older fixed-config families (E2, B1, Standard1/X5, Standard2/X7,
 **    Standard3/X-series, DenseIO1/2) bill a SINGLE bundled OCPU-per-hour SKU;
 **    memory is included in the OCPU rate, so memSku is omitted.
+**  - GPU families (BM.GPU.* / VM.GPU.*) bill a single all-in per-GPU-per-hour
+**    SKU; the underlying OCPUs and memory are INCLUDED in the per-GPU rate, so
+**    ocpuSku/memSku are omitted and gpuSku/gpuCount carry the charge. The fixed
+**    bare-metal shapes carry a known GPU count (e.g. BM.GPU.A100-v2.8 -> 8);
+**    flex VM GPU shapes (VM.GPU.A10.1/2) bill the GPU count in the suffix.
+**  - HPC families (BM.HPC2.36, BM.Optimized3.36) are bare-metal and bill a
+**    single bundled OCPU-per-hour SKU (memory included), like the fixed families.
 **  - Always-Free / Micro shapes cost 0.
 */
 
 export type ShapeSkuConfidence = 'verified' | 'approximate'
 
 export interface ShapeSkuMapping {
-    // cetools OCPU-per-hour part number ('' for always-free shapes that cost 0).
+    // cetools OCPU-per-hour part number ('' for always-free shapes and for GPU
+    // shapes whose charge is fully carried by the per-GPU SKU).
     ocpuSku: string
     // cetools memory (GB)-per-hour part number, when the family bills memory
     // separately. Omitted for fixed-config families that bundle memory.
     memSku?: string
+    // cetools per-GPU-per-hour part number for GPU families. When set, the GPU
+    // charge (gpuSku * gpuCount) is billed and ocpu/memory are NOT (they are
+    // included in the all-in per-GPU rate).
+    gpuSku?: string
+    // Number of GPUs the shape carries. Used to bill gpuSku. For fixed bare-metal
+    // GPU shapes this is the family's full GPU count; flex VM GPU shapes override
+    // it from the shape-name suffix at resolve time.
+    gpuCount?: number
     // True when the shape is a Flex shape (OCPUs/memory come from shapeConfig).
     flex: boolean
     // For non-Flex shapes whose ocpus/memory are not in the design item, these
@@ -81,6 +97,22 @@ const DENSEIO_E6_OCPU = 'B112556' // OCI - Compute - Dense IO - E6 Ax - OCPU
 const DENSEIO_E6_MEM = 'B112557' // OCI - Compute - Dense IO - E6 Ax - Memory
 const DENSEIO_X7_OCPU = 'B88516' // Compute - Virtual Machine Dense I/O - X7 (DenseIO2, bundled)
 const DENSEIO_X7_BM_OCPU = 'B88515' // Compute - Bare Metal Dense I/O - X7
+// ---- GPU families (all-in per-GPU-per-hour SKUs; OCPU/memory included) ----
+const GPU_V2 = 'B89734' // Compute - GPU Standard - V2 (GPU2 / Tesla P100)
+const GPU_E3 = 'B92740' // Compute - GPU - E3 (GPU3 / Tesla V100)
+const GPU_E4 = 'B93544' // OCI - Compute - GPU - E4 (GPU4 / NVIDIA A100 40GB)
+const GPU_A10 = 'B95909' // Compute - GPU - A10 (BM/VM.GPU.A10)
+const GPU_A100_V2 = 'B95907' // Compute - GPU - A100 - v2 (BM.GPU.A100-v2 / A100 80GB)
+const GPU_H100 = 'B98415' // OCI - Compute - GPU - H100 (BM.GPU.H100)
+const GPU_H100T = 'B109480' // OCI - Compute - GPU - H100T
+const GPU_H200 = 'B110519' // OCI - Compute - GPU - H200 (BM.GPU.H200)
+const GPU_L40S = 'B109479' // Compute - GPU - L40S (BM.GPU.L40S)
+const GPU_MI300X = 'B109485' // OCI - Compute - GPU - MI300X (BM.GPU.MI300X)
+const GPU_X7_BM = 'B88517' // Compute - Bare Metal GPU Standard - X7 (GPU2 BM)
+const GPU_X7_VM = 'B88518' // Compute - Virtual Machine GPU Standard - X7 (GPU2 VM)
+// ---- HPC families (bundled OCPU-per-hour SKUs; memory included) ----
+const HPC_E5 = 'B96531' // OCI - Compute - HPC - E5 (BM.Optimized3.36 era)
+const HPC_X7 = 'B90398' // Compute - Bare Metal Standard - HPC - X7 (BM.HPC2.36)
 
 const ALWAYS_FREE_NOTE = 'Always-free shape; no charge.'
 
@@ -98,6 +130,17 @@ const fixedFamily = (
     confidence: ShapeSkuConfidence = 'verified',
     note?: string
 ): ShapeSkuMapping => ({ ocpuSku, memSku, flex: false, confidence, note })
+
+// GPU families bill an all-in per-GPU rate; OCPU/memory are included so ocpuSku
+// is '' and the charge comes entirely from gpuSku * gpuCount. gpuCount is the
+// shape's default GPU count (overridden from the shape-name suffix at resolve
+// time for VM GPU shapes).
+const gpuFamily = (
+    gpuSku: string,
+    gpuCount: number,
+    confidence: ShapeSkuConfidence = 'verified',
+    note?: string
+): ShapeSkuMapping => ({ ocpuSku: '', gpuSku, gpuCount, flex: false, confidence, note })
 
 /*
 ** Family-key -> SKU mapping. Keys are normalized family identifiers produced by
@@ -129,7 +172,25 @@ export const COMPUTE_SHAPE_SKUS: Record<string, ShapeSkuMapping> = {
     'denseio.e5': flexFamily(DENSEIO_E5_OCPU, DENSEIO_E5_MEM),
     'denseio.e6': flexFamily(DENSEIO_E6_OCPU, DENSEIO_E6_MEM),
     'denseio.x7': fixedFamily(DENSEIO_X7_OCPU, undefined, 'verified', 'DenseIO2 (X7) bundled OCPU rate.'),
-    'denseio.x7.bm': fixedFamily(DENSEIO_X7_BM_OCPU, undefined, 'verified', 'BM DenseIO2 (X7) bundled OCPU rate.')
+    'denseio.x7.bm': fixedFamily(DENSEIO_X7_BM_OCPU, undefined, 'verified', 'BM DenseIO2 (X7) bundled OCPU rate.'),
+    // ---- GPU families (all-in per-GPU-per-hour rates; OCPU/memory included) ----
+    // gpuCount is the full bare-metal shape's GPU count; VM GPU shapes override
+    // it from the shape-name suffix (e.g. VM.GPU.A10.2 -> 2 GPUs).
+    'gpu.h200': gpuFamily(GPU_H200, 8, 'verified', 'BM.GPU.H200 all-in per-GPU rate (8 GPUs/host).'),
+    'gpu.h100t': gpuFamily(GPU_H100T, 8, 'verified', 'BM.GPU.H100T all-in per-GPU rate (8 GPUs/host).'),
+    'gpu.h100': gpuFamily(GPU_H100, 8, 'verified', 'BM.GPU.H100 all-in per-GPU rate (8 GPUs/host).'),
+    'gpu.mi300x': gpuFamily(GPU_MI300X, 8, 'verified', 'BM.GPU.MI300X all-in per-GPU rate (8 GPUs/host).'),
+    'gpu.l40s': gpuFamily(GPU_L40S, 4, 'verified', 'BM.GPU.L40S all-in per-GPU rate (4 GPUs/host).'),
+    'gpu.a100': gpuFamily(GPU_A100_V2, 8, 'verified', 'BM.GPU.A100-v2 (A100 80GB) all-in per-GPU rate (8 GPUs/host).'),
+    'gpu.a100-40': gpuFamily(GPU_E4, 8, 'verified', 'BM.GPU4 (A100 40GB) all-in per-GPU rate (8 GPUs/host).'),
+    'gpu.a10': gpuFamily(GPU_A10, 4, 'verified', 'GPU.A10 all-in per-GPU rate (BM=4 GPUs; VM count from suffix).'),
+    'gpu.v100': gpuFamily(GPU_E3, 8, 'verified', 'BM.GPU3 (Tesla V100) all-in per-GPU rate (8 GPUs/host).'),
+    'gpu.p100': gpuFamily(GPU_V2, 2, 'verified', 'BM.GPU2 (Tesla P100) all-in per-GPU rate (2 GPUs/host).'),
+    'gpu.x7.bm': gpuFamily(GPU_X7_BM, 2, 'verified', 'BM GPU Standard X7 (P100) all-in per-GPU rate (2 GPUs/host).'),
+    'gpu.x7.vm': gpuFamily(GPU_X7_VM, 1, 'verified', 'VM GPU Standard X7 (P100) all-in per-GPU rate (count from suffix).'),
+    // ---- HPC families (bare-metal bundled OCPU-per-hour rates; memory included) ----
+    hpc: fixedFamily(HPC_X7, undefined, 'verified', 'BM.HPC2.36 bundled OCPU rate (RDMA cluster network).'),
+    'hpc.e5': fixedFamily(HPC_E5, undefined, 'verified', 'BM.Optimized3.36 / HPC E5 bundled OCPU rate.')
 }
 
 // Fallback used when a shape name cannot be matched to any known family. Uses
@@ -169,6 +230,33 @@ function resolveFamilyKey(shape: string): string | undefined {
     const name = shape.trim()
     const isBm = /^BM\./i.test(name)
     const bmSuffix = isBm ? '.bm' : ''
+
+    // ---- HPC families (check before Optimized3/Standard) ----
+    // BM.HPC2.36 (X7 RDMA) and the bare-metal BM.Optimized3.36 (Intel HPC, fixed
+    // 36-OCPU RDMA shape) are HPC; plain VM.Optimized3.Flex stays Optimized3 Flex.
+    if (/\bHPC2?\b/i.test(name)) return 'hpc'
+    if (isBm && /Optimized3\.\d/i.test(name)) return 'hpc.e5'
+
+    // ---- GPU families (check before plain Standard / generic rules) ----
+    // Match the most specific generations first.
+    if (/GPU/i.test(name)) {
+        if (/H200/i.test(name)) return 'gpu.h200'
+        if (/H100T/i.test(name)) return 'gpu.h100t'
+        if (/H100/i.test(name)) return 'gpu.h100'
+        if (/MI300X/i.test(name)) return 'gpu.mi300x'
+        if (/L40S/i.test(name)) return 'gpu.l40s'
+        if (/A100-v2|A100\.80|A100v2/i.test(name)) return 'gpu.a100'
+        if (/A100/i.test(name)) return 'gpu.a100-40'
+        if (/A10\b|A10\./i.test(name)) return 'gpu.a10'
+        if (/\bGPU4\b/i.test(name)) return 'gpu.a100-40'
+        if (/\bGPU3\b/i.test(name)) return 'gpu.v100'
+        if (/\bGPU2\b/i.test(name)) return 'gpu.p100'
+        // GPU Standard X7 (P100-era bundled SKU)
+        if (/\bX7\b/i.test(name)) return isBm ? 'gpu.x7.bm' : 'gpu.x7.vm'
+        // Generic / unrecognized GPU generation -> nearest verified (A100 80GB),
+        // flagged via the family note; falls through to fallback if absent.
+        return undefined
+    }
 
     // ---- Dense I/O families (check before plain Standard) ----
     if (/DenseIO/i.test(name)) {
@@ -227,10 +315,29 @@ export function resolveShapeSkus(shapeName: unknown): ResolvedShapeSku {
 
     const familyKey = resolveFamilyKey(shape)
     if (familyKey && COMPUTE_SHAPE_SKUS[familyKey]) {
-        return { ...COMPUTE_SHAPE_SKUS[familyKey], familyKey, alwaysFree: false }
+        const mapping = COMPUTE_SHAPE_SKUS[familyKey]
+        // GPU shapes encode the GPU count in the trailing shape-name segment
+        // (e.g. VM.GPU.A10.2 -> 2, BM.GPU.H100.8 -> 8). Prefer that count over
+        // the family default so VM/partial-host shapes bill the right GPU count.
+        if (mapping.gpuSku) {
+            const gpuCount = parseGpuCount(shape) ?? mapping.gpuCount
+            return { ...mapping, gpuCount, familyKey, alwaysFree: false }
+        }
+        return { ...mapping, familyKey, alwaysFree: false }
     }
 
     return { ...FALLBACK_E5, familyKey: 'fallback', alwaysFree: false }
+}
+
+// Parse the trailing GPU-count segment from a GPU shape name. OCI GPU shapes end
+// in the GPU count (e.g. 'VM.GPU.A10.1', 'BM.GPU.A100-v2.8', 'BM.GPU3.8'). The
+// 'A100-v2' segment contains 'v2' which is not a count, so only a pure trailing
+// integer is accepted.
+function parseGpuCount(shape: string): number | undefined {
+    const match = shape.trim().match(/\.(\d+)$/)
+    if (!match) return undefined
+    const count = Number(match[1])
+    return Number.isInteger(count) && count > 0 ? count : undefined
 }
 
 // Every distinct part number referenced by the shape mapping (plus fallback),
@@ -238,7 +345,7 @@ export function resolveShapeSkus(shapeName: unknown): ResolvedShapeSku {
 export const COMPUTE_SHAPE_PART_NUMBERS: readonly string[] = Array.from(
     new Set(
         Object.values(COMPUTE_SHAPE_SKUS)
-            .flatMap((m) => [m.ocpuSku, m.memSku])
+            .flatMap((m) => [m.ocpuSku, m.memSku, m.gpuSku])
             .filter((p): p is string => typeof p === 'string' && p.length > 0)
     )
 ).sort()

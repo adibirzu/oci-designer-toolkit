@@ -72,6 +72,22 @@ PART_NUMBERS: tuple[str, ...] = (
     "B112557",  # OCI - Compute - Dense IO - E6 Ax - Memory
     "B88516",  # Compute - Virtual Machine Dense I/O - X7 (DenseIO2, bundled)
     "B88515",  # Compute - Bare Metal Dense I/O - X7
+    # ---- Compute: GPU (roadmap B1a; all-in per-GPU-per-hour rates) ----
+    "B89734",  # Compute - GPU Standard - V2 (GPU2 / Tesla P100)
+    "B92740",  # Compute - GPU - E3 (GPU3 / Tesla V100)
+    "B93544",  # OCI - Compute - GPU - E4 (GPU4 / A100 40GB)
+    "B95909",  # Compute - GPU - A10
+    "B95907",  # Compute - GPU - A100 - v2 (A100 80GB)
+    "B98415",  # OCI - Compute - GPU - H100
+    "B109480",  # OCI - Compute - GPU - H100T
+    "B110519",  # OCI - Compute - GPU - H200
+    "B109479",  # Compute - GPU - L40S
+    "B109485",  # OCI - Compute - GPU - MI300X
+    "B88517",  # Compute - Bare Metal GPU Standard - X7 (P100)
+    "B88518",  # Compute - Virtual Machine GPU Standard - X7 (P100)
+    # ---- Compute: HPC (roadmap B1a; bundled OCPU-per-hour rates) ----
+    "B96531",  # OCI - Compute - HPC - E5 (BM.Optimized3.36 era)
+    "B90398",  # Compute - Bare Metal Standard - HPC - X7 (BM.HPC2.36)
     # ---- Storage / networking / object storage ----
     "B91961",  # Storage - Block Volume - Storage (GB Capacity Per Month)
     "B91962",  # Storage - Block Volume - Performance Units (Perf Unit/GB/Month)
