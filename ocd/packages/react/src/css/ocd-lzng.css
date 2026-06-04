@@ -693,6 +693,315 @@
     margin-top: 8px;
 }
 
+/* ============================================================
+   Phase 2 — option lists (hub kind / radio cards)
+   ============================================================ */
+.ocd-lzng-fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+}
+
+.ocd-lzng-fieldset > .ocd-lzng-label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.ocd-lzng-option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ocd-lzng-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--oracle-white);
+    transition: border-color 150ms ease, background 150ms ease;
+}
+
+.ocd-lzng-option:hover {
+    border-color: var(--oracle-red);
+}
+
+.ocd-lzng-option-active {
+    border-color: var(--oracle-red);
+    background: #fbeae7;
+}
+
+.ocd-lzng-option-radio {
+    margin-top: 3px;
+    accent-color: var(--oracle-red);
+    flex-shrink: 0;
+}
+
+.ocd-lzng-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.ocd-lzng-option-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+}
+
+.ocd-lzng-option-desc {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    line-height: 1.45;
+}
+
+.ocd-lzng-option-meta {
+    font-size: 11px;
+    color: var(--oracle-text-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* ============================================================
+   Phase 2 — field errors / invalid inputs
+   ============================================================ */
+.ocd-lzng-input-invalid {
+    border-color: var(--oracle-red);
+    background: #fff5f4;
+}
+
+.ocd-lzng-field-error {
+    font-size: 12px;
+    color: var(--oracle-red-dark);
+}
+
+.ocd-lzng-field code,
+.ocd-lzng-help code,
+.ocd-lzng-subcard-title code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    background: rgba(199, 70, 52, 0.08);
+    border-radius: 3px;
+    padding: 1px 5px;
+}
+
+/* ============================================================
+   Phase 2 — chips (projects)
+   ============================================================ */
+.ocd-lzng-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 2px 0 6px;
+}
+
+.ocd-lzng-chips-empty {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    font-style: italic;
+}
+
+.ocd-lzng-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px 4px 10px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 999px;
+    background: var(--oracle-bg);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--oracle-bark);
+}
+
+.ocd-lzng-chip-x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--oracle-text-muted);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.ocd-lzng-chip-x:hover {
+    background: var(--oracle-red);
+    color: var(--oracle-white);
+}
+
+.ocd-lzng-inline-add {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.ocd-lzng-inline-add .ocd-lzng-input,
+.ocd-lzng-inline-add .ocd-lzng-select {
+    flex: 1 1 auto;
+}
+
+/* ============================================================
+   Phase 2 — platform sub-cards
+   ============================================================ */
+.ocd-lzng-subcard {
+    border: 1px solid var(--oracle-border);
+    border-left: 3px solid var(--oracle-red);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    background: var(--oracle-bg);
+}
+
+.ocd-lzng-subcard-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.ocd-lzng-subcard-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--oracle-bark);
+}
+
+.ocd-lzng-subcard-desc {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    line-height: 1.45;
+    margin: 0 0 10px;
+}
+
+.ocd-lzng-subcard .ocd-lzng-field {
+    margin-top: 8px;
+}
+
+.ocd-lzng-checkrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.ocd-lzng-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--oracle-bark);
+    cursor: pointer;
+}
+
+.ocd-lzng-check input {
+    accent-color: var(--oracle-red);
+}
+
+/* ============================================================
+   Phase 2 — Review: file list + IAM diagram
+   ============================================================ */
+.ocd-lzng-file-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ocd-lzng-file-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 6px;
+    background: var(--oracle-white);
+}
+
+.ocd-lzng-file-name {
+    flex: 1 1 auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: var(--oracle-bark);
+    overflow-wrap: anywhere;
+}
+
+.ocd-lzng-file-size {
+    font-size: 12px;
+    color: var(--oracle-text-muted);
+    white-space: nowrap;
+}
+
+.ocd-lzng-iam-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.ocd-lzng-iam-canvas {
+    height: 420px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--oracle-white);
+}
+
+/* React-Flow spoke containers / child + IAM nodes (scoped). */
+.ocd-lzng .ocd-lzng-rf-spoke {
+    border: 1px solid var(--oracle-border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--oracle-text);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 10px;
+    text-align: left;
+    box-shadow: var(--oracle-shadow);
+}
+
+.ocd-lzng .ocd-lzng-rf-spoke.ocd-lzng-rf-secure {
+    border-color: var(--oracle-success);
+    background: rgba(232, 245, 233, 0.9);
+    color: var(--oracle-success);
+}
+
+.ocd-lzng .ocd-lzng-rf-child {
+    border: 1px solid var(--oracle-border);
+    border-radius: 7px;
+    background: var(--oracle-white);
+    color: var(--oracle-text);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 8px;
+    text-align: center;
+}
+
+.ocd-lzng .ocd-lzng-rf-child.ocd-lzng-rf-platform {
+    border-color: #0a5fb4;
+    background: #e8f1fb;
+    color: #0a5fb4;
+}
+
+.ocd-lzng .ocd-lzng-rf-node.ocd-lzng-rf-tenancy {
+    border-color: var(--oracle-red);
+    background: #fbeae7;
+    color: var(--oracle-red-dark);
+}
+
+.ocd-lzng .ocd-lzng-rf-node.ocd-lzng-rf-cmp-parent {
+    border-color: var(--oracle-bark);
+    font-weight: 700;
+}
+
 @media (max-width: 1024px) {
     .ocd-lzng-body {
         grid-template-columns: 1fr;

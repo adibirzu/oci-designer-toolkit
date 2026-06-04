@@ -5,16 +5,20 @@
 
 /*
 ** Foundation (Step 1) form. Captures realm / region / region-short-name and the
-** environment list with a per-environment security-zone toggle. All edits are
+** environment list with a per-environment security-zone toggle. Operates on the
+** full LandingZoneConfig but only touches the foundation-level fields; spoke
+** VCNs, projects and platforms (steps 3-4) are preserved across edits. New
+** environments are seeded with a default spoke VCN and one project. All edits are
 ** immutable and bubble up via onChange so the parent can drive the live diagram.
 */
 
 import React, { useState } from 'react'
 import { LzngToggle } from './LzngToggle'
 import {
-    Environment,
-    Step1State,
-} from '../OcdLzStep1Config'
+    LandingZoneConfig,
+    LzEnvironment,
+    defaultSpokeVcn,
+} from '../OcdLzConfig'
 import {
     findRegion,
     getDefaultRegionForRealm,
@@ -23,20 +27,20 @@ import {
 } from '../OcdLzRegions'
 
 export interface LzngFoundationStepProps {
-    step1: Step1State
-    onChange: (next: Step1State) => void
+    config: LandingZoneConfig
+    onChange: (next: LandingZoneConfig) => void
 }
 
-export function LzngFoundationStep({ step1, onChange }: LzngFoundationStepProps): JSX.Element {
+export function LzngFoundationStep({ config, onChange }: LzngFoundationStepProps): JSX.Element {
     const [newEnvName, setNewEnvName] = useState('')
     const [newEnvSecure, setNewEnvSecure] = useState(false)
 
-    const regionOptions = getRegionsForRealm(step1.realm)
+    const regionOptions = getRegionsForRealm(config.realm)
 
     function updateRealm(realm: string): void {
         const defaultRegion = getDefaultRegionForRealm(realm)
         onChange({
-            ...step1,
+            ...config,
             realm,
             region: defaultRegion?.id || '',
             regionShortName: defaultRegion?.shortName || '',
@@ -44,23 +48,30 @@ export function LzngFoundationStep({ step1, onChange }: LzngFoundationStepProps)
     }
 
     function updateRegion(regionId: string): void {
-        const region = findRegion(step1.realm, regionId)
-        onChange({ ...step1, region: regionId, regionShortName: region?.shortName || step1.regionShortName })
+        const region = findRegion(config.realm, regionId)
+        onChange({ ...config, region: regionId, regionShortName: region?.shortName || config.regionShortName })
     }
 
-    function updateEnvironment(index: number, patch: Partial<Environment>): void {
-        const environments = step1.environments.map((env, idx) => (idx === index ? { ...env, ...patch } : env))
-        onChange({ ...step1, environments })
+    function updateEnvironment(index: number, patch: Partial<LzEnvironment>): void {
+        const environments = config.environments.map((env, idx) => (idx === index ? { ...env, ...patch } : env))
+        onChange({ ...config, environments })
     }
 
     function deleteEnvironment(index: number): void {
-        onChange({ ...step1, environments: step1.environments.filter((_, idx) => idx !== index) })
+        onChange({ ...config, environments: config.environments.filter((_, idx) => idx !== index) })
     }
 
     function addEnvironment(): void {
         const name = newEnvName.trim()
         if (!name) return
-        onChange({ ...step1, environments: [...step1.environments, { name, securityZone: newEnvSecure }] })
+        const next: LzEnvironment = {
+            name,
+            securityZone: newEnvSecure,
+            spokeVcn: defaultSpokeVcn(config.environments.length),
+            projects: ['proj1'],
+            platforms: [],
+        }
+        onChange({ ...config, environments: [...config.environments, next] })
         setNewEnvName('')
         setNewEnvSecure(false)
     }
@@ -78,7 +89,7 @@ export function LzngFoundationStep({ step1, onChange }: LzngFoundationStepProps)
                             <select
                                 id='lzng-realm'
                                 className='ocd-lzng-select'
-                                value={step1.realm}
+                                value={config.realm}
                                 onChange={(event) => updateRealm(event.target.value)}
                             >
                                 {REALM_OPTIONS.map((realm) => (
@@ -91,7 +102,7 @@ export function LzngFoundationStep({ step1, onChange }: LzngFoundationStepProps)
                             <select
                                 id='lzng-region'
                                 className='ocd-lzng-select'
-                                value={step1.region}
+                                value={config.region}
                                 onChange={(event) => updateRegion(event.target.value)}
                             >
                                 {regionOptions.map((region) => (
@@ -107,8 +118,8 @@ export function LzngFoundationStep({ step1, onChange }: LzngFoundationStepProps)
                         <input
                             id='lzng-region-short'
                             className='ocd-lzng-input'
-                            value={step1.regionShortName}
-                            onChange={(event) => onChange({ ...step1, regionShortName: event.target.value })}
+                            value={config.regionShortName}
+                            onChange={(event) => onChange({ ...config, regionShortName: event.target.value })}
                         />
                     </div>
                 </div>
@@ -128,7 +139,7 @@ export function LzngFoundationStep({ step1, onChange }: LzngFoundationStepProps)
                             </tr>
                         </thead>
                         <tbody>
-                            {step1.environments.map((env, index) => (
+                            {config.environments.map((env, index) => (
                                 <tr key={`${env.name}-${index}`}>
                                     <td>
                                         <input
@@ -187,8 +198,8 @@ export function LzngFoundationStep({ step1, onChange }: LzngFoundationStepProps)
                         </tbody>
                     </table>
                     <p className='ocd-lzng-help'>
-                        Hub is fixed to hub_a with VCN 10.100.0.0/21 for this phase. Security-zone selections are
-                        emitted as config.security_targets.
+                        Set the hub topology and VCN in the Hub Network step. Security-zone selections are emitted as
+                        config.security_targets. Spoke VCNs and projects are configured in the Projects step.
                     </p>
                 </div>
             </section>

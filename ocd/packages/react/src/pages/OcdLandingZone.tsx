@@ -11,34 +11,45 @@
 **   - editable title + Download .drawio / Download JSON / Reset actions
 **   - clickable 5-step stepper (LzngStepper)
 **   - two-column body: left = step content, right = live React-Flow network
-**     diagram derived from the Foundation config (LzngNetworkDiagram)
+**     diagram derived from the full Landing Zone config (LzngNetworkDiagram)
 **
 ** The page is theme-independent: all styling lives in css/ocd-lzng.css scoped
 ** under `.ocd-lzng` (the outer div here), with the Oracle Redwood tokens defined
 ** in that scope. It does NOT depend on the redwood-ng console theme.
 **
-** Foundation (step 1) is fully wired; steps 2-5 are scaffolded with placeholder
-** cards and Back/Next navigation. Download JSON runs the jsonnet OE generation
-** and gracefully reports the setup-lz notice if the OE sources are absent.
+** Phase 2 wires every step to the Operating Entities config schema:
+**   1 Foundation        -> region/realm + environments + security_targets
+**   2 Hub Network       -> hub.kind + hub.network.vcn
+**   3 Projects          -> environments.<env>.shared_project_network + projects
+**   4 Platform Templates-> environments.<env>.platforms.<name>.extension
+**   5 Review            -> generate iam/network/... JSON, IAM compartment diagram,
+**                          per-file + tar downloads, read-only config.jsonnet
+**
+** Download JSON runs the jsonnet OE generation and gracefully reports the
+** setup-lz notice if the OE sources are absent.
 */
 
 import React, { useMemo, useState } from 'react'
 import { ConsolePageProps } from '../types/Console'
 import { WizardProvider, useWizard } from '../landingzone/OcdLzWizardContext'
 import { downloadTar, downloadTextFile } from '../landingzone/OcdLzDownloads'
-import { generateLandingZoneFiles } from '../landingzone/OcdLzGenerator'
+import { generateLandingZone } from '../landingzone/OcdLzGenerator'
 import {
-    DEFAULT_STEP1,
-    Step1State,
-    normalizeStep1,
-    serializeStep1Config,
-    validateStep1,
-} from '../landingzone/OcdLzStep1Config'
+    DEFAULT_CONFIG,
+    LandingZoneConfig,
+    normalizeConfig,
+    serializeLandingZoneConfig,
+    upgradeConfig,
+    validateConfig,
+} from '../landingzone/OcdLzConfig'
 import { LzngHeader, LzngLayout } from '../landingzone/ui/LzngHeader'
 import { LZNG_STEPS, LzngStepper } from '../landingzone/ui/LzngStepper'
 import { LzngFoundationStep } from '../landingzone/ui/LzngFoundationStep'
+import { LzngHubStep } from '../landingzone/ui/LzngHubStep'
+import { LzngProjectsStep } from '../landingzone/ui/LzngProjectsStep'
+import { LzngTemplatesStep } from '../landingzone/ui/LzngTemplatesStep'
+import { LzngReviewStep } from '../landingzone/ui/LzngReviewStep'
 import { LzngNetworkDiagram } from '../landingzone/ui/LzngNetworkDiagram'
-import { LzngPlaceholderStep, LzngReviewStep } from '../landingzone/ui/LzngStepStubs'
 import { buildDiagramModel } from '../landingzone/ui/LzngDiagramModel'
 import { buildDrawioXml } from '../landingzone/ui/LzngDrawioExport'
 
@@ -49,11 +60,13 @@ function slugify(value: string): string {
     return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'landing-zone'
 }
 
+function friendlyError(message: string): string {
+    return /bundled|setup-lz|not installed|not found|undefined/i.test(message) ? SETUP_NOTICE : message
+}
+
 function WizardBody(): JSX.Element {
     const { data, reset, setField } = useWizard()
-    const [step1, setStep1] = useState<Step1State>(() =>
-        normalizeStep1({ ...DEFAULT_STEP1, ...((data.step1 as Partial<Step1State>) || {}) }),
-    )
+    const [config, setConfig] = useState<LandingZoneConfig>(() => upgradeConfig(data.config ?? data.step1))
     const [title, setTitle] = useState<string>(() => (typeof data.title === 'string' && data.title ? data.title : DEFAULT_TITLE))
     const [editingTitle, setEditingTitle] = useState(false)
     const [layout, setLayout] = useState<LzngLayout>('split')
@@ -61,16 +74,16 @@ function WizardBody(): JSX.Element {
     const [notice, setNotice] = useState<{ kind: 'info' | 'error'; text: string } | null>(null)
     const [busy, setBusy] = useState(false)
 
-    const validation = useMemo(() => validateStep1(step1), [step1])
+    const validation = useMemo(() => validateConfig(config), [config])
     const serializedConfig = useMemo(
-        () => (validation.errors.length === 0 ? serializeStep1Config(step1) : validation.errors.join('\n')),
-        [step1, validation],
+        () => (validation.errors.length === 0 ? serializeLandingZoneConfig(config) : validation.errors.join('\n')),
+        [config, validation],
     )
 
-    function commitStep1(next: Step1State): void {
-        const normalized = normalizeStep1(next)
-        setStep1(normalized)
-        setField('step1', normalized)
+    function commitConfig(next: LandingZoneConfig): void {
+        const normalized = normalizeConfig(next)
+        setConfig(normalized)
+        setField('config', normalized)
         setNotice(null)
     }
 
@@ -84,7 +97,7 @@ function WizardBody(): JSX.Element {
     function resetWizard(): void {
         if (!window.confirm('Reset the wizard back to defaults?')) return
         reset()
-        setStep1(normalizeStep1(DEFAULT_STEP1))
+        setConfig(normalizeConfig(DEFAULT_CONFIG))
         setTitle(DEFAULT_TITLE)
         setActiveStep(0)
         setNotice(null)
@@ -98,8 +111,8 @@ function WizardBody(): JSX.Element {
         setBusy(true)
         setNotice(null)
         try {
-            const generated = await generateLandingZoneFiles(validation.value)
-            setField('step1', validation.value)
+            const generated = await generateLandingZone(validation.value)
+            setField('config', validation.value)
             downloadTar(`${slugify(title)}-landing-zone.tar`, [
                 { name: 'config.jsonnet', content: generated.configJsonnet },
                 ...generated.files,
@@ -108,15 +121,14 @@ function WizardBody(): JSX.Element {
             setNotice({ kind: 'info', text: `Generated ${generated.files.length} Operating Entities JSON file(s).` })
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : String(err)
-            const friendly = /bundled|setup-lz|not found|undefined/i.test(message) ? SETUP_NOTICE : message
-            setNotice({ kind: 'error', text: friendly })
+            setNotice({ kind: 'error', text: friendlyError(message) })
         } finally {
             setBusy(false)
         }
     }
 
     function downloadDrawio(): void {
-        const model = buildDiagramModel(step1)
+        const model = buildDiagramModel(config)
         downloadTextFile(`${slugify(title)}.drawio`, buildDrawioXml(model))
     }
 
@@ -126,20 +138,35 @@ function WizardBody(): JSX.Element {
 
     function renderLeft(): JSX.Element {
         if (showCode) {
-            return <LzngReviewStep config={serializedConfig} />
+            return (
+                <section className='ocd-lzng-card'>
+                    <div className='ocd-lzng-card-head'>
+                        <h2 className='ocd-lzng-card-title'>config.jsonnet</h2>
+                    </div>
+                    <div className='ocd-lzng-card-body'>
+                        <pre className='ocd-lzng-pre'>{serializedConfig}</pre>
+                    </div>
+                </section>
+            )
         }
         switch (activeStep) {
             case 0:
-                return <LzngFoundationStep step1={step1} onChange={commitStep1} />
+                return <LzngFoundationStep config={config} onChange={commitConfig} />
             case 1:
-                return <LzngPlaceholderStep title='Hub Network' note='Hub VCN topology, gateways, and routing. Coming next.' />
+                return <LzngHubStep config={config} onChange={commitConfig} />
             case 2:
-                return <LzngPlaceholderStep title='Projects' note='Per-environment project compartments and quotas. Coming next.' />
+                return <LzngProjectsStep config={config} onChange={commitConfig} />
             case 3:
-                return <LzngPlaceholderStep title='Platform Templates' note='Reusable platform service templates. Coming next.' />
+                return <LzngTemplatesStep config={config} onChange={commitConfig} />
             case 4:
             default:
-                return <LzngReviewStep config={serializedConfig} />
+                return (
+                    <LzngReviewStep
+                        config={config}
+                        title={title}
+                        onError={(message) => setNotice({ kind: 'error', text: friendlyError(message) })}
+                    />
+                )
         }
     }
 
@@ -225,7 +252,7 @@ function WizardBody(): JSX.Element {
                                     <h2 className='ocd-lzng-card-title'>Network Diagram</h2>
                                 </div>
                                 <div className='ocd-lzng-diagram-canvas'>
-                                    <LzngNetworkDiagram step1={step1} />
+                                    <LzngNetworkDiagram config={config} />
                                 </div>
                             </section>
                         </div>

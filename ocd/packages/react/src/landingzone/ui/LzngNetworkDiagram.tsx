@@ -4,12 +4,17 @@
 */
 
 /*
-** Live network-diagram card built on @xyflow/react (React-Flow v12). Renders a
-** dashed Region container parent node that holds a red-tinted Hub VCN node plus
-** one node per environment (green tint when its security zone is on). The whole
-** graph is derived from the Foundation config via buildDiagramModel and updates
-** live as the config changes. Read-only (no interactive editing); dotted-grid
-** Background, zoom Controls and a MiniMap are provided.
+** Live network-diagram card built on @xyflow/react (React-Flow v12). The graph
+** is derived from the full Landing Zone config via buildDiagramModel and updates
+** live as the wizard config changes:
+**
+**   - a dashed Region container parent node, holding
+**   - a red-tinted Hub VCN node (with its per-kind subnet list), and
+**   - one spoke container per environment (green tint when its security zone is
+**     on), each holding project nodes and platform/extension nodes.
+**
+** Read-only (no interactive editing); dotted-grid Background, zoom Controls and a
+** MiniMap are provided.
 */
 
 import React, { useMemo } from 'react'
@@ -22,25 +27,38 @@ import {
     Node,
     ReactFlow,
 } from '@xyflow/react'
-import { Step1State } from '../OcdLzStep1Config'
-import { buildDiagramModel } from './LzngDiagramModel'
+import { LandingZoneConfig } from '../OcdLzConfig'
+import { LzngDiagramEnvNode, buildDiagramModel } from './LzngDiagramModel'
 
-const REGION_PADDING_X = 28
-const REGION_PADDING_TOP = 46
-const NODE_WIDTH = 150
-const NODE_HEIGHT = 60
-const NODE_GAP = 28
+const REGION_PAD_X = 28
+const REGION_PAD_TOP = 46
+const HUB_WIDTH = 200
+const ENV_WIDTH = 220
+const ENV_GAP = 26
+const ENV_HEAD = 56
+const CHILD_HEIGHT = 46
+const CHILD_GAP = 12
+const CHILD_PAD_X = 16
+const CHILD_TOP = ENV_HEAD
 
 export interface LzngNetworkDiagramProps {
-    step1: Step1State
+    config: LandingZoneConfig
 }
 
-function buildFlow(step1: Step1State): { nodes: Node[]; edges: Edge[] } {
-    const model = buildDiagramModel(step1)
-    const nodeCount = 1 + model.environments.length
-    const innerWidth = nodeCount * NODE_WIDTH + Math.max(nodeCount - 1, 0) * NODE_GAP
-    const regionWidth = innerWidth + REGION_PADDING_X * 2
-    const regionHeight = REGION_PADDING_TOP + NODE_HEIGHT + 28
+function envHeight(env: LzngDiagramEnvNode): number {
+    const childCount = env.projects.length + env.platforms.length
+    const body = childCount > 0 ? childCount * CHILD_HEIGHT + (childCount - 1) * CHILD_GAP : 8
+    return CHILD_TOP + body + 16
+}
+
+function buildFlow(config: LandingZoneConfig): { nodes: Node[]; edges: Edge[] } {
+    const model = buildDiagramModel(config)
+    const hubHeight = REGION_PAD_TOP + 56 + (model.hubSubnets.length > 0 ? 22 : 0)
+    const envHeights = model.environments.map(envHeight)
+    const tallestEnv = envHeights.length > 0 ? Math.max(...envHeights) : 0
+    const innerWidth = HUB_WIDTH + ENV_GAP + model.environments.length * (ENV_WIDTH + ENV_GAP)
+    const regionWidth = Math.max(innerWidth + REGION_PAD_X * 2, HUB_WIDTH + REGION_PAD_X * 2)
+    const regionHeight = REGION_PAD_TOP + Math.max(hubHeight, tallestEnv) + 28
 
     const nodes: Node[] = [
         {
@@ -56,17 +74,20 @@ function buildFlow(step1: Step1State): { nodes: Node[]; edges: Edge[] } {
             id: 'hub',
             parentId: 'region',
             extent: 'parent',
-            position: { x: REGION_PADDING_X, y: REGION_PADDING_TOP },
+            position: { x: REGION_PAD_X, y: REGION_PAD_TOP },
             data: {
                 label: (
                     <span>
                         {model.hubLabel}
                         <span className='ocd-lzng-rf-node-sub'>{model.hubVcn}</span>
+                        {model.hubSubnets.length > 0 && (
+                            <span className='ocd-lzng-rf-node-sub'>{model.hubSubnets.join(' · ')}</span>
+                        )}
                     </span>
                 ),
             },
             className: 'ocd-lzng-rf-node ocd-lzng-rf-hub',
-            style: { width: NODE_WIDTH, height: NODE_HEIGHT },
+            style: { width: HUB_WIDTH, height: hubHeight - REGION_PAD_TOP },
             draggable: false,
         },
     ]
@@ -74,22 +95,25 @@ function buildFlow(step1: Step1State): { nodes: Node[]; edges: Edge[] } {
     const edges: Edge[] = []
 
     model.environments.forEach((env, index) => {
-        const x = REGION_PADDING_X + (index + 1) * (NODE_WIDTH + NODE_GAP)
+        const x = REGION_PAD_X + HUB_WIDTH + ENV_GAP + index * (ENV_WIDTH + ENV_GAP)
+        const height = envHeights[index]
         nodes.push({
             id: env.id,
             parentId: 'region',
             extent: 'parent',
-            position: { x, y: REGION_PADDING_TOP },
+            position: { x, y: REGION_PAD_TOP },
             data: {
                 label: (
                     <span>
                         {env.name}
-                        <span className='ocd-lzng-rf-node-sub'>{env.secure ? 'security zone' : 'environment'}</span>
+                        <span className='ocd-lzng-rf-node-sub'>
+                            {env.spokeVcn || 'no spoke'}{env.secure ? ' · security zone' : ''}
+                        </span>
                     </span>
                 ),
             },
-            className: `ocd-lzng-rf-node${env.secure ? ' ocd-lzng-rf-secure' : ''}`,
-            style: { width: NODE_WIDTH, height: NODE_HEIGHT },
+            className: `ocd-lzng-rf-spoke${env.secure ? ' ocd-lzng-rf-secure' : ''}`,
+            style: { width: ENV_WIDTH, height },
             draggable: false,
         })
         edges.push({
@@ -98,13 +122,55 @@ function buildFlow(step1: Step1State): { nodes: Node[]; edges: Edge[] } {
             target: env.id,
             style: { stroke: '#C74634' },
         })
+
+        let childY = CHILD_TOP
+        env.projects.forEach((proj, projIndex) => {
+            nodes.push({
+                id: `${env.id}-proj-${projIndex}`,
+                parentId: env.id,
+                extent: 'parent',
+                position: { x: CHILD_PAD_X, y: childY },
+                data: {
+                    label: (
+                        <span>
+                            {proj}
+                            <span className='ocd-lzng-rf-node-sub'>project</span>
+                        </span>
+                    ),
+                },
+                className: 'ocd-lzng-rf-child ocd-lzng-rf-project',
+                style: { width: ENV_WIDTH - CHILD_PAD_X * 2, height: CHILD_HEIGHT },
+                draggable: false,
+            })
+            childY += CHILD_HEIGHT + CHILD_GAP
+        })
+        env.platforms.forEach((plat) => {
+            nodes.push({
+                id: plat.id,
+                parentId: env.id,
+                extent: 'parent',
+                position: { x: CHILD_PAD_X, y: childY },
+                data: {
+                    label: (
+                        <span>
+                            {plat.name}
+                            <span className='ocd-lzng-rf-node-sub'>{plat.vcn}</span>
+                        </span>
+                    ),
+                },
+                className: 'ocd-lzng-rf-child ocd-lzng-rf-platform',
+                style: { width: ENV_WIDTH - CHILD_PAD_X * 2, height: CHILD_HEIGHT },
+                draggable: false,
+            })
+            childY += CHILD_HEIGHT + CHILD_GAP
+        })
     })
 
     return { nodes, edges }
 }
 
-export function LzngNetworkDiagram({ step1 }: LzngNetworkDiagramProps): JSX.Element {
-    const { nodes, edges } = useMemo(() => buildFlow(step1), [step1])
+export function LzngNetworkDiagram({ config }: LzngNetworkDiagramProps): JSX.Element {
+    const { nodes, edges } = useMemo(() => buildFlow(config), [config])
 
     return (
         <ReactFlow
