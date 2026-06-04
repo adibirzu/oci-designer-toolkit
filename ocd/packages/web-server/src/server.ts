@@ -35,6 +35,24 @@ const HOST = '127.0.0.1'
 const DEFAULT_PORT = 5050
 const MAX_BODY_BYTES = 1_048_576 // 1 MiB cap on request bodies (compartment id lists are small)
 
+// CORS is restricted to the local dev renderer origins ONLY. A wildcard would let
+// ANY website the user visits read their tenancy topology cross-origin while this
+// server runs. Requests with no Origin (curl, the vite proxy) get no CORS header
+// and are served normally; cross-origin requests from non-allowlisted sites get
+// no Access-Control-Allow-Origin and are blocked by the browser.
+const ALLOWED_ORIGINS = new Set<string>([
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+])
+const allowOriginByRes = new WeakMap<http.ServerResponse, string>()
+const resolveAllowedOrigin = (origin: string | undefined): string =>
+    origin && ALLOWED_ORIGINS.has(origin) ? origin : ''
+// DNS-rebinding defense: only serve requests whose Host header is loopback.
+const isLoopbackHost = (host: string | undefined): boolean => {
+    const name = (host ?? '').split(':')[0]
+    return name === '' || name === '127.0.0.1' || name === 'localhost'
+}
+
 interface ApiSuccess<T> {
     success: true
     data: T
@@ -55,14 +73,19 @@ const port = (): number => {
 
 const sendJson = <T>(res: http.ServerResponse, status: number, payload: ApiResponse<T>): void => {
     const body = JSON.stringify(payload)
+    const allowOrigin = allowOriginByRes.get(res) ?? ''
     res.writeHead(status, {
         'Content-Type': 'application/json; charset=utf-8',
         'Content-Length': Buffer.byteLength(body),
-        // The dev server proxy strips the cross-origin nature; CORS is only relaxed for the
-        // loopback dev origin so the renderer can call directly if the proxy is not used.
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type'
+        // Only emit CORS headers for an allowlisted dev origin; omit otherwise.
+        ...(allowOrigin
+            ? {
+                  'Access-Control-Allow-Origin': allowOrigin,
+                  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                  'Access-Control-Allow-Headers': 'Content-Type',
+                  Vary: 'Origin'
+              }
+            : {})
     })
     res.end(body)
 }
@@ -110,12 +133,25 @@ const handleRequest = async (req: http.IncomingMessage, res: http.ServerResponse
     const url = new URL(req.url ?? '/', `http://${HOST}`)
     const pathname = url.pathname
 
+    // Reject non-loopback Host headers (DNS-rebinding defense).
+    if (!isLoopbackHost(req.headers.host)) {
+        res.writeHead(403, { 'Content-Type': 'text/plain' })
+        res.end('Forbidden')
+        return
+    }
+
+    const allowOrigin = resolveAllowedOrigin(req.headers.origin)
+    allowOriginByRes.set(res, allowOrigin)
+
     if (method === 'OPTIONS') {
-        res.writeHead(204, {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type'
-        })
+        res.writeHead(204, allowOrigin
+            ? {
+                  'Access-Control-Allow-Origin': allowOrigin,
+                  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                  'Access-Control-Allow-Headers': 'Content-Type',
+                  Vary: 'Origin'
+              }
+            : { Vary: 'Origin' })
         res.end()
         return
     }
