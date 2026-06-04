@@ -390,6 +390,52 @@ export function validateConfig(input: LandingZoneConfigInput = {}): LandingZoneV
 }
 
 // ---------------------------------------------------------------------------
+// Per-step validation: returns true when the current step's required fields are
+// well-formed enough to advance. Cheap, derived from the full validation pass.
+// ---------------------------------------------------------------------------
+export function isStepValid(stepIndex: number, input: LandingZoneConfigInput = {}): boolean {
+    const value = normalizeConfig(input)
+    switch (stepIndex) {
+        case 0: {
+            // Foundation: region/realm + at least one well-named environment.
+            if (!value.region || !value.realm || !value.regionShortName) return false
+            if (value.environments.length === 0) return false
+            const names = new Set<string>()
+            for (const env of value.environments) {
+                if (!ENV_NAME_RE.test(env.name) || names.has(env.name)) return false
+                names.add(env.name)
+            }
+            return true
+        }
+        case 1:
+            // Hub Network: valid hub kind + hub VCN.
+            return HUB_KIND_OPTIONS.some((opt) => opt.id === value.hubKind) && isValidCidr(value.hubVcn)
+        case 2:
+            // Projects: any well-formed spoke VCN + valid project names.
+            for (const env of value.environments) {
+                if (env.spokeVcn && !isValidCidr(env.spokeVcn)) return false
+                for (const proj of env.projects) {
+                    if (!PROJECT_NAME_RE.test(proj)) return false
+                }
+            }
+            return true
+        case 3:
+            // Platform Templates: attached platforms must have valid networks.
+            for (const env of value.environments) {
+                for (const plat of env.platforms) {
+                    const template = findExtensionTemplate(plat.type)
+                    if (!template) return false
+                    if (template.networkMode === 'required' && !isValidCidr(plat.vcn)) return false
+                    if (template.networkMode === 'optional' && plat.vcn && !isValidCidr(plat.vcn)) return false
+                }
+            }
+            return true
+        default:
+            return validateConfig(input).errors.length === 0
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Serialization to jsonnet (config.libsonnet schema).
 // ---------------------------------------------------------------------------
 const JSONNET_IDENTIFIER_RE = /^[A-Za-z_][A-Za-z0-9_]*$/

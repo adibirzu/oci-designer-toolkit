@@ -12,7 +12,7 @@
 
 import React from 'react'
 
-export type LzngLayout = 'split' | 'list' | 'diagram' | 'code'
+export type LzngLayout = 'split' | 'list' | 'diagram'
 
 export interface LzngHeaderProps {
     layout: LzngLayout
@@ -50,18 +50,10 @@ const DIAGRAM_ICON = (
     </svg>
 )
 
-const CODE_ICON = (
-    <svg viewBox='0 0 16 16' fill='none' stroke='currentColor' strokeWidth='1.4' aria-hidden>
-        <polyline points='5.5,4 2,8 5.5,12' />
-        <polyline points='10.5,4 14,8 10.5,12' />
-    </svg>
-)
-
 const TOGGLES: ToggleDef[] = [
     { id: 'split', title: 'Split panel', icon: SPLIT_ICON },
     { id: 'list', title: 'Form only', icon: LIST_ICON },
-    { id: 'diagram', title: 'Diagram only', icon: DIAGRAM_ICON },
-    { id: 'code', title: 'JSON view', icon: CODE_ICON },
+    { id: 'diagram', title: 'Preview only', icon: DIAGRAM_ICON },
 ]
 
 export function LzngHeader({ layout, onLayoutChange, onExit }: LzngHeaderProps): JSX.Element {
