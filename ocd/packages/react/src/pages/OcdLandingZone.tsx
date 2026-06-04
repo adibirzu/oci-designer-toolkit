@@ -32,9 +32,11 @@
 import React, { useMemo, useState } from 'react'
 import { ConsolePageProps } from '../types/Console'
 import { OcdConsoleConfig } from '../components/OcdConsoleConfiguration'
+import { OcdDocument } from '../components/OcdDocument'
 import { WizardProvider, useWizard } from '../landingzone/OcdLzWizardContext'
 import { downloadTar, downloadTextFile } from '../landingzone/OcdLzDownloads'
-import { generateLandingZone } from '../landingzone/OcdLzGenerator'
+import { GeneratedFile, generateLandingZone } from '../landingzone/OcdLzGenerator'
+import { buildOcdDesignFromLz } from '../landingzone/OcdLzToModel'
 import {
     DEFAULT_CONFIG,
     LandingZoneConfig,
@@ -68,7 +70,12 @@ function friendlyError(message: string): string {
     return /bundled|setup-lz|not installed|not found|undefined/i.test(message) ? SETUP_NOTICE : message
 }
 
-function WizardBody({ onExit }: { onExit: () => void }): JSX.Element {
+interface WizardBodyProps {
+    onExit: () => void
+    onOpenInDesigner: (title: string, files: GeneratedFile[]) => void
+}
+
+function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element {
     const { data, reset, setField } = useWizard()
     const [config, setConfig] = useState<LandingZoneConfig>(() => upgradeConfig(data.config ?? data.step1))
     const [title, setTitle] = useState<string>(() => (typeof data.title === 'string' && data.title ? data.title : DEFAULT_TITLE))
@@ -172,6 +179,7 @@ function WizardBody({ onExit }: { onExit: () => void }): JSX.Element {
                         config={config}
                         title={title}
                         onError={(message) => setNotice({ kind: 'error', text: friendlyError(message) })}
+                        onOpenInDesigner={(files) => onOpenInDesigner(title, files)}
                     />
                 )
         }
@@ -297,13 +305,31 @@ function WizardBody({ onExit }: { onExit: () => void }): JSX.Element {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig }: ConsolePageProps): JSX.Element => {
-    const onExit = () => {
+    const switchToDesigner = (): void => {
         ocdConsoleConfig.config.displayPage = 'designer'
         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
     }
+
+    const onExit = () => switchToDesigner()
+
+    // Translate the generated OE files into an editable OCD design, set it as the
+    // active document, and switch the console to the Designer page.
+    const onOpenInDesigner = (title: string, files: GeneratedFile[]): void => {
+        const { design, topCompartmentIds } = buildOcdDesignFromLz(files, title)
+        const document = OcdDocument.new()
+        document.design = design
+        // Add one layer per top-level compartment (first selected), mirroring the
+        // Terraform import flow.
+        const layerIds = topCompartmentIds.length > 0 ? topCompartmentIds : [design.model.oci.resources.compartment?.[0]?.id].filter(Boolean)
+        layerIds.forEach((id: string, index: number) => document.addLayer(id, index === 0))
+        document.autoLayout(document.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle)
+        setOcdDocument(document)
+        switchToDesigner()
+    }
+
     return (
         <WizardProvider>
-            <WizardBody onExit={onExit} />
+            <WizardBody onExit={onExit} onOpenInDesigner={onOpenInDesigner} />
         </WizardProvider>
     )
 }
