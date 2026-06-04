@@ -13,6 +13,7 @@ import { newDragData } from '../types/DragData'
 import { ActiveFileContext, SelectedResourceContext } from '../pages/OcdConsole'
 import { OcdUtils } from '@ocd/core'
 import { OcdDragResource, OcdSelectedResource } from '../types/Console'
+import { isLzOriginDesign, resolveLzPlacement } from '../landingzone/OcdLzPlacement'
 
 export interface OcdContextMenu {
     show: boolean
@@ -88,7 +89,19 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
             // Get Page
             const page: OcdViewPage = ocdDocument.getActivePage()
             const layer: OcdViewLayer = ocdDocument.getActiveLayer(page.id)
-            const compartmentId: string = layer.id
+            // A5 LZ-origin placement: when the active design was produced by the
+            // LZNG wizard, route the dropped stencil into the appropriate LZ
+            // compartment (network / security / fallback-root) instead of always
+            // inheriting the currently-selected canvas layer.  For non-LZ designs
+            // the behaviour is identical to before (layer.id).
+            const lzCompartments = ocdDocument.design.model.oci.resources.compartment ?? []
+            const compartmentId: string = isLzOriginDesign(ocdDocument.design) && dragData.dragObject
+                ? (resolveLzPlacement(
+                      // Derive the OCD model type from the palette class (e.g. 'oci-vcn' -> 'vcn').
+                      dragData.dragObject.class.replace(/^oci-/, '').replaceAll('-', '_'),
+                      lzCompartments,
+                  ) || layer.id)
+                : layer.id
             const pocid = dropTarget.dataset.ocid ? dropTarget.dataset.ocid : ''
             const pgid = dropTarget.dataset.gid ? dropTarget.dataset.gid : ''
             console.info('OcdCanvas: Dataset', dropTarget.dataset)
