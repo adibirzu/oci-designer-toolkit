@@ -36,6 +36,7 @@
         "build": "cd ocd && npm run build",
         "generate-lz-jsonnet": "node scripts/generate_lz_jsonnet_sources.mjs",
         "setup-lz": "node scripts/setup_landing_zone.mjs",
-        "setup-lz:latest": "node scripts/setup_landing_zone.mjs --latest"
+        "setup-lz:latest": "node scripts/setup_landing_zone.mjs --latest",
+        "hooks:install": "git config core.hooksPath .githooks && echo 'Git hooks enabled (.githooks): pre-commit redaction gate + pre-push chain.'"
     }
 }
