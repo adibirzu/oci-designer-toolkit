@@ -108,44 +108,108 @@ curl -sL -A "Mozilla/5.0" \
 **Important format note.** These packs do *not* contain standalone `.svg` files. They are
 editor stencil libraries:
 
-- `OCI-Style-Guide-for-Drawio.zip` → `OCI Library.xml` (a drawio `<mxlibrary>` whose shapes
-  are base64 + raw-DEFLATE + URI-encoded vector definitions) plus `.drawio` toolkit files.
-- `OCI_Icons_Visio.zip` → Visio `.vssx` stencils.
+- `OCI-Style-Guide-for-Drawio.zip` → `OCI Library.xml` (a drawio `<mxlibrary>` of 224 shapes)
+  plus `.drawio` toolkit files. As of the 24.2 pack the file unzips to
+  `OCI Style Guide for Drawio/OCI Library.xml`.
+- `OCI_Icons_Visio.zip` → Visio `.vssx` stencils (not used here).
 
-Oracle's official set also does **not** ship distinct glyphs for every OCD sub-resource.
-Fine-grained stencils such as **DRG Route Table**, **DRG Route Distribution**, and
-**File System Export Set** reuse their parent-service icon (DRG, File Storage) in Oracle's
-own diagrams. For those, hand-authored line icons (see §2) are the correct approach and are
-what this repo ships.
+**The drawio pack IS fully decodable to SVG (verified, automated).** This was done in
+follow-up #2: 44 of the 46 OCD OCI *resource* stencils now ship Oracle's official glyphs,
+normalized to the redwood `#2c5967` colour. See the working pipeline below.
 
-### Refresh procedure (for icons that DO exist in the official pack)
+#### Two-layer encoding (the decode that works)
 
-1. Download + unzip the drawio pack:
+```
+OCI Library.xml
+  └─ <mxlibrary>[ { "xml": <ENC1>, "w", "h", "title" }, … ]   (224 entries)
+        ENC1 = base64( rawDeflate( uriEncode( mxGraphModelXml ) ) )
+        decode: decodeURIComponent( zlib.inflateRawSync( Buffer.from(ENC1,'base64') ) )
+
+  mxGraphModelXml is a stack of <mxCell> shapes composing ONE icon:
+    - white rounded-square frame   (fillColor=#FFFFFF / #F5F4F2 / #FCFBFA / #fbf9f8 / #DFDCD8)
+    - one or more glyph cells       (fillColor=#2d5967, #2c5967, #aa643b, #AE562C, … tinted)
+    - a text-label cell below the 84-frame (y >= 84)   ← excluded
+  Each glyph cell's style carries  shape=stencil(<ENC2>)
+        ENC2 = base64( rawDeflate( uriEncode( stencilXml ) ) )   (SAME chain again)
+
+  stencilXml is drawio's vector language on a 0..100 box:
+    <shape><foreground><path>
+      <move x= y=/> <line x= y=/> <curve x1= y1= x2= y2= x3= y3=/> <close/>
+    </path><fillstroke/></foreground></shape>
+    → maps 1:1 to SVG path commands  M / L / C / Z
+```
+
+#### Refresh / re-run procedure (fully scripted)
+
+The converter + mapping + applier live in this repo's history of follow-up #2 and were run
+from `/tmp`. To regenerate from a fresh pack:
+
+1. Download + unzip:
    ```bash
-   unzip OCI-Style-Guide-for-Drawio.zip -d /tmp/oci-official
+   cd /tmp
+   curl -sL -A "Mozilla/5.0" \
+     https://docs.oracle.com/iaas/Content/Resources/Assets/OCI-Style-Guide-for-Drawio.zip \
+     -o OCI-Style-Guide-for-Drawio.zip
+   unzip -o -q OCI-Style-Guide-for-Drawio.zip -d /tmp/oci-official
    ```
-2. Decode the drawio `<mxlibrary>` to recover each shape. drawio encodes shape XML as
-   `base64( rawDeflate( uriEncode( shapeXml ) ) )`. To extract a single shape's vector
-   stencil, decode that chain (e.g. with Node `zlib.inflateRawSync` after base64-decoding
-   the per-shape `xml` field, then `decodeURIComponent`). Each shape becomes drawio
-   `shape=stencil(...)` markup or an `<svg>`.
-3. Render / save each recovered shape as a 42×42 SVG matching the redwood style
-   (white circle, `#2c5967` glyph) so it sits consistently with the existing icons.
-4. Base64-encode each SVG and add/replace the corresponding
-   `.oci-<resource> { background-image: url("data:image/svg+xml;base64,…"); }` rule in
-   `packages/react/src/css/oci-theme.css`. Match the class to the palette `class` string
-   (kebab-case, must equal the existing palette entry; never rename palette classes).
-5. Regenerate + build per §2 steps 3–4.
+2. **Convert** (`/tmp/oci-convert.js`): parse `<mxlibrary>`, for each entry decode ENC1,
+   collect glyph cells (stencil cells whose `fillColor` is NOT a background tone:
+   `none,#ffffff,#f5f4f2,#fcfbfa,#fbf9f8,#dfdcd8`) that sit inside the 84×84 frame
+   (absolute `y < 84`, walking parent `mxCell` offsets), decode each stencil ENC2, translate
+   `move/line/curve/close` → `M/L/C/Z` scaled from the 0..100 stencil box into the cell's
+   geometry, then into a `viewBox="0 0 42 42"`. Recolour the whole glyph to `#2c5967` and
+   wrap as `<g fill="#2c5967" fill-rule="evenodd">…paths…</g>`. (Oracle's frame is a rounded
+   *square*, matching the dominant existing `oci-instance` style — so the output uses the
+   full 84-frame, no imposed circle.)
+3. **Map** (`/tmp/oci-mapping.js`): official library index → palette `oci-*` class. The
+   mapping covers 44 resource classes; sub-resources without a dedicated official glyph reuse
+   their parent-service glyph (e.g. `oci-mount-target`, `oci-file-system-export-set` →
+   File Storage #10; `oci-drg-attachment/route-table/route-distribution` → DRG #30;
+   `oci-load-balancer-backend-set/listener` → Load Balancer #18; `oci-oke-node-pool` → OKE
+   #74; `oci-datascience-notebook-session` → Data Science #68).
+4. **Apply** (`/tmp/oci-apply.js`): parse `oci-theme.css`, and for every rule whose selector
+   list contains a mapped class, replace only its `url("data:image/svg+xml;base64,…")` with
+   the new official data-URI. This preserves selector aliases (e.g.
+   `.oci-vcn, .oci-virtual-cloud-network`), the `-background-colour` group rules, and the
+   group/header icons. Idempotent.
+5. Regenerate + build per §2 steps 3–4. **Set aside untracked theme CSS before codegen**
+   (`ocd-lzng.css`, `ocd-redwood-ng-theme.css` in `packages/desktop/src/css/`) so the
+   generated `OcdSvgCssData.ts` key set stays equal to HEAD's 10 keys, then restore them.
 
-> Headless note: steps 1 and the download are fully automatable. Step 2/3 (decode + visual
-> normalization to the redwood circle style) is a one-time scripted/manual pass per new icon,
-> because the official assets are editor stencils, not drop-in SVG files.
+#### Glyphs Oracle does NOT ship (kept as-is)
 
-## 4. Current state
+- `oci-subnet` — only a *grouping* container shape (no glyph). Existing icon retained.
+- `oci-ipsec` — no VPN/IPSec glyph; mapped to the **CPE** glyph (#21) as the closest
+  official networking equivalent.
+- The 6 group/header classes (`oci-network`, `oci-storage`, `oci-compute`, `oci-database`,
+  `oci-identity`, `oci-container`) and `oci-provider` render text labels — intentionally
+  left on their legacy art.
 
-- 49 OCI resource stencils in the palette all have real icons in `oci-theme.css`.
-- The only remaining icon-less OCI class is `oci-provider`, which is a provider header
-  label (renders text, never a blank stencil).
-- Icons added in this pass (hand-authored redwood-style line icons, since Oracle's pack has
-  no dedicated glyph for them): `oci-drg-route-table`, `oci-drg-route-distribution`,
-  `oci-file-system-export-set`.
+## 4. License / attribution
+
+The vendored glyphs are derived from Oracle's official **OCI Architecture Diagram Toolkit /
+Style Guide for Drawio** (`OCI-Style-Guide-for-Drawio.zip`, pack v24.2), published by Oracle
+at <https://docs.oracle.com/iaas/Content/Resources/Assets/>. Oracle provides these icons for
+use in OCI architecture diagrams. They have been recoloured to the OCD redwood `#2c5967` and
+normalized to a 42×42 viewBox; the underlying glyph artwork remains Oracle's. Attribution:
+"OCI service icons © Oracle, from the OCI Architecture Diagram Toolkit." Retain this note if
+the icon set is refreshed.
+
+## 5. Current state (after follow-up #2 — official set vendored)
+
+- **52 active OCI palette classes.** 46 are resource stencils; 6 are group/provider header
+  labels (`oci-network`, `oci-storage`, `oci-compute`, `oci-database`, `oci-identity`,
+  `oci-container`) plus `oci-provider`.
+- **44 resource classes now use Oracle's OFFICIAL glyphs** (decoded from the drawio pack,
+  recoloured to `#2c5967`). Replaced in `oci-theme.css` (44 `background-image` rules) and
+  regenerated into `OcdSvgCssData.ts`. The generated key set is unchanged (10 keys = HEAD).
+- **2 resource classes kept their prior icon** (no official glyph exists): `oci-subnet`
+  (grouping-only shape) and — `oci-ipsec` was mapped to the official CPE glyph as the nearest
+  equivalent.
+- The group/header classes and `oci-provider` keep their legacy art (text labels; never blank).
+- Build verified green: `npm run build --workspace=packages/react` and
+  `npm run prebuild --workspace=packages/desktop`. Gap audit (palette class → css rule) shows
+  the only icon-less class is `oci-provider` (a text label), i.e. no blank stencils.
+- The earlier hand-authored line icons (`oci-drg-route-table`, `oci-drg-route-distribution`,
+  `oci-file-system-export-set`) were replaced by the official DRG / File Storage glyphs they
+  semantically map to.
