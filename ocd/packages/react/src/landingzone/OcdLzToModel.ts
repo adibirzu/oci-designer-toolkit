@@ -41,6 +41,14 @@ import { OcdDesign, OciModelResources } from '@ocd/model'
 import { GeneratedFile } from './OcdLzGenerator'
 import { byOeKind } from './OcdLzResourceMap'
 
+/**
+ * `design.userDefined` key used by the canvas placement resolver (A5).
+ * Set to `true` whenever a design is built from LZNG-generated OE files so
+ * that dropped stencils are routed into the correct LZ compartment instead of
+ * always landing on the currently-selected layer.
+ */
+export const LZ_ORIGIN_KEY = 'lzOrigin'
+
 /** Result of translating the OE output into an OcdDesign. */
 export interface OcdLzToModelResult {
     /** The assembled OCD design ready to drop into an OcdDocument. */
@@ -574,6 +582,10 @@ export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zo
     } else {
         notes.push('No network.json found; only IAM compartments were mapped.')
     }
+
+    // Mark the design as LZ-origin so the canvas placement resolver (A5) can
+    // route dropped stencils into the correct LZ compartment automatically.
+    design.userDefined[LZ_ORIGIN_KEY] = true
 
     return { design, counts, topCompartmentIds, notes }
 }
