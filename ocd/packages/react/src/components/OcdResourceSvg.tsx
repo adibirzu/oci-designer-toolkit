@@ -43,13 +43,14 @@ export const OcdSvgContextMenu = ({ contextMenu, setContextMenu, ocdDocument, se
     const onCloneClick = (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation()
         const page = ocdDocument.getActivePage()
-        const cloneResource = ocdDocument.cloneResource(resource.ocid)
-        if (cloneResource) {
-            // Coords
-            const cloneCoords = ocdDocument.cloneCoords(resource)
-            cloneCoords.ocid = cloneResource.id
-            ocdDocument.setCoordsRelativeToCanvas(cloneCoords)
-            ocdDocument.addCoords(cloneCoords, page.id, cloneCoords.pgid)
+        // Deep-clone the resource AND any nested child resources (e.g. a Subnet
+        // containing a DB System). cloneResourceTree clones each backing model
+        // resource, re-parents children onto the freshly cloned parent, and
+        // returns the new coords sub-tree ready to attach to the page.
+        const newRoot = ocdDocument.cloneResourceTree(resource)
+        if (newRoot) {
+            ocdDocument.setCoordsRelativeToCanvas(newRoot)
+            ocdDocument.addCoords(newRoot, page.id, newRoot.pgid)
         }
         setContextMenu({show: false, x: 0, y: 0})
         const clone = OcdDocument.clone(ocdDocument)
