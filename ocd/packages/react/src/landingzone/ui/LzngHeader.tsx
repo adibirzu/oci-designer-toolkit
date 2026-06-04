@@ -17,6 +17,7 @@ export type LzngLayout = 'split' | 'list' | 'diagram' | 'code'
 export interface LzngHeaderProps {
     layout: LzngLayout
     onLayoutChange: (layout: LzngLayout) => void
+    onExit: () => void
 }
 
 interface ToggleDef {
@@ -63,10 +64,17 @@ const TOGGLES: ToggleDef[] = [
     { id: 'code', title: 'JSON view', icon: CODE_ICON },
 ]
 
-export function LzngHeader({ layout, onLayoutChange }: LzngHeaderProps): JSX.Element {
+export function LzngHeader({ layout, onLayoutChange, onExit }: LzngHeaderProps): JSX.Element {
     return (
         <header className='ocd-lzng-header'>
             <div className='ocd-lzng-brand'>
+                <button type='button' className='ocd-lzng-exit-btn' title='Back to OCD Designer' aria-label='Back to OCD Designer' onClick={onExit}>
+                    <svg viewBox='0 0 16 16' fill='none' stroke='currentColor' strokeWidth='1.6' aria-hidden>
+                        <polyline points='9.5,3.5 5,8 9.5,12.5' />
+                    </svg>
+                    <span>Designer</span>
+                </button>
+                <span className='ocd-lzng-brand-divider' aria-hidden />
                 <span className='ocd-lzng-logo' aria-hidden />
                 <span className='ocd-lzng-brand-name'>Oracle Cloud Infrastructure</span>
                 <span className='ocd-lzng-brand-divider' aria-hidden />
