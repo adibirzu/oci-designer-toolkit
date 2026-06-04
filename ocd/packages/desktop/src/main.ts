@@ -369,19 +369,23 @@ async function handleLoadOciConfigProfile(event: any, profile: string) {
 async function handleListRegions(event: any, profile: string) {
 	console.debug('Electron Main: handleListRegions')
 	const ociQuery = new OciQuery(profile)
-	return ociQuery.listRegions()
+	// Bound so an unreachable endpoint rejects instead of hanging the UI (issue #741).
+	return ociQuery.withTimeout(ociQuery.listRegions(), 'listRegions')
 }
 
 async function handleListTenancyCompartments(event: any, profile: string) {
 	console.debug('Electron Main: handleListTenancyCompartments')
 	const ociQuery = new OciQuery(profile)
-	return ociQuery.listTenancyCompartments()
+	// Bound so an unreachable endpoint rejects instead of hanging the UI (issue #741).
+	return ociQuery.withTimeout(ociQuery.listTenancyCompartments(), 'listTenancyCompartments')
 }
 
 async function handleQueryTenancy(event: any, profile: string, compartmentIds: string[], region: string) {
 	console.debug('Electron Main: handleQueryTenancy')
 	const ociQuery = new OciQuery(profile, region)
-	return ociQuery.queryTenancy(compartmentIds)
+	// Bound the overall tenancy query so an unresponsive / unreachable endpoint surfaces as a
+	// rejection instead of leaving the renderer spinner hanging forever (issue #741).
+	return ociQuery.withTimeout(ociQuery.queryTenancy(compartmentIds), 'queryTenancy')
 }
 
 async function handleQueryDropdown(event: any, profile: string, region: string) {
