@@ -24,7 +24,11 @@ console.info('Args:', process.argv, archPos, arch)
 const config: ForgeConfig = {
   outDir: '../../dist',
   packagerConfig: {
-    asar: { unpack: '**/*.wasm' },
+    // Basename glob (asar unpack uses matchBase) so it matches the jsonnet WASM
+    // even though Vite emits it under the dot-dir `.vite/` — `**/*.wasm` would
+    // miss it because minimatch `**` does not traverse dot-directories. The
+    // WASM must be asar-unpacked so the renderer can fetch it under file://.
+    asar: { unpack: '*.wasm' },
     executableName: 'ocd',
     icon: './public/assets/icon',
     // osxSign: {}, // Appears to break the MacOS App I assume because it's empty
