@@ -121,3 +121,4 @@ firestore-debug.log*
 
 # Build
 .a2-verify.log
+*.original.md
