@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+#
+# A2 catalog curation — bounded autonomous loop (Sequential Pipeline pattern).
+#
+# Each iteration: curate the next batch of OCI services via the codegen pipeline,
+# verify with the GATE-AWARE check (npm test + strict @ocd/model tsc + build:pages
+# — NOT the full `npm run build`, which runs the un-compilable appdmg DMG step),
+# commit locally, and update SHARED_TASK_NOTES.md. Push is left to the operator
+# (needs ECC_SKIP_PREPUSH=1 until the Node-26/appdmg toolchain is fixed).
+#
+# Usage:
+#   scripts/a2-curation-loop.sh --max-runs 5
+#   scripts/a2-curation-loop.sh --max-runs 10 --batch 14
+#
+# Safety rails: bounded by --max-runs; stops on the completion signal
+# (A2_CATALOG_COMPLETE) or when a verify gate fails (so a broken batch never
+# compounds). Requires the `claude` CLI on PATH.
+
+set -euo pipefail
+
+MAX_RUNS=5
+BATCH=14
+NOTES="SHARED_TASK_NOTES.a2.md"
+COMPLETION_SIGNAL="A2_CATALOG_COMPLETE"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --max-runs) MAX_RUNS="$2"; shift 2 ;;
+    --batch)    BATCH="$2"; shift 2 ;;
+    *) echo "unknown arg: $1"; exit 2 ;;
+  esac
+done
+
+cd "$(dirname "$0")/.."   # repo root
+
+# Seed the cross-iteration notes once (bridges context between fresh claude -p calls).
+if [[ ! -f "$NOTES" ]]; then
+  cat > "$NOTES" <<'EOF'
+# A2 Catalog Curation — Shared Task Notes
+
+## Goal
+Expand the OCI catalog in curated batches toward the full provider set. Each
+service needs a resourceMap entry + curated resourceAttributes in
+ocd/packages/codegen/src/importer/data/OciResourceMap.ts.
+
+## Hard rules (learned)
+- A curated attribute leaf named `resources`/`resource`/`results` collides with the
+  generator's reserved param -> TS2349 in the model validator. Drop such attributes.
+- Verify with the STRICT model build: `npm run build --workspace=packages/model`.
+- Do NOT run the full `npm run build` (the appdmg DMG maker won't compile on Node 26).
+
+## Progress
+- (loop appends per-iteration here)
+
+## Next
+- Pick services NOT already in OciResourceMap.ts; curate ~14/batch.
+EOF
+fi
+
+verify() {
+  # Gate-aware verify: strict model tsc + dependent builds + tests + web build.
+  ( cd ocd && npm run compile-for-codegen >/dev/null 2>&1 ) || return 1
+  ( cd ocd && npm run build --workspace=packages/model --workspace=packages/export \
+      --workspace=packages/import --workspace=packages/react ) || return 1
+  ( cd ocd && npm test ) || return 1
+  ( cd ocd && OCD_PAGES_BASE=/ npm run build:pages ) || return 1
+}
+
+for ((i = 1; i <= MAX_RUNS; i++)); do
+  echo "=== A2 curation iteration $i / $MAX_RUNS ==="
+
+  OUT=$(claude -p "You are curating OCI services into the OKIT catalog (A2). Read $NOTES
+for rules and progress. Add the NEXT $BATCH high-value OCI services that are NOT
+already present in ocd/packages/codegen/src/importer/data/OciResourceMap.ts:
+add a resourceMap entry + curated resourceAttributes (the key user-set fields +
+relationship *Id FKs; never an attribute literally named resources/resource/results).
+Then regenerate via 'cd ocd && npm run compile-for-codegen && npm run
+import-and-generate-oci --workspace=packages/codegen-cli'. Update the Progress
+section of $NOTES with the services you added and the new resource count. Do NOT
+commit, do NOT run the full 'npm run build', do NOT npm install. If no further
+high-value services remain to curate, output the exact token ${COMPLETION_SIGNAL}.")
+
+  echo "$OUT" | tail -20
+
+  if echo "$OUT" | grep -q "$COMPLETION_SIGNAL"; then
+    echo "Completion signal received — catalog curation complete. Stopping."
+    break
+  fi
+
+  echo "--- verify (gate-aware) ---"
+  if ! verify; then
+    echo "VERIFY FAILED on iteration $i. Stopping so the broken batch does not compound."
+    echo "Inspect the working tree, fix or 'git checkout -- .', then resume."
+    exit 1
+  fi
+
+  COUNT=$(node -e "const s=require('./ocd/packages/codegen-cli/schema/oci-schema.json');console.log(Array.isArray(s)?s.length:Object.keys(s).length)" 2>/dev/null || echo '?')
+  git add ocd/packages/codegen/src/importer/data/OciResourceMap.ts \
+          ocd/packages/codegen-cli/schema/oci-schema.json \
+          ocd/packages/model ocd/packages/export ocd/packages/import ocd/packages/react \
+          "$NOTES"
+  git commit -q -m "feat(oci): A2 curation batch (iteration $i, catalog -> ${COUNT})" \
+    && echo "committed iteration $i (catalog: $COUNT resources)"
+done
+
+echo "=== loop finished. Review commits, then push with: ECC_SKIP_PREPUSH=1 git push ==="
