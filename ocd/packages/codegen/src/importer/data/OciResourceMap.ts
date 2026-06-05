@@ -267,7 +267,24 @@ export const resourceMap: OcdResourceMap = {
     "oci_devops_deployment": "devops_deployment",
     "oci_devops_connection": "devops_connection",
     "oci_data_safe_security_assessment": "data_safe_security_assessment",
-    "oci_ai_anomaly_detection_model": "ai_anomaly_detection_model"
+    "oci_ai_anomaly_detection_model": "ai_anomaly_detection_model",
+    // Batch 5 (182 -> 196): API Gateway/WAF policy/RMS PE/GoldenGate/DevOps stage/
+    // Data Safe user assessment/Cloud Guard list/ADB backup/MySQL channel/DNS rrset/
+    // Email DKIM/Stack Monitoring config/DB KeyStore/FSDR DR plan
+    "oci_apigateway_api": "apigateway_api",
+    "oci_waf_web_app_firewall_policy": "web_app_firewall_policy",
+    "oci_resourcemanager_private_endpoint": "resourcemanager_private_endpoint",
+    "oci_golden_gate_connection": "golden_gate_connection",
+    "oci_devops_deploy_stage": "devops_deploy_stage",
+    "oci_data_safe_user_assessment": "data_safe_user_assessment",
+    "oci_cloud_guard_managed_list": "cloud_guard_managed_list",
+    "oci_database_autonomous_database_backup": "autonomous_database_backup",
+    "oci_mysql_channel": "mysql_channel",
+    "oci_dns_rrset": "dns_rrset",
+    "oci_email_dkim": "email_dkim",
+    "oci_stack_monitoring_config": "stack_monitoring_config",
+    "oci_database_key_store": "database_key_store",
+    "oci_disaster_recovery_dr_plan": "dr_plan"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -2443,5 +2460,115 @@ export const resourceAttributes: OcdIncludedElements = {
         "model_training_details.target_fap",
         "model_training_details.training_fraction",
         "model_training_details.window_size"
+    ],
+    "oci_apigateway_api": [
+        "display_name",
+        "content"
+    ],
+    "oci_waf_web_app_firewall_policy": [
+        "display_name",
+        "actions",
+        "actions.name",
+        "actions.type",
+        "actions.code",
+        "request_access_control",
+        "request_access_control.default_action_name",
+        "request_protection",
+        "request_protection.body_inspection_size_limit_in_bytes"
+    ],
+    "oci_resourcemanager_private_endpoint": [
+        "display_name",
+        "description",
+        "vcn_id",
+        "subnet_id",
+        "nsg_id_list",
+        "dns_zones",
+        "is_used_with_configuration_source_provider"
+    ],
+    "oci_golden_gate_connection": [
+        "display_name",
+        "description",
+        "connection_type",
+        "technology_type",
+        "vault_id",
+        "subnet_id",
+        "database_id",
+        "deployment_id",
+        "nsg_ids",
+        "routing_method"
+    ],
+    "oci_devops_deploy_stage": [
+        "display_name",
+        "description",
+        "deploy_stage_type",
+        "deploy_pipeline_id",
+        "deploy_environment_id_a",
+        "deploy_environment_id_b",
+        "deploy_artifact_ids",
+        "compute_instance_group_deploy_environment_id",
+        "oke_cluster_deploy_environment_id"
+    ],
+    "oci_data_safe_user_assessment": [
+        "display_name",
+        "description",
+        "target_id",
+        "is_assessment_scheduled",
+        "schedule"
+    ],
+    "oci_cloud_guard_managed_list": [
+        "display_name",
+        "description",
+        "list_type",
+        "list_items",
+        "source_managed_list_id"
+    ],
+    "oci_database_autonomous_database_backup": [
+        "display_name",
+        "autonomous_database_id",
+        "is_long_term_backup",
+        "retention_period_in_days"
+    ],
+    "oci_mysql_channel": [
+        "display_name",
+        "description",
+        "is_enabled",
+        "source",
+        "source.source_type",
+        "source.hostname",
+        "source.port",
+        "source.ssl_mode",
+        "source.username",
+        "target",
+        "target.target_type",
+        "target.db_system_id",
+        "target.channel_name",
+        "target.applier_username",
+        "target.delay_in_seconds"
+    ],
+    "oci_dns_rrset": [
+        "domain",
+        "rtype",
+        "zone_name_or_id",
+        "view_id",
+        "scope"
+    ],
+    "oci_email_dkim": [
+        "name",
+        "description",
+        "email_domain_id"
+    ],
+    "oci_stack_monitoring_config": [
+        "display_name",
+        "config_type",
+        "is_enabled",
+        "license"
+    ],
+    "oci_database_key_store": [
+        "display_name"
+    ],
+    "oci_disaster_recovery_dr_plan": [
+        "display_name",
+        "type",
+        "dr_protection_group_id"
     ]
 }
