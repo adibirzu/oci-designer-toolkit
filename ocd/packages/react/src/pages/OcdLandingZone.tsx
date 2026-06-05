@@ -409,21 +409,20 @@ const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdC
         // Terraform import flow.
         const layerIds = topCompartmentIds.length > 0 ? topCompartmentIds : [design.model.oci.resources.compartment?.[0]?.id].filter(Boolean)
         layerIds.forEach((id: string, index: number) => document.addLayer(id, index === 0))
-        document.autoLayout(document.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle)
-        // Materialise the Realm > Region > AD > FD scaffold when the wizard tick
-        // is on. reconcileLzScaffold is a pure, idempotent no-op otherwise.
-        if (scaffoldEnabled) {
-            document.design = reconcileLzScaffold(document.design)
-        }
-        // Materialise the Database Observability topology (DBM + OPSI). Pure,
-        // idempotent no-op when the tick is off.
+        // Apply the resource-adding overlays BEFORE autoLayout so the resources
+        // they introduce (DBM/OPSI, OKE) get laid out on the canvas. Each is a
+        // pure, idempotent no-op when its tick is off.
         if (observabilityEnabled) {
             document.design = applyObservabilityOverlay(document.design)
         }
-        // Materialise the OKE-native topology (VCN-native CNI + Workload Identity).
-        // Pure, idempotent no-op when the tick is off.
         if (okeNativeEnabled) {
             document.design = applyOkeNativeOverlay(document.design)
+        }
+        document.autoLayout(document.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle)
+        // The Realm > Region > AD > FD scaffold manages its own nested container
+        // coords, so it runs AFTER autoLayout. Idempotent no-op when off.
+        if (scaffoldEnabled) {
+            document.design = reconcileLzScaffold(document.design)
         }
         setOcdDocument(document)
         switchToDesigner()
