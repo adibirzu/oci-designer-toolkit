@@ -186,7 +186,22 @@ export const resourceMap: OcdResourceMap = {
     "oci_core_volume_group": "volume_group",
     "oci_core_dedicated_vm_host": "dedicated_vm_host",
     // Exadata
-    "oci_database_cloud_exadata_infrastructure": "cloud_exadata_infrastructure"
+    "oci_database_cloud_exadata_infrastructure": "cloud_exadata_infrastructure",
+    // Database Management (DBM)
+    "oci_database_management_db_management_private_endpoint": "dbm_private_endpoint",
+    "oci_database_management_managed_database_group": "managed_database_group",
+    "oci_database_management_external_db_system": "external_db_system",
+    "oci_database_management_external_db_system_connector": "external_db_system_connector",
+    // Operations Insights (OPSI)
+    "oci_opsi_database_insight": "opsi_database_insight",
+    "oci_opsi_operations_insights_private_endpoint": "opsi_private_endpoint",
+    "oci_opsi_exadata_insight": "opsi_exadata_insight",
+    "oci_opsi_host_insight": "opsi_host_insight",
+    "oci_opsi_awr_hub": "opsi_awr_hub",
+    "oci_opsi_operations_insights_warehouse": "opsi_warehouse",
+    "oci_opsi_opsi_configuration": "opsi_configuration",
+    // Management Agent
+    "oci_management_agent_management_agent": "management_agent"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -1800,5 +1815,134 @@ export const resourceAttributes: OcdIncludedElements = {
         "availability_domain",
         "dedicated_vm_host_shape",
         "fault_domain"
+    ],
+    "oci_database_management_db_management_private_endpoint": [
+        "name",
+        "description",
+        "subnet_id",
+        "vcn_id",
+        "nsg_ids",
+        "is_cluster",
+        "is_dns_resolution_enabled"
+    ],
+    "oci_database_management_managed_database_group": [
+        "name",
+        "description",
+        "managed_databases",
+        "managed_databases.id",
+        "managed_databases.name",
+        "managed_databases.database_type",
+        "managed_databases.database_sub_type",
+        "managed_databases.deployment_type",
+        "managed_databases.workload_type"
+    ],
+    "oci_database_management_external_db_system": [
+        "display_name",
+        "db_system_discovery_id",
+        "discovery_agent_id",
+        "is_cluster",
+        "home_directory",
+        "database_management_config",
+        "database_management_config.license_model",
+        "stack_monitoring_config",
+        "stack_monitoring_config.is_enabled"
+    ],
+    "oci_database_management_external_db_system_connector": [
+        "display_name",
+        "external_db_system_id",
+        "connector_type",
+        "agent_id",
+        "connection_info",
+        "connection_info.component_type",
+        "connection_info.connection_string",
+        "connection_info.connection_string.host_name",
+        "connection_info.connection_string.port",
+        "connection_info.connection_string.protocol",
+        "connection_info.connection_string.service",
+        "connection_info.connection_credentials",
+        "connection_info.connection_credentials.credential_name",
+        "connection_info.connection_credentials.credential_type",
+        "connection_info.connection_credentials.user_name",
+        "connection_info.connection_credentials.role",
+        "connection_info.connection_credentials.password_secret_id"
+    ],
+    "oci_opsi_database_insight": [
+        "entity_source",
+        "database_id",
+        "database_resource_type",
+        "deployment_type",
+        "opsi_private_endpoint_id",
+        "dbm_private_endpoint_id",
+        "exadata_insight_id",
+        "service_name",
+        "connection_details",
+        "connection_details.host_name",
+        "connection_details.port",
+        "connection_details.protocol",
+        "connection_details.service_name",
+        "credential_details",
+        "credential_details.credential_type",
+        "credential_details.credential_source_name",
+        "credential_details.user_name",
+        "credential_details.role",
+        "credential_details.password_secret_id",
+        "credential_details.wallet_secret_id"
+    ],
+    "oci_opsi_operations_insights_private_endpoint": [
+        "display_name",
+        "description",
+        "vcn_id",
+        "subnet_id",
+        "nsg_ids",
+        "is_used_for_rac_dbs"
+    ],
+    "oci_opsi_exadata_insight": [
+        "entity_source",
+        "exadata_infra_id",
+        "exadata_infra_resource_type",
+        "exadata_type",
+        "is_auto_sync_enabled",
+        "is_virtualized_exadata",
+        "member_vm_cluster_details",
+        "member_vm_cluster_details.vmcluster_id",
+        "member_vm_cluster_details.compartment_id",
+        "member_vm_cluster_details.dbm_private_endpoint_id",
+        "member_vm_cluster_details.opsi_private_endpoint_id"
+    ],
+    "oci_opsi_host_insight": [
+        "entity_source",
+        "compute_id",
+        "management_agent_id",
+        "host_type",
+        "host_name",
+        "host_display_name",
+        "exadata_insight_id"
+    ],
+    "oci_opsi_awr_hub": [
+        "display_name",
+        "operations_insights_warehouse_id",
+        "object_storage_bucket_name"
+    ],
+    "oci_opsi_operations_insights_warehouse": [
+        "display_name",
+        "cpu_allocated",
+        "storage_allocated_in_gbs"
+    ],
+    "oci_opsi_opsi_configuration": [
+        "opsi_config_type",
+        "display_name",
+        "description",
+        "config_items",
+        "config_items.config_item_type",
+        "config_items.name",
+        "config_items.value",
+        "config_items.applicable_contexts"
+    ],
+    "oci_management_agent_management_agent": [
+        "display_name",
+        "managed_agent_id",
+        "deploy_plugins_id",
+        "install_key_id",
+        "is_agent_auto_upgradable"
     ]
 }
