@@ -165,7 +165,28 @@ export const resourceMap: OcdResourceMap = {
     // AI Vision
     "oci_ai_vision_project": "ai_vision_project",
     // Data Labeling
-    "oci_data_labeling_service_dataset": "data_labeling_dataset"
+    "oci_data_labeling_service_dataset": "data_labeling_dataset",
+    // Data Science
+    "oci_datascience_model": "datascience_model",
+    "oci_datascience_model_deployment": "datascience_model_deployment",
+    "oci_datascience_job": "datascience_job",
+    // Data Integration
+    "oci_dataintegration_workspace": "dataintegration_workspace",
+    // Governance / Quotas
+    "oci_limits_quota": "limits_quota",
+    // Web App Acceleration (WAA)
+    "oci_waa_web_app_acceleration_policy": "waa_policy",
+    "oci_waa_web_app_acceleration": "waa_acceleration",
+    // DevOps sub-resources
+    "oci_devops_repository": "devops_repository",
+    "oci_devops_build_pipeline": "devops_build_pipeline",
+    "oci_devops_deploy_pipeline": "devops_deploy_pipeline",
+    "oci_devops_deploy_environment": "devops_deploy_environment",
+    // Compute
+    "oci_core_volume_group": "volume_group",
+    "oci_core_dedicated_vm_host": "dedicated_vm_host",
+    // Exadata
+    "oci_database_cloud_exadata_infrastructure": "cloud_exadata_infrastructure"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -648,12 +669,22 @@ export const resourceAttributes: OcdIncludedElements = {
     ],
     // "oci_database_autonomous_exadata_infrastructure": [],
     "oci_database_cloud_exadata_infrastructure": [
+            "display_name",
             "availability_domain",
             "shape",
             "cluster_placement_group_id",
             "compute_count",
+            "storage_count",
             "customer_contacts",
             "customer_contacts.email",
+            "maintenance_window",
+            "maintenance_window.preference",
+            "maintenance_window.days_of_week",
+            "maintenance_window.days_of_week.name",
+            "maintenance_window.hours_of_day",
+            "maintenance_window.months",
+            "maintenance_window.months.name",
+            "maintenance_window.weeks_of_month"
     ],
     "oci_database_cloud_autonomous_vm_cluster": [],
     "oci_database_cloud_vm_cluster": [
@@ -1499,8 +1530,6 @@ export const resourceAttributes: OcdIncludedElements = {
         "recurrence_details",
         "time_starts",
         "time_ends",
-        "resources",
-        "resources.id",
         "resource_filters",
         "resource_filters.attribute",
         "resource_filters.condition",
@@ -1625,4 +1654,151 @@ export const resourceAttributes: OcdIncludedElements = {
         "dataset_source_details.prefix",
         "label_set"
     ],
+    "oci_datascience_model": [
+        "display_name",
+        "description",
+        "project_id",
+        "input_schema",
+        "output_schema",
+        "model_artifact",
+        "artifact_content_length",
+        "artifact_content_disposition",
+        "custom_metadata_list",
+        "custom_metadata_list.key",
+        "custom_metadata_list.value",
+        "custom_metadata_list.category",
+        "defined_metadata_list",
+        "defined_metadata_list.key",
+        "defined_metadata_list.value"
+    ],
+    "oci_datascience_model_deployment": [
+        "display_name",
+        "description",
+        "project_id",
+        "model_deployment_configuration_details",
+        "model_deployment_configuration_details.deployment_type",
+        "model_deployment_configuration_details.model_configuration_details",
+        "model_deployment_configuration_details.model_configuration_details.model_id",
+        "model_deployment_configuration_details.model_configuration_details.instance_configuration",
+        "model_deployment_configuration_details.model_configuration_details.instance_configuration.instance_shape_name",
+        "model_deployment_configuration_details.model_configuration_details.scaling_policy",
+        "category_log_details",
+        "category_log_details.access",
+        "category_log_details.access.log_group_id",
+        "category_log_details.access.log_id",
+        "category_log_details.predict",
+        "category_log_details.predict.log_group_id",
+        "category_log_details.predict.log_id"
+    ],
+    "oci_datascience_job": [
+        "display_name",
+        "description",
+        "project_id",
+        "job_artifact",
+        "artifact_content_length",
+        "artifact_content_disposition",
+        "job_configuration_override_details",
+        "job_infrastructure_configuration_details",
+        "job_infrastructure_configuration_details.job_infrastructure_type",
+        "job_infrastructure_configuration_details.shape_name",
+        "job_infrastructure_configuration_details.subnet_id",
+        "job_infrastructure_configuration_details.block_storage_size_in_gbs",
+        "job_log_configuration_override_details"
+    ],
+    "oci_dataintegration_workspace": [
+        "display_name",
+        "description",
+        "subnet_id",
+        "vcn_id",
+        "is_private_network_enabled",
+        "endpoint_id",
+        "endpoint_name",
+        "dns_server_ip",
+        "dns_server_zone"
+    ],
+    "oci_limits_quota": [
+        "name",
+        "description",
+        "statements",
+        "is_lock_override"
+    ],
+    "oci_waa_web_app_acceleration_policy": [
+        "display_name",
+        "response_caching_policy",
+        "response_caching_policy.is_response_header_based_caching_enabled",
+        "response_compression_policy",
+        "response_compression_policy.gzip_compression",
+        "response_compression_policy.gzip_compression.is_enabled"
+    ],
+    "oci_waa_web_app_acceleration": [
+        "display_name",
+        "backend_type",
+        "load_balancer_id",
+        "web_app_acceleration_policy_id"
+    ],
+    "oci_devops_repository": [
+        "name",
+        "description",
+        "project_id",
+        "repository_type",
+        "default_branch",
+        "mirror_repository_config",
+        "mirror_repository_config.repository_url",
+        "mirror_repository_config.connector_id",
+        "mirror_repository_config.trigger_schedule",
+        "mirror_repository_config.trigger_schedule.type",
+        "mirror_repository_config.trigger_schedule.custom_schedule"
+    ],
+    "oci_devops_build_pipeline": [
+        "display_name",
+        "description",
+        "project_id",
+        "build_pipeline_parameters",
+        "build_pipeline_parameters.items",
+        "build_pipeline_parameters.items.name",
+        "build_pipeline_parameters.items.default_value",
+        "build_pipeline_parameters.items.description"
+    ],
+    "oci_devops_deploy_pipeline": [
+        "display_name",
+        "description",
+        "project_id",
+        "deploy_pipeline_parameters",
+        "deploy_pipeline_parameters.items",
+        "deploy_pipeline_parameters.items.name",
+        "deploy_pipeline_parameters.items.default_value",
+        "deploy_pipeline_parameters.items.description"
+    ],
+    "oci_devops_deploy_environment": [
+        "display_name",
+        "description",
+        "project_id",
+        "deploy_environment_type",
+        "cluster_id",
+        "function_id",
+        "network_channel",
+        "network_channel.network_channel_type",
+        "network_channel.subnet_id",
+        "network_channel.nsg_ids"
+    ],
+    "oci_core_volume_group": [
+        "display_name",
+        "availability_domain",
+        "volume_ids",
+        "source_details",
+        "source_details.type",
+        "source_details.volume_ids",
+        "source_details.volume_group_id",
+        "source_details.volume_group_backup_id",
+        "backup_policy_id",
+        "volume_group_replicas",
+        "volume_group_replicas.availability_domain",
+        "volume_group_replicas.display_name"
+    ],
+    "oci_core_dedicated_vm_host": [
+        "display_name",
+        "availability_domain",
+        "dedicated_vm_host_shape",
+        "fault_domain"
+    ]
 }
