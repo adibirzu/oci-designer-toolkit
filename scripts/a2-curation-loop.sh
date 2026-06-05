@@ -104,14 +104,19 @@ must exit 0 — the export build catches base-property collisions the model buil
 misses. If it fails, fix or drop the offending attribute and re-verify before
 finishing. Update the Progress section of $NOTES with the services added + new
 count. Do NOT commit, do NOT run the appdmg-breaking plain 'npm run build' at the
-ocd root, do NOT npm install. If no further high-value services remain, output the
-exact token ${COMPLETION_SIGNAL}."
+ocd root, do NOT npm install. ONLY if you curated ZERO services this run because no further
+high-value services remain, output ${COMPLETION_SIGNAL} ALONE on its own final
+line and nothing else on that line. If you curated any services, do NOT output
+that token anywhere (not even negated)."
   OUT=$(printf '%s' "$PROMPT" | claude -p --permission-mode acceptEdits \
     --allowedTools "Read,Edit,Write,Glob,Grep,Bash")
 
   echo "$OUT" | tail -20
 
-  if echo "$OUT" | grep -q "$COMPLETION_SIGNAL"; then
+  # Match the signal ONLY as a standalone whole line (grep -x), so a negated
+  # mention in prose ("this is NOT A2_CATALOG_COMPLETE") doesn't falsely trigger
+  # completion and discard a valid curated batch.
+  if echo "$OUT" | grep -qxF "$COMPLETION_SIGNAL"; then
     echo "Completion signal received — catalog curation complete. Stopping."
     break
   fi
