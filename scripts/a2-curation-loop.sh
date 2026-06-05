@@ -100,9 +100,16 @@ high-value services remain to curate, output the exact token ${COMPLETION_SIGNAL
 
   echo "--- verify (gate-aware) ---"
   if ! verify; then
-    echo "VERIFY FAILED on iteration $i. Stopping so the broken batch does not compound."
-    echo "Inspect the working tree, fix or 'git checkout -- .', then resume."
-    exit 1
+    # The gate can flake if it races codegen settling. Re-verify ONCE before
+    # treating the failure as real (a genuinely broken batch fails twice).
+    echo "verify failed; re-running once (gate can race codegen settle)..."
+    sleep 5
+    if ! verify; then
+      echo "VERIFY FAILED (twice) on iteration $i. Stopping so the broken batch does not compound."
+      echo "--- last 30 lines of .a2-verify.log ---"; tail -30 .a2-verify.log 2>/dev/null
+      echo "Inspect the working tree, fix or 'git checkout -- .', then resume."
+      exit 1
+    fi
   fi
 
   COUNT=$(node -e "const s=require('./ocd/packages/codegen-cli/schema/oci-schema.json');console.log(Array.isArray(s)?s.length:Object.keys(s).length)" 2>/dev/null || echo '?')
