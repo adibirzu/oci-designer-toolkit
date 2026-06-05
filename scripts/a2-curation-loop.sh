@@ -69,7 +69,13 @@ verify() {
 for ((i = 1; i <= MAX_RUNS; i++)); do
   echo "=== A2 curation iteration $i / $MAX_RUNS ==="
 
-  OUT=$(claude -p "You are curating OCI services into the OKIT catalog (A2). Read $NOTES
+  # Non-interactive claude -p needs explicit permission to edit files + run the
+  # codegen via Bash, or every edit is blocked. acceptEdits auto-applies edits;
+  # allowedTools grants the tools the curation needs. (Global rule: configure
+  # allowedTools, never --dangerously-skip-permissions.)
+  OUT=$(claude -p --permission-mode acceptEdits \
+    --allowedTools "Read,Edit,Write,Glob,Grep,Bash" \
+    "You are curating OCI services into the OKIT catalog (A2). Read $NOTES
 for rules and progress. Add the NEXT $BATCH high-value OCI services that are NOT
 already present in ocd/packages/codegen/src/importer/data/OciResourceMap.ts:
 add a resourceMap entry + curated resourceAttributes (the key user-set fields +
