@@ -167,4 +167,64 @@ test.describe('Landing Zone wizard smoke', () => {
     /* ── Done ──────────────────────────────────────────────────────────── */
     // Wizard opened, all five steps traversed, Review rendered LZ output — pass.
   })
+
+  test('ticking Realm/AD/FD scaffold renders nested AD/FD containers in the Designer', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('.ocd-console')).toBeVisible({ timeout: 20_000 })
+
+    // Open wizard.
+    const wizardBtn = page.locator(`[title="${WIZARD_BUTTON_TITLE}"]`)
+    await expect(wizardBtn).toBeVisible({ timeout: 10_000 })
+    await wizardBtn.click()
+    await expect(page.locator('.ocd-lzng').first()).toBeVisible({ timeout: 30_000 })
+
+    // Tick the wizard "Realm/AD/FD scaffold" toggle (action bar, all steps).
+    const scaffoldToggle = page.locator('.ocd-lzng-scaffold-toggle input[type="checkbox"]')
+    await expect(scaffoldToggle).toBeVisible()
+    await scaffoldToggle.check()
+    await expect(scaffoldToggle).toBeChecked()
+
+    // Walk Foundation → Review.
+    for (let step = 0; step < STEP_COUNT - 1; step += 1) {
+      await clickContinue(page, step)
+    }
+    await expect(page.getByRole('heading', { name: 'Generated Files' })).toBeVisible()
+
+    // "Open in Designer" is enabled only once OE generation produced files. The
+    // jsonnet-WASM generation needs the full OE operating-entities sources; in a
+    // headless static build those may be absent (the same reason the smoke test
+    // tolerates a setup-lz / "No iam.json" fallback). When generation yields no
+    // files the button stays disabled and the scaffold cannot be reached via the
+    // UI — skip with a clear reason rather than false-fail. This test asserts the
+    // full scaffold render in environments where OE generation works.
+    await page.getByText('Generating Operating Entities…').waitFor({ state: 'hidden', timeout: 30_000 }).catch(() => {})
+    const openBtn = page.getByRole('button', { name: 'Open in Designer' })
+    let openEnabled = false
+    try {
+      await expect(openBtn).toBeEnabled({ timeout: 15_000 })
+      openEnabled = true
+    } catch {
+      openEnabled = false
+    }
+    test.skip(!openEnabled, 'OE generation produced no files in this headless build; "Open in Designer" is unavailable, so the scaffold cannot be exercised via the UI here.')
+    await openBtn.click()
+
+    // The console switches to the Designer; the canvas SVG renders the scaffold.
+    // Each scaffold container's background element carries a
+    // `${class}-background-colour` class (OcdResourceSvg). Default region
+    // eu-frankfurt-1 is a 3-AD region → 1 realm, 1 region, 3 ADs, 9 FDs. Assert
+    // robust lower bounds (>=1 AD, >=3 FDs holds for single-AD regions too).
+    const adContainers = page.locator('.ocd-ad-background-colour')
+    const fdContainers = page.locator('.ocd-fd-background-colour')
+    await expect(adContainers.first()).toBeVisible({ timeout: 30_000 })
+
+    const adCount = await adContainers.count()
+    const fdCount = await fdContainers.count()
+    expect(adCount, 'at least one Availability Domain container should render').toBeGreaterThanOrEqual(1)
+    expect(fdCount, 'each AD has 3 Fault Domains, so at least 3 FD containers').toBeGreaterThanOrEqual(3)
+
+    // Realm + region wrapper containers (exactly one each).
+    await expect(page.locator('.ocd-realm-background-colour')).toHaveCount(1)
+    await expect(page.locator('.oci-region-background-colour')).toHaveCount(1)
+  })
 })
