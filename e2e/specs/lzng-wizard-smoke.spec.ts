@@ -168,7 +168,7 @@ test.describe('Landing Zone wizard smoke', () => {
     // Wizard opened, all five steps traversed, Review rendered LZ output — pass.
   })
 
-  test('ticking Realm/AD/FD scaffold renders nested AD/FD containers in the Designer', async ({ page }) => {
+  test('ticking the LZ overlays renders scaffold + DB-observability + OKE-native resources', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('.ocd-console')).toBeVisible({ timeout: 20_000 })
 
@@ -178,11 +178,15 @@ test.describe('Landing Zone wizard smoke', () => {
     await wizardBtn.click()
     await expect(page.locator('.ocd-lzng').first()).toBeVisible({ timeout: 30_000 })
 
-    // Tick the wizard "Realm/AD/FD scaffold" toggle (action bar, all steps).
-    const scaffoldToggle = page.locator('.ocd-lzng-scaffold-toggle input[type="checkbox"]')
-    await expect(scaffoldToggle).toBeVisible()
-    await scaffoldToggle.check()
-    await expect(scaffoldToggle).toBeChecked()
+    // Tick all three overlay toggles (action bar, visible on all steps).
+    const toggleByLabel = (label: string) =>
+      page.locator('.ocd-lzng-scaffold-toggle', { hasText: label }).locator('input[type="checkbox"]')
+    for (const label of ['Realm/AD/FD scaffold', 'DB Observability', 'OKE Native']) {
+      const toggle = toggleByLabel(label)
+      await expect(toggle).toBeVisible()
+      await toggle.check()
+      await expect(toggle).toBeChecked()
+    }
 
     // Walk Foundation → Review.
     for (let step = 0; step < STEP_COUNT - 1; step += 1) {
@@ -226,5 +230,14 @@ test.describe('Landing Zone wizard smoke', () => {
     // Realm + region wrapper containers (exactly one each).
     await expect(page.locator('.ocd-realm-background-colour')).toHaveCount(1)
     await expect(page.locator('.oci-region-background-colour')).toHaveCount(1)
+
+    // DB Observability overlay: DBM + OPSI resources materialised on the canvas
+    // (rendered with their displayName titles by autoLayout).
+    await expect(page.getByText('DBM Private Endpoint', { exact: false }).first()).toBeVisible({ timeout: 15_000 })
+    await expect(page.getByText('OPSI Private Endpoint', { exact: false }).first()).toBeVisible()
+
+    // OKE-native overlay: the VCN-native pod subnet + enhanced cluster.
+    await expect(page.getByText('OKE Pod Subnet (VCN-native CNI)', { exact: false }).first()).toBeVisible()
+    await expect(page.getByText('OKE Cluster (enhanced)', { exact: false }).first()).toBeVisible()
   })
 })
