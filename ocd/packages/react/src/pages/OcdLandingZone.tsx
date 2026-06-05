@@ -44,6 +44,7 @@ import { buildOcdDesignFromLz } from '../landingzone/OcdLzToModel'
 import { reconcileLzScaffold } from '../landingzone/OcdLzScaffold'
 import { LZ_SCAFFOLD_ENABLED_KEY } from '../landingzone/OcdLzReconcile'
 import { applyObservabilityOverlay, LZ_OBSERVABILITY_ENABLED_KEY } from '../landingzone/OcdLzObservability'
+import { applyOkeNativeOverlay, LZ_OKE_NATIVE_ENABLED_KEY } from '../landingzone/OcdLzOke'
 import {
     DEFAULT_CONFIG,
     LandingZoneConfig,
@@ -85,7 +86,7 @@ function friendlyError(message: string): string {
 
 interface WizardBodyProps {
     onExit: () => void
-    onOpenInDesigner: (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean, observabilityEnabled: boolean) => void
+    onOpenInDesigner: (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean, observabilityEnabled: boolean, okeNativeEnabled: boolean) => void
 }
 
 function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element {
@@ -93,6 +94,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
     const [config, setConfig] = useState<LandingZoneConfig>(() => upgradeConfig(data.config ?? data.step1))
     const [scaffoldEnabled, setScaffoldEnabled] = useState<boolean>(() => Boolean(data.scaffoldEnabled))
     const [observabilityEnabled, setObservabilityEnabled] = useState<boolean>(() => Boolean(data.observabilityEnabled))
+    const [okeNativeEnabled, setOkeNativeEnabled] = useState<boolean>(() => Boolean(data.okeNativeEnabled))
     const [title, setTitle] = useState<string>(() => (typeof data.title === 'string' && data.title ? data.title : DEFAULT_TITLE))
     const [editingTitle, setEditingTitle] = useState(false)
     const [layout, setLayout] = useState<LzngLayout>('split')
@@ -118,6 +120,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         setField('title', title)
         setField('scaffoldEnabled', scaffoldEnabled)
         setField('observabilityEnabled', observabilityEnabled)
+        setField('okeNativeEnabled', okeNativeEnabled)
         setNotice({ kind: 'info', text: 'Draft saved.' })
     }
 
@@ -132,6 +135,12 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         const next = !observabilityEnabled
         setObservabilityEnabled(next)
         setField('observabilityEnabled', next)
+    }
+
+    function toggleOkeNative(): void {
+        const next = !okeNativeEnabled
+        setOkeNativeEnabled(next)
+        setField('okeNativeEnabled', next)
     }
 
     function commitConfig(next: LandingZoneConfig): void {
@@ -154,6 +163,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         setConfig(normalizeConfig(DEFAULT_CONFIG))
         setScaffoldEnabled(false)
         setObservabilityEnabled(false)
+        setOkeNativeEnabled(false)
         setTitle(DEFAULT_TITLE)
         setActiveStep(0)
         setNotice(null)
@@ -221,7 +231,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                         config={config}
                         title={title}
                         onError={(message) => setNotice({ kind: 'error', text: friendlyError(message) })}
-                        onOpenInDesigner={(files) => onOpenInDesigner(title, files, config, scaffoldEnabled, observabilityEnabled)}
+                        onOpenInDesigner={(files) => onOpenInDesigner(title, files, config, scaffoldEnabled, observabilityEnabled, okeNativeEnabled)}
                     />
                 )
         }
@@ -279,6 +289,14 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                                 onChange={toggleObservability}
                             />
                             <span>DB Observability</span>
+                        </label>
+                        <label className='ocd-lzng-scaffold-toggle' title='When ticked, opening in the Designer adds an OKE-native topology (VCN-native CNI pod subnet, enhanced cluster, Workload Identity dynamic group + policy, NSG, Vault + Key).'>
+                            <input
+                                type='checkbox'
+                                checked={okeNativeEnabled}
+                                onChange={toggleOkeNative}
+                            />
+                            <span>OKE Native</span>
                         </label>
                         <span className='ocd-lzng-action-sep' aria-hidden />
                         <button type='button' className='ocd-lzng-btn ocd-lzng-btn-primary' onClick={saveDraft}>
@@ -378,12 +396,13 @@ const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdC
     // active document, and switch the console to the Designer page. The wizard
     // config is persisted into the design (design.userDefined.lzConfig) so the
     // idempotent scaffold reconcile has a source of truth that survives saves.
-    const onOpenInDesigner = (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean, observabilityEnabled: boolean): void => {
+    const onOpenInDesigner = (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean, observabilityEnabled: boolean, okeNativeEnabled: boolean): void => {
         const { design, topCompartmentIds } = buildOcdDesignFromLz(files, title, config)
         // Record the wizard ticks on the design so the designer-side toggles and
         // idempotent overlays know they apply.
         design.userDefined[LZ_SCAFFOLD_ENABLED_KEY] = scaffoldEnabled
         design.userDefined[LZ_OBSERVABILITY_ENABLED_KEY] = observabilityEnabled
+        design.userDefined[LZ_OKE_NATIVE_ENABLED_KEY] = okeNativeEnabled
         const document = OcdDocument.new()
         document.design = design
         // Add one layer per top-level compartment (first selected), mirroring the
@@ -400,6 +419,11 @@ const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdC
         // idempotent no-op when the tick is off.
         if (observabilityEnabled) {
             document.design = applyObservabilityOverlay(document.design)
+        }
+        // Materialise the OKE-native topology (VCN-native CNI + Workload Identity).
+        // Pure, idempotent no-op when the tick is off.
+        if (okeNativeEnabled) {
+            document.design = applyOkeNativeOverlay(document.design)
         }
         setOcdDocument(document)
         switchToDesigner()
