@@ -12,7 +12,24 @@ import os from 'os'
 // import * as Package from './package.json'
 // import * as Package from './package.json' with {type: "json"}
 import Package from './package.json' with {type: "json"}
+import { existsSync } from 'fs'
+import path from 'path'
 console.debug('Forge Config: package.json.version', Package.version)
+
+// The DMG maker depends on the optional native `appdmg` (-> `macos-alias`), which
+// does not compile under newer Node (e.g. Node 26 + electron node-gyp). When it
+// is unavailable, fall back to the ZIP maker for darwin so `electron-forge make`
+// still succeeds (the build gate stays green). A real .dmg is produced only where
+// appdmg actually resolves. Filesystem check (no import.meta/require) so it works
+// regardless of how electron-forge loads this config. node_modules is hoisted to
+// the monorepo root (../../) but may also be local (./).
+function appdmgAvailable(): boolean {
+  const cwd = process.cwd()
+  return existsSync(path.join(cwd, '..', '..', 'node_modules', 'appdmg', 'package.json')) ||
+         existsSync(path.join(cwd, 'node_modules', 'appdmg', 'package.json'))
+}
+const dmgMakerAvailable = appdmgAvailable()
+console.info('Forge Config: appdmg available =', dmgMakerAvailable)
 
 const archPos = process.argv.findIndex(arg => arg.startsWith('--arch'))
 let arch = archPos > 0 ? process.argv[archPos+1] : os.arch()
@@ -40,8 +57,10 @@ const config: ForgeConfig = {
       name: 'ocd',
       setupExe: `ocd-${Package.version}-Setup.exe`
     }), 
-    // new MakerZIP({}, ['darwin']), 
-    new MakerDMG({
+    // Always ship a darwin ZIP (no native deps) so the build gate is green even
+    // when appdmg cannot compile. The DMG maker below is added only when available.
+    new MakerZIP({}, ['darwin']),
+    ...(dmgMakerAvailable ? [new MakerDMG({
       background: './public/assets/background.png',
       icon: './public/assets/icon.icns',
       title: 'OKIT - Open Cloud Designer',
@@ -69,7 +88,7 @@ const config: ForgeConfig = {
           path: `${process.cwd()}/../../dist/ocd-darwin-${arch}/ocd.app`
         }
       ]
-    }, ['darwin']), 
+    }, ['darwin'])] : []),
     new MakerRpm({
       options: {
         name: 'ocd',
