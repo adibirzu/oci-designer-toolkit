@@ -40,6 +40,7 @@
 import { OcdDesign, OciModelResources } from '@ocd/model'
 import { GeneratedFile } from './OcdLzGenerator'
 import { byOeKind } from './OcdLzResourceMap'
+import { LandingZoneConfig } from './OcdLzConfig'
 
 /**
  * `design.userDefined` key used by the canvas placement resolver (A5).
@@ -48,6 +49,24 @@ import { byOeKind } from './OcdLzResourceMap'
  * always landing on the currently-selected layer.
  */
 export const LZ_ORIGIN_KEY = 'lzOrigin'
+
+/**
+ * `design.userDefined` key under which the originating `LandingZoneConfig` is
+ * retained, so the wizard config survives a save/reload of the design and the
+ * Realm > Region > AD > FD scaffold reconcile (OcdLzScaffold) can rebuild from
+ * the same source of truth.
+ */
+export const LZ_CONFIG_KEY = 'lzConfig'
+
+/**
+ * Read the `LandingZoneConfig` previously stamped onto a design by
+ * `buildOcdDesignFromLz`. Returns `undefined` when the design did not originate
+ * from the LZNG wizard (or pre-dates config persistence).
+ */
+export function getLzConfig(design: { userDefined?: Record<string, unknown> } | null | undefined): LandingZoneConfig | undefined {
+    const config = design?.userDefined?.[LZ_CONFIG_KEY]
+    return config ? (config as LandingZoneConfig) : undefined
+}
 
 /** Result of translating the OE output into an OcdDesign. */
 export interface OcdLzToModelResult {
@@ -217,7 +236,7 @@ function modelTypeFor(oeKind: string): string | undefined {
  * Build an OcdDesign (with model.oci.resources fully populated) from the OE
  * generated files. Never throws on malformed / missing content.
  */
-export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zone'): OcdLzToModelResult {
+export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zone', config?: LandingZoneConfig): OcdLzToModelResult {
     const design = OcdDesign.newDesign()
     // Start from an empty resource set; the bridge owns every resource.
     design.model.oci.resources = {}
@@ -586,6 +605,10 @@ export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zo
     // Mark the design as LZ-origin so the canvas placement resolver (A5) can
     // route dropped stencils into the correct LZ compartment automatically.
     design.userDefined[LZ_ORIGIN_KEY] = true
+
+    // Retain the originating wizard config (when supplied) so it survives saves
+    // and drives the Realm > Region > AD > FD scaffold reconcile.
+    if (config) design.userDefined[LZ_CONFIG_KEY] = config
 
     return { design, counts, topCompartmentIds, notes }
 }
