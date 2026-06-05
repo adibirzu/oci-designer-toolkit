@@ -1,19 +1,24 @@
 [![License: UPL](https://img.shields.io/badge/license-UPL-green)](https://img.shields.io/badge/license-UPL-green) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=oracle_oci-designer-toolkit&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=oracle_oci-designer-toolkit)
-# Oracle Edge Cloud Infrastructure Designer and Visualisation Toolkit [OKIT-Desktop 0.3.0](CHANGELOG.md#okit-desktop-version-0.3.0) / [OKIT-Classic 0.70.0](CHANGELOG.md#okit-classic-version-0.70.0)
+# Oracle Edge Cloud Infrastructure Designer and Visualisation Toolkit [OKIT-Desktop 0.4.0](CHANGELOG.md#okit-desktop-version-0.4.0) / [OKIT-Classic 0.70.0](CHANGELOG.md#okit-classic-version-0.70.0)
 
 > [!NOTE]
-> ## 🛠️ This is an enhanced fork
+> ## 🛠️ This is an enhanced fork — v0.4.0
 >
-> This fork extends the upstream OCI Designer Toolkit (OKIT) with new features focused on **OCI Landing Zones** and a refreshed Oracle Redwood UI/UX. It is a work in progress; expect rapid iteration on the items below.
+> This fork extends the upstream OCI Designer Toolkit (OKIT) with new features focused on **OCI Landing Zones**, **cost estimation**, and a refreshed Oracle Redwood UI/UX. Work in progress; rapid iteration on the items below.
 >
-> **What we are adding**
-> - **Oracle Redwood (Next-Gen) theme** — aligning OCD's look and feel with the [Landing Zone Next Gen](https://lzng.netlify.app/) designer (Oracle Redwood palette, Segoe UI typography, accessible focus states).
-> - **Real cost estimation** — wiring Oracle's public [OCI list-pricing API](https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/signingup_topic-Estimating_Costs.htm) (`apexapps.oracle.com/.../cetools/api/v1/products/`) into the BoM/cost page, replacing static placeholders, with multi-currency support. _(Closes upstream #143.)_
-> - **OCI Landing Zone mapping** — Observability Landing Zone templates (Free-First and Full-Enterprise), generated Terraform / Resource Manager packages, and a versioned baseline manifest that maps every add-on variable to its Terraform variable, `.auto.tfvars.json` key, OKIT model path, and official [OCI Landing Zones](https://github.com/oracle-quickstart/terraform-oci-open-lz) convention.
-> - **Landing Zone Wizard** — a wizard-driven Landing Zone generator integrated as a new mode inside the designer. It renders the official OCI [Operating Entities](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities) Landing Zone JSON via jsonnet-WASM in the browser. The upstream OE sources are **not committed** (they embed public OCI reference OCIDs); fetch them locally once with `npm run setup-lz` before using the wizard. No OCIDs, tenancy names, or secrets are stored in this repository — you supply your own.
-> - **Expanded OCI resource coverage & reliability** — OKE node pools, NSG-to-NSG rules, LB listeners, and Resource Manager export hardening.
+> **What this fork adds**
+> - **Oracle Redwood (Next-Gen) theme** — aligns OCD with the [Landing Zone Next Gen](https://lzng.netlify.app/) designer (Oracle Redwood palette, Segoe UI typography, accessible focus states).
+> - **Real cost estimation** — Oracle's public [OCI list-pricing API](https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/signingup_topic-Estimating_Costs.htm) (`cetools`) wired into the BoM/cost page, with **per-shape compute SKU mapping** (E2–E6, A1/A2, GPU, HPC, DenseIO) and all-costable-service SKUs, multi-currency, snapshot fallback. _(Closes upstream #143.)_
+> - **Landing Zone Wizard** — a 5-step wizard that renders the official OCI [Operating Entities](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities) Landing Zone JSON via jsonnet-WASM in-browser, then opens the result on the drag-drop canvas. OE sources are **not committed** (they embed public OCI reference OCIDs); fetch once with `npm run setup-lz`.
+> - **Realm → Region → AD → FD scaffold** — an idempotent designer overlay that builds the nested availability-domain/fault-domain frames from the wizard's region (or via the **Add Frames** toolbar action on any design), with a dual-tick live reconcile between wizard and designer.
+> - **Database Observability overlay** — one tick materialises the DBM + OPSI topology (separate DBM/OPSI private endpoints, Database Insight, Management Agent), grounded in OCI DBM/OPSI domain practice.
+> - **OKE-native overlay** — one tick materialises a VCN-native CNI topology (dedicated pod subnet, enhanced cluster, Workload Identity dynamic group + policy, NSG, Vault + Key).
+> - **Drag-to-connect** — a **Connect mode** that wires entity associations (FK fields) by dragging one resource onto another.
+> - **~140 curated OCI services** in the catalog (regenerated from the OCI Terraform provider schema), plus official Oracle diagram icons and the full provider stencil palette.
+> - **Web OCI discovery** — a localhost `@ocd/web-server` backend exposing read-only OCI query endpoints for the browser build; full discovery/import in the Electron desktop app.
+> - **Quality**: Vitest test suite (130+ tests), Playwright wizard E2E, web-bundle code-splitting, GitHub Pages CI, and a pre-commit redaction gate.
 >
-> See [`docs/observability-landing-zone-enhancements.md`](docs/observability-landing-zone-enhancements.md) for the detailed enhancement log and upstream-issue coverage.
+> No OCIDs, tenancy names, or secrets are stored in this repository — you supply your own. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the system architecture and [`docs/oci-lz-designer-roadmap.md`](docs/oci-lz-designer-roadmap.md) for the roadmap.
 >
 > **Building & running the desktop (Electron) app**
 >

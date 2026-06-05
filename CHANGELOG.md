@@ -1,6 +1,23 @@
 # Release Notes
 
 
+## Enhanced Fork Release (v0.4.0)
+
+### OKIT-Desktop Version 0.4.0
+#### Features (enhanced fork)
+- **Oracle Redwood (Next-Gen) theme** and a 5-step **Landing Zone Wizard** rendering the official OCI Operating-Entities LZ via jsonnet-WASM in-browser, opening into the designer.
+- **Real cost estimation** via the OCI `cetools` list-pricing API, with per-shape compute SKU mapping (E2–E6, A1/A2, GPU, HPC, DenseIO) and all-costable-service SKUs; multi-currency + snapshot fallback.
+- **Realm → Region → AD → FD scaffold** — idempotent designer overlay + **Add Frames** toolbar action (region-driven AD count); dual-tick live reconcile between wizard and designer.
+- **Database Observability overlay** — DBM + OPSI private endpoints, Database Insight, Management Agent.
+- **OKE-native overlay** — VCN-native CNI pod subnet, enhanced cluster, Workload Identity (dynamic group + policy), NSG, Vault + Key.
+- **Drag-to-connect** — Connect mode wires entity FK associations by dragging one resource onto another.
+- **~140 curated OCI services** in the catalog; official Oracle diagram icons; full provider stencil palette.
+- **Web OCI discovery** backend (`@ocd/web-server`); GitHub Pages static deploy; web-bundle code-splitting.
+- **Quality**: Vitest suite (130+ tests), Playwright wizard E2E, pre-commit redaction gate.
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`docs/oci-lz-designer-roadmap.md`](docs/oci-lz-designer-roadmap.md).
+
+
 ## June 2025 Release
 **Release Date**: 30th June 2025
 
