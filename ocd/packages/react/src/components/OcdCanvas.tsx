@@ -490,6 +490,15 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
                                 />
                         })}
                         </g>
+                        {ocdConsoleConfig.config.connectMode && dragging && (() => {
+                            const src = ocdDocument.getRelativeXY(ocdDocument.dragResource.resource)
+                            const r = ocdDocument.dragResource.resource
+                            const hw = (r.w || 32) / 2
+                            const hh = (r.h || 32) / 2
+                            return <line className='ocd-connect-rubber-band'
+                                x1={src.x + hw} y1={src.y + hh}
+                                x2={ghostTranslate.x + hw} y2={ghostTranslate.y + hh} />
+                        })()}
                         <g className='ocd-ghost-group'
                             transform={`translate(${ghostTranslate.x}, ${ghostTranslate.y})`}
                             >

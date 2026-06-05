@@ -485,7 +485,7 @@ export const OcdResourceSvg = ({ ocdConsoleConfig, ocdDocument, setOcdDocument, 
             onClick={!hidden ? onResourceClick : onNooPEvent}
             onContextMenu={!hidden ? onResourceRightClick : onNooPEvent}
             >
-                <SvgRect 
+                <SvgRect
                     ocdConsoleConfig={ocdConsoleConfig}
                     ocdDocument={ocdDocument}
                     setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)}
@@ -493,6 +493,11 @@ export const OcdResourceSvg = ({ ocdConsoleConfig, ocdDocument, setOcdDocument, 
                     hidden={hidden}
                     setOrigin={setOrigin}
                     />
+                {/* Connect-mode affordance: a handle hinting "drag me onto another
+                    resource to wire an association". The whole resource is the drag
+                    source; this is the visual cue. */}
+                {ocdConsoleConfig.config.connectMode && !hidden && !resource.container &&
+                    <circle className='ocd-connect-handle' cx={resource.w || 32} cy={(resource.h || 32) / 2} r={5} />}
                 <OcdForeignObject 
                     ocdConsoleConfig={ocdConsoleConfig}
                     ocdDocument={ocdDocument}
