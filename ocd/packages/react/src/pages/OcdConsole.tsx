@@ -34,7 +34,7 @@ import { OcdActiveFileContext, OcdConsoleConfigContext, OcdDialogContext, OcdDoc
 import { OcdExportToResourceManagerDialog } from '../components/dialogs/OcdExportToResourceManagerDialog'
 import { ocdThemes } from '../data/OcdThemes'
 import { canReconcile, isReconcileEnabled, reconcileOnEdit, LZ_RECONCILE_ENABLED_KEY } from '../landingzone/OcdLzReconcile'
-import { reconcileLzScaffold } from '../landingzone/OcdLzScaffold'
+import { reconcileLzScaffold, addRealmAdFdFrames } from '../landingzone/OcdLzScaffold'
 // Context Providers
 import { CacheProvider, useCache, useCacheDispatch } from '../contexts/OcdCacheContext'
 import { defaultTheme, ThemeProvider, useThemeDispatch } from '../contexts/OcdThemeContext'
@@ -230,6 +230,14 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         document.design = reconcileLzScaffold(document.design)
         setOcdDocument(document)
     }
+    // Add Realm > Region > AD > FD frames to ANY design (idempotent). Available
+    // on the Designer page regardless of LZ origin.
+    const onAddFramesClick = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design = addRealmAdFdFrames(document.design)
+        setOcdDocument(document)
+    }
+    const onDesignerPage = ocdConsoleConfig.config.displayPage === 'designer'
     const showReconcile = canReconcile(ocdDocument.design)
     const reconcileOn = isReconcileEnabled(ocdDocument.design)
     let PageLeftToolbar = OcdEmptyLeftRightToolbar
@@ -291,6 +299,7 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                         <span>LZ sync</span>
                     </label>}
                     {showReconcile && <div className='ocd-lz-reapply ocd-console-toolbar-icon' title='Re-apply the Realm/AD/FD scaffold now (idempotent)' onClick={onReapplyScaffold} aria-hidden></div>}
+                    {onDesignerPage && <div className='ocd-add-frames ocd-console-toolbar-icon' title='Add Realm / Region / AD / FD frames to the canvas' onClick={onAddFramesClick} aria-hidden></div>}
                     <div className='cost-estimate ocd-console-toolbar-icon' title='BoM and Cost Estimate' onClick={onEstimateClick} aria-hidden></div>
                 </div>
             </div>

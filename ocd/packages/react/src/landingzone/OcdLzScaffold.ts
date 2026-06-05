@@ -280,7 +280,27 @@ function fdTokenOf(resource: Record<string, unknown>): string | undefined {
 export function reconcileLzScaffold(design: OcdDesign): OcdDesign {
     const config = getLzConfig(design)
     if (!config || !isLzOriginDesign(design)) return design
+    return buildScaffold(design, config)
+}
 
+/**
+ * Add the Realm > Region > AD > FD frames to ANY design (not just LZ-origin),
+ * with an explicit region/realm. Idempotent like the reconcile (re-apply is a
+ * no-op). Powers the designer 'Add Frames' action.
+ */
+export function addRealmAdFdFrames(design: OcdDesign, region = 'us-ashburn-1', realm = 'oc1'): OcdDesign {
+    const config: LandingZoneConfig = {
+        region,
+        regionShortName: region.slice(0, 3),
+        realm,
+        hubKind: 'hub_a',
+        hubVcn: '',
+        environments: [],
+    }
+    return buildScaffold(design, config)
+}
+
+function buildScaffold(design: OcdDesign, config: LandingZoneConfig): OcdDesign {
     const next = cloneDesign(design)
     const page = next.view.pages[0]
     if (!page) return design
