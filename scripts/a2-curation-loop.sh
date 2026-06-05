@@ -59,11 +59,14 @@ fi
 
 verify() {
   # Gate-aware verify: strict model tsc + dependent builds + tests + web build.
-  ( cd ocd && npm run compile-for-codegen >/dev/null 2>&1 ) || return 1
+  # All output is teed to .a2-verify.log so a failure is diagnosable (the gate
+  # can flake if it races codegen settling — re-run once before treating as real).
+  local log=".a2-verify.log"; : > "$log"
+  ( cd ocd && npm run compile-for-codegen ) >>"../$log" 2>&1 || return 1
   ( cd ocd && npm run build --workspace=packages/model --workspace=packages/export \
-      --workspace=packages/import --workspace=packages/react ) || return 1
-  ( cd ocd && npm test ) || return 1
-  ( cd ocd && OCD_PAGES_BASE=/ npm run build:pages ) || return 1
+      --workspace=packages/import --workspace=packages/react ) >>"../$log" 2>&1 || return 1
+  ( cd ocd && npm test ) >>"../$log" 2>&1 || return 1
+  ( cd ocd && OCD_PAGES_BASE=/ npm run build:pages ) >>"../$log" 2>&1 || return 1
 }
 
 for ((i = 1; i <= MAX_RUNS; i++)); do
