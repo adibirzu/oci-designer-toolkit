@@ -77,6 +77,32 @@ ocd/packages/codegen/src/importer/data/OciResourceMap.ts.
   OCI codegen; FULL build (model+export+import+react) clean: exit 0, 0 TS errors,
   no TS2416/TS2349. Active resourceMap entries: 182.
 
+- Iteration 5 (catalog 182 -> 196): added 14 high-value services across
+  apigateway/security(WAF,CloudGuard,DataSafe)/RMS/integration(GoldenGate)/
+  devops/database/mysql/dns/email/observability(StackMonitoring)/FSDR:
+  apigateway_api (oci_apigateway_api),
+  web_app_firewall_policy (oci_waf_web_app_firewall_policy),
+  resourcemanager_private_endpoint (oci_resourcemanager_private_endpoint),
+  golden_gate_connection (oci_golden_gate_connection),
+  devops_deploy_stage (oci_devops_deploy_stage),
+  data_safe_user_assessment (oci_data_safe_user_assessment),
+  cloud_guard_managed_list (oci_cloud_guard_managed_list),
+  autonomous_database_backup (oci_database_autonomous_database_backup),
+  mysql_channel (oci_mysql_channel),
+  dns_rrset (oci_dns_rrset),
+  email_dkim (oci_email_dkim),
+  stack_monitoring_config (oci_stack_monitoring_config),
+  database_key_store (oci_database_key_store),
+  dr_plan (oci_disaster_recovery_dr_plan).
+  Notes: dropped all golden_gate_connection secret inputs (password, ssl_key*,
+  account_key, secret_access_key, private_key_file/passphrase, sas_token,
+  key_store_password, wallet, region) for secret-hygiene + collision caution;
+  dropped `resource_type` from stack_monitoring_config (resourceType collision
+  caution). All 14 verified present in tf-schema.json (count 2 each) before
+  curation. Regenerated OCI codegen; FULL build
+  (model+export+import+react) clean: exit 0, 0 TS errors, no TS2416/TS2349.
+  Active resourceMap entries: 196.
+
 ## Next
 - Pick services NOT already in OciResourceMap.ts; curate ~14/batch.
 - Before curating: confirm each candidate exists in
