@@ -138,7 +138,34 @@ export const resourceMap: OcdResourceMap = {
     // Functions
     "oci_functions_function": "functions_function",
     // Bastion Session
-    "oci_bastion_session": "bastion_session"
+    "oci_bastion_session": "bastion_session",
+    // GoldenGate
+    "oci_golden_gate_deployment": "golden_gate_deployment",
+    // Resource Scheduler
+    "oci_resource_scheduler_schedule": "resource_scheduler_schedule",
+    // Compute Capacity Reservation
+    "oci_core_compute_capacity_reservation": "compute_capacity_reservation",
+    // Streaming Stream Pool
+    "oci_streaming_stream_pool": "streaming_stream_pool",
+    // Data Catalog
+    "oci_datacatalog_catalog": "datacatalog_catalog",
+    // Visual Builder
+    "oci_visual_builder_vb_instance": "visual_builder_instance",
+    // Blockchain
+    "oci_blockchain_blockchain_platform": "blockchain_platform",
+    // ODA (Digital Assistant)
+    "oci_oda_oda_instance": "oda_instance",
+    // DNS Resolver
+    "oci_dns_resolver": "dns_resolver",
+    // Vulnerability Scanning
+    "oci_vulnerability_scanning_host_scan_recipe": "vss_host_scan_recipe",
+    "oci_vulnerability_scanning_host_scan_target": "vss_host_scan_target",
+    // AI Language
+    "oci_ai_language_project": "ai_language_project",
+    // AI Vision
+    "oci_ai_vision_project": "ai_vision_project",
+    // Data Labeling
+    "oci_data_labeling_service_dataset": "data_labeling_dataset"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -1442,5 +1469,160 @@ export const resourceAttributes: OcdIncludedElements = {
         "target_resource_details.target_resource_operating_system_user_name",
         "target_resource_details.target_resource_private_ip_address",
         "target_resource_details.target_resource_fqdn"
+    ],
+    "oci_golden_gate_deployment": [
+        "display_name",
+        "description",
+        "deployment_type",
+        "license_model",
+        "cpu_core_count",
+        "is_auto_scaling_enabled",
+        "is_public",
+        "fqdn",
+        "nsg_ids",
+        "load_balancer_subnet_id",
+        "ogg_data",
+        "ogg_data.deployment_name",
+        "ogg_data.admin_username",
+        "ogg_data.admin_password",
+        "ogg_data.ogg_version",
+        "ogg_data.credential_store",
+        "maintenance_window",
+        "maintenance_window.day",
+        "maintenance_window.start_hour"
+    ],
+    "oci_resource_scheduler_schedule": [
+        "display_name",
+        "description",
+        "action",
+        "recurrence_type",
+        "recurrence_details",
+        "time_starts",
+        "time_ends",
+        "resources",
+        "resources.id",
+        "resource_filters",
+        "resource_filters.attribute",
+        "resource_filters.condition",
+        "resource_filters.should_include_child_compartments"
+    ],
+    "oci_core_compute_capacity_reservation": [
+        "display_name",
+        "availability_domain",
+        "is_default_reservation",
+        "instance_reservation_configs",
+        "instance_reservation_configs.instance_shape",
+        "instance_reservation_configs.reserved_count",
+        "instance_reservation_configs.fault_domain",
+        "instance_reservation_configs.instance_shape_config",
+        "instance_reservation_configs.instance_shape_config.ocpus",
+        "instance_reservation_configs.instance_shape_config.memory_in_gbs"
+    ],
+    "oci_streaming_stream_pool": [
+        "name",
+        "is_private",
+        "kafka_settings",
+        "kafka_settings.auto_create_topics_enable",
+        "kafka_settings.log_retention_hours",
+        "kafka_settings.num_partitions",
+        "custom_encryption_key",
+        "custom_encryption_key.kms_key_id",
+        "private_endpoint_settings",
+        "private_endpoint_settings.subnet_id",
+        "private_endpoint_settings.private_endpoint_ip",
+        "private_endpoint_settings.nsg_ids"
+    ],
+    "oci_datacatalog_catalog": [
+        "display_name"
+    ],
+    "oci_visual_builder_vb_instance": [
+        "display_name",
+        "node_count",
+        "consumption_model",
+        "is_visual_builder_enabled",
+        "idcs_open_id",
+        "custom_endpoint",
+        "custom_endpoint.hostname",
+        "custom_endpoint.certificate_secret_id"
+    ],
+    "oci_blockchain_blockchain_platform": [
+        "display_name",
+        "description",
+        "platform_role",
+        "compute_shape",
+        "platform_version",
+        "idcs_access_token",
+        "is_byol",
+        "is_multi_ad",
+        "storage_size_in_tbs",
+        "total_ocpu_capacity",
+        "load_balancer_shape",
+        "replicas",
+        "replicas.ca_count",
+        "replicas.console_count",
+        "replicas.proxy_count"
+    ],
+    "oci_oda_oda_instance": [
+        "display_name",
+        "description",
+        "shape_name",
+        "is_role_based_access",
+        "identity_domain"
+    ],
+    "oci_dns_resolver": [
+        "display_name",
+        "scope",
+        "attached_vcn_id",
+        "default_view_id",
+        "attached_views",
+        "attached_views.view_id",
+        "rules",
+        "rules.action",
+        "rules.destination_addresses",
+        "rules.source_endpoint_name",
+        "rules.client_address_conditions",
+        "rules.qname_cover_conditions"
+    ],
+    "oci_vulnerability_scanning_host_scan_recipe": [
+        "display_name",
+        "agent_settings",
+        "agent_settings.scan_level",
+        "port_settings",
+        "port_settings.scan_level",
+        "schedule",
+        "schedule.type",
+        "schedule.day_of_week",
+        "application_settings",
+        "application_settings.is_enabled",
+        "application_settings.application_scan_recurrence"
+    ],
+    "oci_vulnerability_scanning_host_scan_target": [
+        "display_name",
+        "description",
+        "host_scan_recipe_id",
+        "target_compartment_id",
+        "instance_ids"
+    ],
+    "oci_ai_language_project": [
+        "display_name",
+        "description"
+    ],
+    "oci_ai_vision_project": [
+        "display_name",
+        "description"
+    ],
+    "oci_data_labeling_service_dataset": [
+        "display_name",
+        "description",
+        "annotation_format",
+        "labeling_instructions",
+        "dataset_format_details",
+        "dataset_format_details.format_type",
+        "dataset_source_details",
+        "dataset_source_details.source_type",
+        "dataset_source_details.namespace",
+        "dataset_source_details.bucket",
+        "dataset_source_details.prefix",
+        "label_set"
     ],
 }
