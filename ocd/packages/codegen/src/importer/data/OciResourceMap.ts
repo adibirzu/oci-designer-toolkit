@@ -284,7 +284,24 @@ export const resourceMap: OcdResourceMap = {
     "oci_email_dkim": "email_dkim",
     "oci_stack_monitoring_config": "stack_monitoring_config",
     "oci_database_key_store": "database_key_store",
-    "oci_disaster_recovery_dr_plan": "dr_plan"
+    "oci_disaster_recovery_dr_plan": "dr_plan",
+    // Batch 6 (196 -> 210): governance(Cloud Advisor/Service Catalog)/identity creds/
+    // LB sub-resources/WAF address list/API Gateway cert+usage-plan/Object Storage object/
+    // KMS key version/Fusion Apps/DevOps trigger/Database software image
+    "oci_optimizer_profile": "optimizer_profile",
+    "oci_service_catalog_service_catalog": "service_catalog",
+    "oci_identity_api_key": "identity_api_key",
+    "oci_identity_auth_token": "identity_auth_token",
+    "oci_load_balancer_rule_set": "load_balancer_rule_set",
+    "oci_load_balancer_hostname": "load_balancer_hostname",
+    "oci_waf_network_address_list": "waf_network_address_list",
+    "oci_apigateway_certificate": "apigateway_certificate",
+    "oci_apigateway_usage_plan": "apigateway_usage_plan",
+    "oci_objectstorage_object": "objectstorage_object",
+    "oci_kms_key_version": "kms_key_version",
+    "oci_fusion_apps_fusion_environment": "fusion_environment",
+    "oci_devops_trigger": "devops_trigger",
+    "oci_database_database_software_image": "database_software_image"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -2570,5 +2587,163 @@ export const resourceAttributes: OcdIncludedElements = {
         "display_name",
         "type",
         "dr_protection_group_id"
+    ],
+    "oci_optimizer_profile": [
+        "name",
+        "description",
+        "aggregation_interval_in_days",
+        "levels_configuration",
+        "levels_configuration.items",
+        "levels_configuration.items.level",
+        "levels_configuration.items.recommendation_id",
+        "target_compartments",
+        "target_compartments.items",
+        "target_tags",
+        "target_tags.items",
+        "target_tags.items.tag_definition_name",
+        "target_tags.items.tag_namespace_name",
+        "target_tags.items.tag_value_type",
+        "target_tags.items.tag_values"
+    ],
+    "oci_service_catalog_service_catalog": [
+        "display_name"
+    ],
+    "oci_identity_api_key": [
+        "user_id",
+        "key_value"
+    ],
+    "oci_identity_auth_token": [
+        "user_id",
+        "description"
+    ],
+    "oci_load_balancer_rule_set": [
+        "name",
+        "load_balancer_id",
+        "items",
+        "items.action",
+        "items.allowed_methods",
+        "items.description",
+        "items.header",
+        "items.prefix",
+        "items.suffix",
+        "items.value",
+        "items.response_code",
+        "items.status_code",
+        "items.conditions",
+        "items.conditions.attribute_name",
+        "items.conditions.attribute_value",
+        "items.conditions.operator",
+        "items.redirect_uri",
+        "items.redirect_uri.host",
+        "items.redirect_uri.path",
+        "items.redirect_uri.port",
+        "items.redirect_uri.protocol",
+        "items.redirect_uri.query"
+    ],
+    "oci_load_balancer_hostname": [
+        "name",
+        "hostname",
+        "load_balancer_id"
+    ],
+    "oci_waf_network_address_list": [
+        "display_name",
+        "type",
+        "addresses",
+        "vcn_addresses",
+        "vcn_addresses.addresses",
+        "vcn_addresses.vcn_id"
+    ],
+    "oci_apigateway_certificate": [
+        "display_name",
+        "subject_names"
+    ],
+    "oci_apigateway_usage_plan": [
+        "display_name",
+        "entitlements",
+        "entitlements.name",
+        "entitlements.description",
+        "entitlements.quota",
+        "entitlements.quota.operation_on_breach",
+        "entitlements.quota.reset_policy",
+        "entitlements.quota.unit",
+        "entitlements.quota.value",
+        "entitlements.rate_limit",
+        "entitlements.rate_limit.unit",
+        "entitlements.rate_limit.value",
+        "entitlements.targets",
+        "entitlements.targets.deployment_id"
+    ],
+    "oci_objectstorage_object": [
+        "bucket",
+        "namespace",
+        "object",
+        "content_type",
+        "content_encoding",
+        "content_language",
+        "content_disposition",
+        "cache_control",
+        "storage_tier",
+        "metadata",
+        "opc_sse_kms_key_id",
+        "source"
+    ],
+    "oci_kms_key_version": [
+        "key_id",
+        "vault_id",
+        "management_endpoint",
+        "is_primary",
+        "is_auto_rotated",
+        "public_key"
+    ],
+    "oci_fusion_apps_fusion_environment": [
+        "display_name",
+        "dns_prefix",
+        "fusion_environment_family_id",
+        "fusion_environment_type",
+        "kms_key_id",
+        "lockbox_id",
+        "subscription_ids",
+        "additional_language_packs",
+        "is_break_glass_enabled",
+        "create_fusion_environment_admin_user_details",
+        "create_fusion_environment_admin_user_details.email_address",
+        "create_fusion_environment_admin_user_details.first_name",
+        "create_fusion_environment_admin_user_details.last_name",
+        "create_fusion_environment_admin_user_details.username",
+        "maintenance_policy",
+        "maintenance_policy.environment_maintenance_override",
+        "maintenance_policy.monthly_patching_override",
+        "rules",
+        "rules.action",
+        "rules.description",
+        "rules.conditions",
+        "rules.conditions.attribute_name",
+        "rules.conditions.attribute_value"
+    ],
+    "oci_devops_trigger": [
+        "display_name",
+        "description",
+        "project_id",
+        "connection_id",
+        "repository_id",
+        "trigger_source",
+        "actions",
+        "actions.build_pipeline_id",
+        "actions.type",
+        "actions.filter",
+        "actions.filter.events",
+        "actions.filter.trigger_source",
+        "actions.filter.include",
+        "actions.filter.exclude"
+    ],
+    "oci_database_database_software_image": [
+        "display_name",
+        "database_version",
+        "image_shape_family",
+        "image_type",
+        "patch_set",
+        "source_db_home_id",
+        "database_software_image_included_patches",
+        "database_software_image_one_off_patches"
     ]
 }
