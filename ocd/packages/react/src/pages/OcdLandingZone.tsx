@@ -41,6 +41,8 @@ import { WizardProvider, useWizard } from '../landingzone/OcdLzWizardContext'
 import { downloadTar, downloadTextFile } from '../landingzone/OcdLzDownloads'
 import { GeneratedFile, generateLandingZone } from '../landingzone/OcdLzGenerator'
 import { buildOcdDesignFromLz } from '../landingzone/OcdLzToModel'
+import { reconcileLzScaffold } from '../landingzone/OcdLzScaffold'
+import { LZ_SCAFFOLD_ENABLED_KEY } from '../landingzone/OcdLzReconcile'
 import {
     DEFAULT_CONFIG,
     LandingZoneConfig,
@@ -82,12 +84,13 @@ function friendlyError(message: string): string {
 
 interface WizardBodyProps {
     onExit: () => void
-    onOpenInDesigner: (title: string, files: GeneratedFile[]) => void
+    onOpenInDesigner: (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean) => void
 }
 
 function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element {
     const { data, reset, setField } = useWizard()
     const [config, setConfig] = useState<LandingZoneConfig>(() => upgradeConfig(data.config ?? data.step1))
+    const [scaffoldEnabled, setScaffoldEnabled] = useState<boolean>(() => Boolean(data.scaffoldEnabled))
     const [title, setTitle] = useState<string>(() => (typeof data.title === 'string' && data.title ? data.title : DEFAULT_TITLE))
     const [editingTitle, setEditingTitle] = useState(false)
     const [layout, setLayout] = useState<LzngLayout>('split')
@@ -111,7 +114,15 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         // explicit, user-visible action: re-commit config + title and confirm.
         setField('config', config)
         setField('title', title)
+        setField('scaffoldEnabled', scaffoldEnabled)
         setNotice({ kind: 'info', text: 'Draft saved.' })
+    }
+
+    function toggleScaffold(): void {
+        const next = !scaffoldEnabled
+        setScaffoldEnabled(next)
+        // Persist immediately so the tick survives draft saves / reloads.
+        setField('scaffoldEnabled', next)
     }
 
     function commitConfig(next: LandingZoneConfig): void {
@@ -132,6 +143,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         if (!window.confirm('Reset the wizard back to defaults?')) return
         reset()
         setConfig(normalizeConfig(DEFAULT_CONFIG))
+        setScaffoldEnabled(false)
         setTitle(DEFAULT_TITLE)
         setActiveStep(0)
         setNotice(null)
@@ -199,7 +211,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                         config={config}
                         title={title}
                         onError={(message) => setNotice({ kind: 'error', text: friendlyError(message) })}
-                        onOpenInDesigner={(files) => onOpenInDesigner(title, files)}
+                        onOpenInDesigner={(files) => onOpenInDesigner(title, files, config, scaffoldEnabled)}
                     />
                 )
         }
@@ -242,6 +254,15 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                         </p>
                     </div>
                     <div className='ocd-lzng-titlerow-actions'>
+                        <label className='ocd-lzng-scaffold-toggle' title='When ticked, opening in the Designer builds a Realm > Region > AD > FD scaffold and keeps it in sync (idempotent reconcile).'>
+                            <input
+                                type='checkbox'
+                                checked={scaffoldEnabled}
+                                onChange={toggleScaffold}
+                            />
+                            <span>Realm/AD/FD scaffold</span>
+                        </label>
+                        <span className='ocd-lzng-action-sep' aria-hidden />
                         <button type='button' className='ocd-lzng-btn ocd-lzng-btn-primary' onClick={saveDraft}>
                             Save draft
                         </button>
@@ -336,9 +357,13 @@ const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdC
     const onExit = () => switchToDesigner()
 
     // Translate the generated OE files into an editable OCD design, set it as the
-    // active document, and switch the console to the Designer page.
-    const onOpenInDesigner = (title: string, files: GeneratedFile[]): void => {
-        const { design, topCompartmentIds } = buildOcdDesignFromLz(files, title)
+    // active document, and switch the console to the Designer page. The wizard
+    // config is persisted into the design (design.userDefined.lzConfig) so the
+    // idempotent scaffold reconcile has a source of truth that survives saves.
+    const onOpenInDesigner = (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean): void => {
+        const { design, topCompartmentIds } = buildOcdDesignFromLz(files, title, config)
+        // Record the wizard 'Generate Realm/AD/FD scaffold' tick on the design.
+        design.userDefined[LZ_SCAFFOLD_ENABLED_KEY] = scaffoldEnabled
         const document = OcdDocument.new()
         document.design = design
         // Add one layer per top-level compartment (first selected), mirroring the
@@ -346,6 +371,11 @@ const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdC
         const layerIds = topCompartmentIds.length > 0 ? topCompartmentIds : [design.model.oci.resources.compartment?.[0]?.id].filter(Boolean)
         layerIds.forEach((id: string, index: number) => document.addLayer(id, index === 0))
         document.autoLayout(document.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle)
+        // Materialise the Realm > Region > AD > FD scaffold when the wizard tick
+        // is on. reconcileLzScaffold is a pure, idempotent no-op otherwise.
+        if (scaffoldEnabled) {
+            document.design = reconcileLzScaffold(document.design)
+        }
         setOcdDocument(document)
         switchToDesigner()
     }

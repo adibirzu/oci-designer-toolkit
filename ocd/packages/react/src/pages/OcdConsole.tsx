@@ -33,6 +33,8 @@ import { OcdActiveFileContext, OcdConsoleConfigContext, OcdDialogContext, OcdDoc
 // import { OcdActiveFileContext, OcdCacheContext, OcdConsoleConfigContext, OcdDialogContext, OcdDocumentContext, OcdDragResourceContext, OcdSelectedResourceContext } from './OcdConsoleContext'
 import { OcdExportToResourceManagerDialog } from '../components/dialogs/OcdExportToResourceManagerDialog'
 import { ocdThemes } from '../data/OcdThemes'
+import { canReconcile, isReconcileEnabled, reconcileOnEdit, LZ_RECONCILE_ENABLED_KEY } from '../landingzone/OcdLzReconcile'
+import { reconcileLzScaffold } from '../landingzone/OcdLzScaffold'
 // Context Providers
 import { CacheProvider, useCache, useCacheDispatch } from '../contexts/OcdCacheContext'
 import { defaultTheme, ThemeProvider, useThemeDispatch } from '../contexts/OcdThemeContext'
@@ -48,11 +50,21 @@ export const DialogContext = createContext<OcdDialogContext>({displayDialog: '',
 
 export const OcdConsole = (): JSX.Element => {
     // State Variables
-    const [ocdDocument, setOcdDocument] = useState(OcdDocument.new())
+    const [ocdDocument, setOcdDocumentState] = useState(OcdDocument.new())
     const [ocdConsoleConfig, setOcdConsoleConfig] = useState(OcdConsoleConfig.new())
     // const [ocdCache, setOcdCache] = useState(OcdCacheData.new())
     const [activeFile, setActiveFile] = useState({name: '', modified: false})
     const [selectedResource, setSelectedResource] = useState({} as OcdSelectedResource)
+    // Reconcile-on-edit funnel: every edit flows through setOcdDocument. When both
+    // the wizard 'Realm/AD/FD scaffold' tick and the designer 'LZ live reconcile'
+    // tick are on, re-apply the idempotent scaffold. reconcileOnEdit returns the
+    // SAME design reference when not applicable (non-LZ, ticks off) or when nothing
+    // changed, so this never loops and is a no-op for ordinary designs.
+    const setOcdDocument = (document: OcdDocument): void => {
+        const reconciled = reconcileOnEdit(document.design)
+        if (reconciled !== document.design) document.design = reconciled
+        setOcdDocumentState(document)
+    }
     // Context
     // Memo Hooks
     const activeFileContext = useMemo(() => ({activeFile, setActiveFile}), [activeFile])
@@ -205,6 +217,21 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         ocdConsoleConfig.config.displayPage = 'landingzone'
         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
     }
+    // Designer 'LZ live reconcile' tick: records that edits should re-apply the
+    // Realm/AD/FD scaffold. Only meaningful together with the wizard scaffold tick.
+    const onReconcileToggle = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design.userDefined[LZ_RECONCILE_ENABLED_KEY] = !isReconcileEnabled(ocdDocument.design)
+        setOcdDocument(document)
+    }
+    // One-shot: re-apply the scaffold now without enabling live mode (idempotent).
+    const onReapplyScaffold = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design = reconcileLzScaffold(document.design)
+        setOcdDocument(document)
+    }
+    const showReconcile = canReconcile(ocdDocument.design)
+    const reconcileOn = isReconcileEnabled(ocdDocument.design)
     let PageLeftToolbar = OcdEmptyLeftRightToolbar
     let PageRightToolbar = OcdEmptyLeftRightToolbar
     switch (ocdConsoleConfig.config.displayPage) {
@@ -259,6 +286,11 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                         />
                     <div className={validateClassName} title={validateTitle} onClick={onValidateClick} aria-hidden></div>
                     <div className='landing-zone ocd-console-toolbar-icon' title='Landing Zone Wizard' onClick={onLandingZoneClick} aria-hidden></div>
+                    {showReconcile && <label className={`ocd-lz-reconcile-toggle ${reconcileOn ? 'on' : ''}`} title='LZ live reconcile: when on (with the wizard scaffold tick), edits re-apply the Realm/AD/FD scaffold idempotently.'>
+                        <input type='checkbox' checked={reconcileOn} onChange={onReconcileToggle} />
+                        <span>LZ sync</span>
+                    </label>}
+                    {showReconcile && <div className='ocd-lz-reapply ocd-console-toolbar-icon' title='Re-apply the Realm/AD/FD scaffold now (idempotent)' onClick={onReapplyScaffold} aria-hidden></div>}
                     <div className='cost-estimate ocd-console-toolbar-icon' title='BoM and Cost Estimate' onClick={onEstimateClick} aria-hidden></div>
                 </div>
             </div>
