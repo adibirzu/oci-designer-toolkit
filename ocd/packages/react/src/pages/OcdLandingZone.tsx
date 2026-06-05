@@ -43,6 +43,7 @@ import { GeneratedFile, generateLandingZone } from '../landingzone/OcdLzGenerato
 import { buildOcdDesignFromLz } from '../landingzone/OcdLzToModel'
 import { reconcileLzScaffold } from '../landingzone/OcdLzScaffold'
 import { LZ_SCAFFOLD_ENABLED_KEY } from '../landingzone/OcdLzReconcile'
+import { applyObservabilityOverlay, LZ_OBSERVABILITY_ENABLED_KEY } from '../landingzone/OcdLzObservability'
 import {
     DEFAULT_CONFIG,
     LandingZoneConfig,
@@ -84,13 +85,14 @@ function friendlyError(message: string): string {
 
 interface WizardBodyProps {
     onExit: () => void
-    onOpenInDesigner: (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean) => void
+    onOpenInDesigner: (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean, observabilityEnabled: boolean) => void
 }
 
 function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element {
     const { data, reset, setField } = useWizard()
     const [config, setConfig] = useState<LandingZoneConfig>(() => upgradeConfig(data.config ?? data.step1))
     const [scaffoldEnabled, setScaffoldEnabled] = useState<boolean>(() => Boolean(data.scaffoldEnabled))
+    const [observabilityEnabled, setObservabilityEnabled] = useState<boolean>(() => Boolean(data.observabilityEnabled))
     const [title, setTitle] = useState<string>(() => (typeof data.title === 'string' && data.title ? data.title : DEFAULT_TITLE))
     const [editingTitle, setEditingTitle] = useState(false)
     const [layout, setLayout] = useState<LzngLayout>('split')
@@ -115,6 +117,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         setField('config', config)
         setField('title', title)
         setField('scaffoldEnabled', scaffoldEnabled)
+        setField('observabilityEnabled', observabilityEnabled)
         setNotice({ kind: 'info', text: 'Draft saved.' })
     }
 
@@ -123,6 +126,12 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         setScaffoldEnabled(next)
         // Persist immediately so the tick survives draft saves / reloads.
         setField('scaffoldEnabled', next)
+    }
+
+    function toggleObservability(): void {
+        const next = !observabilityEnabled
+        setObservabilityEnabled(next)
+        setField('observabilityEnabled', next)
     }
 
     function commitConfig(next: LandingZoneConfig): void {
@@ -144,6 +153,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         reset()
         setConfig(normalizeConfig(DEFAULT_CONFIG))
         setScaffoldEnabled(false)
+        setObservabilityEnabled(false)
         setTitle(DEFAULT_TITLE)
         setActiveStep(0)
         setNotice(null)
@@ -211,7 +221,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                         config={config}
                         title={title}
                         onError={(message) => setNotice({ kind: 'error', text: friendlyError(message) })}
-                        onOpenInDesigner={(files) => onOpenInDesigner(title, files, config, scaffoldEnabled)}
+                        onOpenInDesigner={(files) => onOpenInDesigner(title, files, config, scaffoldEnabled, observabilityEnabled)}
                     />
                 )
         }
@@ -261,6 +271,14 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                                 onChange={toggleScaffold}
                             />
                             <span>Realm/AD/FD scaffold</span>
+                        </label>
+                        <label className='ocd-lzng-scaffold-toggle' title='When ticked, opening in the Designer adds a Database Observability topology (DBM + OPSI private endpoints, Database Insight, Management Agent).'>
+                            <input
+                                type='checkbox'
+                                checked={observabilityEnabled}
+                                onChange={toggleObservability}
+                            />
+                            <span>DB Observability</span>
                         </label>
                         <span className='ocd-lzng-action-sep' aria-hidden />
                         <button type='button' className='ocd-lzng-btn ocd-lzng-btn-primary' onClick={saveDraft}>
@@ -360,10 +378,12 @@ const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdC
     // active document, and switch the console to the Designer page. The wizard
     // config is persisted into the design (design.userDefined.lzConfig) so the
     // idempotent scaffold reconcile has a source of truth that survives saves.
-    const onOpenInDesigner = (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean): void => {
+    const onOpenInDesigner = (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean, observabilityEnabled: boolean): void => {
         const { design, topCompartmentIds } = buildOcdDesignFromLz(files, title, config)
-        // Record the wizard 'Generate Realm/AD/FD scaffold' tick on the design.
+        // Record the wizard ticks on the design so the designer-side toggles and
+        // idempotent overlays know they apply.
         design.userDefined[LZ_SCAFFOLD_ENABLED_KEY] = scaffoldEnabled
+        design.userDefined[LZ_OBSERVABILITY_ENABLED_KEY] = observabilityEnabled
         const document = OcdDocument.new()
         document.design = design
         // Add one layer per top-level compartment (first selected), mirroring the
@@ -375,6 +395,11 @@ const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdC
         // is on. reconcileLzScaffold is a pure, idempotent no-op otherwise.
         if (scaffoldEnabled) {
             document.design = reconcileLzScaffold(document.design)
+        }
+        // Materialise the Database Observability topology (DBM + OPSI). Pure,
+        // idempotent no-op when the tick is off.
+        if (observabilityEnabled) {
+            document.design = applyObservabilityOverlay(document.design)
         }
         setOcdDocument(document)
         switchToDesigner()
