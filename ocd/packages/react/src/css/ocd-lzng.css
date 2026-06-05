@@ -1587,3 +1587,25 @@
 .oci-region > rect, rect.oci-region { fill: rgba(199, 70, 52, 0.05); stroke: var(--oracle-red-dark, #A63D2E); }
 .ocd-ad     > rect, rect.ocd-ad     { fill: rgba(46, 125, 50, 0.05); stroke: var(--oracle-success, #2e7d32); }
 .ocd-fd     > rect, rect.ocd-fd     { fill: rgba(92, 92, 92, 0.06); stroke: var(--oracle-text-muted, #5C5C5C); }
+
+/* Designer toolbar 'Add Realm/Region/AD/FD frames' action. */
+.ocd-add-frames {
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 4px;
+    border: 1px solid var(--oracle-border, #E0E0E0);
+    background: var(--oracle-bg, #F5F5F5);
+    position: relative;
+    cursor: pointer;
+}
+.ocd-add-frames::after {
+    content: '\229E'; /* squared plus — "add frames" */
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--oracle-red, #C74634);
+    font-size: 1rem;
+}
+.ocd-add-frames:hover { background: var(--oracle-white, #FFF); }

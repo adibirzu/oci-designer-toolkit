@@ -10,6 +10,7 @@ import { buildOcdDesignFromLz, LZ_CONFIG_KEY } from '../OcdLzToModel'
 import {
     findScaffoldContainer,
     reconcileLzScaffold,
+    addRealmAdFdFrames,
     scaffoldKey,
     ScaffoldMarker,
 } from '../OcdLzScaffold'
@@ -215,6 +216,19 @@ describe('OcdLzScaffold — idempotency and purity', () => {
         delete design.userDefined[LZ_CONFIG_KEY]
 
         expect(reconcileLzScaffold(design)).toBe(design)
+    })
+
+    it('addRealmAdFdFrames builds frames on ANY design (no LZ origin needed)', () => {
+        const plain = OcdDesign.newDesign()
+        const result = addRealmAdFdFrames(plain, 'us-ashburn-1') // 3-AD region
+
+        const counts = countByTier(result)
+        expect(counts.realm).toBe(1)
+        expect(counts.region).toBe(1)
+        expect(counts.ad).toBe(3)
+        expect(counts.fd).toBe(9)
+        // Idempotent: re-applying yields the same structure.
+        expect(JSON.stringify(addRealmAdFdFrames(result, 'us-ashburn-1'))).toBe(JSON.stringify(result))
     })
 })
 
