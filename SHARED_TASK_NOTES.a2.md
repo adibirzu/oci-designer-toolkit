@@ -8,7 +8,7 @@ ocd/packages/codegen/src/importer/data/OciResourceMap.ts.
 ## Hard rules (learned)
 - A curated attribute leaf named `resources`/`resource`/`results` collides with the
   generator's reserved param -> TS2349 in the model validator. Drop such attributes.
-- Verify with the STRICT model build: `npm run build --workspace=packages/model`.
+- A curated attr 'home_region' -> homeRegion collides with base OciTerraformResource (TS2416 in export); drop it. Verify the FULL build (model+export+import+react), not just model.
 - Do NOT run the full `npm run build` (the appdmg DMG maker won't compile on Node 26).
 
 ## Progress
