@@ -73,9 +73,9 @@ for ((i = 1; i <= MAX_RUNS; i++)); do
   # codegen via Bash, or every edit is blocked. acceptEdits auto-applies edits;
   # allowedTools grants the tools the curation needs. (Global rule: configure
   # allowedTools, never --dangerously-skip-permissions.)
-  OUT=$(claude -p --permission-mode acceptEdits \
-    --allowedTools "Read,Edit,Write,Glob,Grep,Bash" \
-    "You are curating OCI services into the OKIT catalog (A2). Read $NOTES
+  # Build the prompt, then pass it via STDIN (robust for multi-line prompts with
+  # --print; avoids positional-arg parsing breaking when flags are present).
+  PROMPT="You are curating OCI services into the OKIT catalog (A2). Read $NOTES
 for rules and progress. Add the NEXT $BATCH high-value OCI services that are NOT
 already present in ocd/packages/codegen/src/importer/data/OciResourceMap.ts:
 add a resourceMap entry + curated resourceAttributes (the key user-set fields +
@@ -84,7 +84,9 @@ Then regenerate via 'cd ocd && npm run compile-for-codegen && npm run
 import-and-generate-oci --workspace=packages/codegen-cli'. Update the Progress
 section of $NOTES with the services you added and the new resource count. Do NOT
 commit, do NOT run the full 'npm run build', do NOT npm install. If no further
-high-value services remain to curate, output the exact token ${COMPLETION_SIGNAL}.")
+high-value services remain to curate, output the exact token ${COMPLETION_SIGNAL}."
+  OUT=$(printf '%s' "$PROMPT" | claude -p --permission-mode acceptEdits \
+    --allowedTools "Read,Edit,Write,Glob,Grep,Bash")
 
   echo "$OUT" | tail -20
 
