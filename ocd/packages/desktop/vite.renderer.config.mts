@@ -1,8 +1,25 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path'
+
+// Build @ocd/react from its TypeScript SOURCE (not the prebuilt dist), exactly as
+// the static web build (vite.web.config.mts) does. This guarantees the Electron
+// desktop renderer and the web build ship the SAME features (no stale-dist lag —
+// source edits land in both without rebuilding the @ocd/react workspace) and the
+// esbuild JSX settings are required because the source contains .tsx.
+const ocdReactSrc = resolve(__dirname, '../react/src/index.ts')
 
 // https://vitejs.dev/config
 export default defineConfig({
   assetsInclude: ['**/*.wasm'],
+  resolve: {
+    alias: {
+      '@ocd/react': ocdReactSrc,
+    },
+  },
+  esbuild: {
+    jsx: 'automatic',
+    jsxImportSource: 'react',
+  },
   build: {
     target: 'esnext'
   },
