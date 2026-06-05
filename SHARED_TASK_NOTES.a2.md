@@ -103,6 +103,46 @@ ocd/packages/codegen/src/importer/data/OciResourceMap.ts.
   (model+export+import+react) clean: exit 0, 0 TS errors, no TS2416/TS2349.
   Active resourceMap entries: 196.
 
+- Iteration 6 (catalog 196 -> 210): added 14 high-value services across
+  governance(Cloud Advisor/Service Catalog)/identity creds/LB sub-resources/
+  WAF/API Gateway/Object Storage/KMS/Fusion Apps/DevOps/Database:
+  optimizer_profile (oci_optimizer_profile),
+  service_catalog (oci_service_catalog_service_catalog),
+  identity_api_key (oci_identity_api_key),
+  identity_auth_token (oci_identity_auth_token),
+  load_balancer_rule_set (oci_load_balancer_rule_set),
+  load_balancer_hostname (oci_load_balancer_hostname),
+  waf_network_address_list (oci_waf_network_address_list),
+  apigateway_certificate (oci_apigateway_certificate),
+  apigateway_usage_plan (oci_apigateway_usage_plan),
+  objectstorage_object (oci_objectstorage_object),
+  kms_key_version (oci_kms_key_version),
+  fusion_environment (oci_fusion_apps_fusion_environment),
+  devops_trigger (oci_devops_trigger),
+  database_software_image (oci_database_database_software_image).
+  Notes:
+  * Dropped oci_resourcemanager_stack — it is data-source-only in the vendored
+    tf-schema.json (not in resource_schemas), so the generator skips it;
+    substituted database_software_image (present, count 2). Dropped
+    oci_mysql_configuration candidate (count 0).
+  * Secret hygiene: dropped identity_auth_token `token` (generated secret) and
+    apigateway_certificate `private_key`/`certificate`/`intermediate_certificates`
+    (cert material) and fusion admin-user `password`; kept identity_api_key
+    `key_value` (public PEM, not secret).
+  * objectstorage_object: dropped the `source_uri_details` block — its nested
+    `object` leaf generated a converter `sourceUriDetailsObject` that collided
+    (TS2300/TS2717/TS2451) with the block's own generated symbol in export/import/
+    react. Flat `object`/`bucket`/`namespace`/content-* fields kept and clean.
+  * Build-cache gotcha: a top-level attribute literally named `object` is fine,
+    BUT after deleting+regenerating the wrapper+generated files, incremental
+    `tsc` (stale .tsbuildinfo) failed to re-emit the ESM `generated/*.d.ts` and
+    the export ESM barrel entry, surfacing as bogus "not assignable to
+    OciResource" / "Could not resolve OciObjectstorageObject.js". Fix: delete
+    each package's `*.tsbuildinfo` + `lib/` and rebuild clean. If a future batch
+    deletes/regenerates resource files, nuke incremental caches before verifying.
+  Regenerated OCI codegen; FULL build (model+export+import+react) clean: exit 0,
+  0 TS errors, no TS2416/TS2349/TS2300. Active resourceMap entries: 210.
+
 ## Next
 - Pick services NOT already in OciResourceMap.ts; curate ~14/batch.
 - Before curating: confirm each candidate exists in
