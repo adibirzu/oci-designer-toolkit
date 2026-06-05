@@ -301,7 +301,21 @@ export const resourceMap: OcdResourceMap = {
     "oci_kms_key_version": "kms_key_version",
     "oci_fusion_apps_fusion_environment": "fusion_environment",
     "oci_devops_trigger": "devops_trigger",
-    "oci_database_database_software_image": "database_software_image"
+    "oci_database_database_software_image": "database_software_image",
+    "oci_containerengine_virtual_node_pool": "virtual_node_pool",
+    "oci_containerengine_addon": "containerengine_addon",
+    "oci_core_boot_volume_backup": "boot_volume_backup",
+    "oci_file_storage_replication": "file_storage_replication",
+    "oci_file_storage_filesystem_snapshot_policy": "filesystem_snapshot_policy",
+    "oci_mysql_heat_wave_cluster": "mysql_heat_wave_cluster",
+    "oci_ons_subscription": "ons_subscription",
+    "oci_budget_alert_rule": "budget_alert_rule",
+    "oci_datacatalog_data_asset": "datacatalog_data_asset",
+    "oci_dns_resolver_endpoint": "dns_resolver_endpoint",
+    "oci_waas_waas_policy": "waas_policy",
+    "oci_ai_language_endpoint": "ai_language_endpoint",
+    "oci_certificates_management_ca_bundle": "certificates_ca_bundle",
+    "oci_nosql_table_replica": "nosql_table_replica"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -2745,5 +2759,94 @@ export const resourceAttributes: OcdIncludedElements = {
         "source_db_home_id",
         "database_software_image_included_patches",
         "database_software_image_one_off_patches"
+    ],
+    "oci_containerengine_virtual_node_pool": [
+        "display_name",
+        "cluster_id",
+        "size",
+        "nsg_ids"
+    ],
+    "oci_containerengine_addon": [
+        "addon_name",
+        "cluster_id",
+        "version",
+        "remove_addon_resources_on_delete"
+    ],
+    "oci_core_boot_volume_backup": [
+        "display_name",
+        "boot_volume_id",
+        "type",
+        "kms_key_id"
+    ],
+    "oci_file_storage_replication": [
+        "display_name",
+        "source_id",
+        "target_id",
+        "replication_interval"
+    ],
+    "oci_file_storage_filesystem_snapshot_policy": [
+        "display_name",
+        "availability_domain",
+        "policy_prefix"
+    ],
+    "oci_mysql_heat_wave_cluster": [
+        "db_system_id",
+        "shape_name",
+        "cluster_size",
+        "is_lakehouse_enabled"
+    ],
+    "oci_ons_subscription": [
+        "topic_id",
+        "protocol",
+        "endpoint"
+    ],
+    "oci_budget_alert_rule": [
+        "display_name",
+        "description",
+        "budget_id",
+        "type",
+        "threshold",
+        "threshold_type",
+        "message",
+        "recipients"
+    ],
+    "oci_datacatalog_data_asset": [
+        "display_name",
+        "description",
+        "catalog_id",
+        "type_key"
+    ],
+    "oci_dns_resolver_endpoint": [
+        "name",
+        "resolver_id",
+        "subnet_id",
+        "endpoint_type",
+        "is_forwarding",
+        "is_listening",
+        "forwarding_address",
+        "listening_address",
+        "nsg_ids",
+        "scope"
+    ],
+    "oci_waas_waas_policy": [
+        "display_name",
+        "domain",
+        "additional_domains"
+    ],
+    "oci_ai_language_endpoint": [
+        "display_name",
+        "description",
+        "model_id",
+        "inference_units"
+    ],
+    "oci_certificates_management_ca_bundle": [
+        "name",
+        "description",
+        "ca_bundle_pem"
+    ],
+    "oci_nosql_table_replica": [
+        "table_name_or_id",
+        "max_read_units",
+        "max_write_units"
     ]
 }

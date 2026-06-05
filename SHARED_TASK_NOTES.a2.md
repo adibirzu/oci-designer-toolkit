@@ -143,6 +143,38 @@ ocd/packages/codegen/src/importer/data/OciResourceMap.ts.
   Regenerated OCI codegen; FULL build (model+export+import+react) clean: exit 0,
   0 TS errors, no TS2416/TS2349/TS2300. Active resourceMap entries: 210.
 
+- Iteration 7 (catalog 210 -> 224): added 14 high-value services across
+  OKE/storage(boot-volume,FSS)/database(MySQL HeatWave,NoSQL)/notifications/
+  governance(budget)/datacatalog/dns/security(WAAS,certificates)/AI:
+  virtual_node_pool (oci_containerengine_virtual_node_pool),
+  containerengine_addon (oci_containerengine_addon),
+  boot_volume_backup (oci_core_boot_volume_backup),
+  file_storage_replication (oci_file_storage_replication),
+  filesystem_snapshot_policy (oci_file_storage_filesystem_snapshot_policy),
+  mysql_heat_wave_cluster (oci_mysql_heat_wave_cluster),
+  ons_subscription (oci_ons_subscription),
+  budget_alert_rule (oci_budget_alert_rule),
+  datacatalog_data_asset (oci_datacatalog_data_asset),
+  dns_resolver_endpoint (oci_dns_resolver_endpoint),
+  waas_policy (oci_waas_waas_policy),
+  ai_language_endpoint (oci_ai_language_endpoint),
+  certificates_ca_bundle (oci_certificates_management_ca_bundle),
+  nosql_table_replica (oci_nosql_table_replica).
+  Notes:
+  * All 14 confirmed present in resource_schemas of the vendored tf-schema.json
+    before curation.
+  * Dropped `region` from nosql_table_replica — region->region collides with the
+    base OciResource.region property (same class of collision as the iter-4
+    virtual_circuit `region` drop). Curated lists also omit compartment_id/id/
+    tags per the existing "common" convention.
+  * Generator derives class names from the SHORT map value, not the TF type:
+    virtual_node_pool -> OciVirtualNodePool, filesystem_snapshot_policy ->
+    OciFilesystemSnapshotPolicy, certificates_ca_bundle -> OciCertificatesCaBundle.
+  * Kept certificates_ca_bundle `ca_bundle_pem` (public CA cert material, not a
+    secret); ons_subscription/budget_alert_rule have no secret inputs.
+  Regenerated OCI codegen; FULL build (model+export+import+react) clean: exit 0,
+  0 TS errors, no TS2416/TS2349/TS2300. Active resourceMap entries: 224.
+
 ## Next
 - Pick services NOT already in OciResourceMap.ts; curate ~14/batch.
 - Before curating: confirm each candidate exists in
