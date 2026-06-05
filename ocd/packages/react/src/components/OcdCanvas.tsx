@@ -14,6 +14,7 @@ import { ActiveFileContext, SelectedResourceContext } from '../pages/OcdConsole'
 import { OcdUtils } from '@ocd/core'
 import { OcdDragResource, OcdSelectedResource } from '../types/Console'
 import { isLzOriginDesign, resolveLzPlacement } from '../landingzone/OcdLzPlacement'
+import { connectResources } from './OcdConnect'
 
 export interface OcdContextMenu {
     show: boolean
@@ -235,6 +236,25 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
             console.info('OcdCanvas: SVG Drag End', ocdDocument.dragResource)
             const hasMoved = coordinates.x !== 0 || coordinates.y !== 0
             setDragging(false)
+            // Drag-to-connect: when a connection target was recorded (connect mode),
+            // wire the FK association instead of moving/re-parenting the resource.
+            const connectTarget = ocdDocument.dragResource.connectTarget
+            if (connectTarget) {
+                const sourceId = ocdDocument.dragResource.resource.ocid
+                const result = connectResources(ocdDocument.design, sourceId, connectTarget.ocid)
+                ocdDocument.dragResource = OcdDocument.newDragResource()
+                setCoordinates({ x: 0, y: 0 })
+                setGhostTranslate({ x: 0, y: 0 })
+                if (result.connected) {
+                    ocdDocument.design = result.design
+                    setOcdDocument(OcdDocument.clone(ocdDocument))
+                    if (!activeFile.modified) setActiveFile({ name: activeFile.name, modified: true })
+                } else {
+                    // Nothing to wire (incompatible types / self) — just redraw to clear the drag.
+                    setOcdDocument(OcdDocument.clone(ocdDocument))
+                }
+                return
+            }
             // Test if container dropped on self
             if (ocdDocument.dragResource.parent && ocdDocument.dragResource.resource.id === ocdDocument.dragResource.parent.id) {
                 delete ocdDocument.dragResource.parent

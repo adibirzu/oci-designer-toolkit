@@ -453,6 +453,15 @@ export const OcdResourceSvg = ({ ocdConsoleConfig, ocdDocument, setOcdDocument, 
         e.preventDefault()
         console.info('OcdResourceSvg: Resource Mouse Up', resource.ocid, e.clientX, e.clientY)
         if (!contextMenu.show) {
+            // Drag-to-connect: in connect mode, dropping the dragged resource onto
+            // any other resource records it as the connection target (wired on drag
+            // end). Default reparenting is unchanged when connect mode is off.
+            if (ocdConsoleConfig.config.connectMode) {
+                if (resource.id !== ocdDocument.dragResource.resource.id) {
+                    ocdDocument.dragResource.connectTarget = resource
+                }
+                return
+            }
             if (resource.container) {
                 const childCoordIds = ocdDocument.getChildCoords([ocdDocument.dragResource.resource]).map((c) => c.id)
                 if (resource.id !== ocdDocument.dragResource.resource.id && !childCoordIds.includes(resource.id) && !ocdDocument.dragResource.parent) {

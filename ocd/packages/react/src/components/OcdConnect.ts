@@ -1,0 +1,93 @@
+/*
+** Copyright (c) 2021, Andrew Hopkinson.
+** Licensed under the GNU GENERAL PUBLIC LICENSE v 3.0 as shown at https://www.gnu.org/licenses/.
+*/
+
+/*
+** Drag-to-connect helper. OCI resource associations are derived from foreign-key
+** fields (e.g. a Subnet's `vcnId` / `routeTableId`). "Connecting" entity A to
+** entity B therefore means setting the FK field on A that references B's type —
+** the association line then renders automatically (coords default
+** `showConnections = true`).
+**
+** Pure: connectResources returns a NEW design; the input is not mutated. The
+** field resolver is the only domain logic — it maps a target resource type
+** (snake_case, e.g. 'route_table') to the camelCase FK field on the source
+** ('routeTableId' scalar, or 'routeTableIds' array).
+*/
+
+import { OcdDesign } from '@ocd/model'
+
+/** snake_case -> camelCase ('route_table' -> 'routeTable'). */
+export function toCamel(snake: string): string {
+    return snake.replace(/_([a-z])/g, (_m, c: string) => c.toUpperCase())
+}
+
+interface ConnectionField {
+    field: string
+    multi: boolean
+}
+
+/**
+ * Resolve the FK field on `source` that references a resource of `targetType`.
+ * Prefers a scalar `<camelTarget>Id`, then an array `<camelTarget>Ids`. Returns
+ * undefined when the source has no field for that target type.
+ */
+export function resolveConnectionField(source: Record<string, unknown>, targetType: string): ConnectionField | undefined {
+    const camel = toCamel(targetType)
+    const scalar = `${camel}Id`
+    const multi = `${camel}Ids`
+    if (scalar in source) return { field: scalar, multi: false }
+    if (multi in source) return { field: multi, multi: true }
+    return undefined
+}
+
+function findResource(design: OcdDesign, modelId: string): { resource: Record<string, unknown>; type: string } | undefined {
+    const providers = ['oci', 'azure', 'google'] as const
+    for (const provider of providers) {
+        const resources = (design.model?.[provider]?.resources ?? {}) as Record<string, Record<string, unknown>[]>
+        for (const [type, list] of Object.entries(resources)) {
+            if (!Array.isArray(list)) continue
+            const resource = list.find((r) => r.id === modelId)
+            if (resource) return { resource, type }
+        }
+    }
+    return undefined
+}
+
+export interface ConnectResult {
+    design: OcdDesign
+    connected: boolean
+    field?: string
+    /** Reason a connection could not be made (when connected is false). */
+    reason?: string
+}
+
+/**
+ * Connect source -> target by setting the source's FK field for the target's
+ * type. Pure (clones the design). Returns connected=false (and the original
+ * design) when no FK field exists for that target type, or on self-connect.
+ */
+export function connectResources(design: OcdDesign, sourceModelId: string, targetModelId: string): ConnectResult {
+    if (sourceModelId === targetModelId) {
+        return { design, connected: false, reason: 'Cannot connect a resource to itself.' }
+    }
+    const next = JSON.parse(JSON.stringify(design)) as OcdDesign
+    const source = findResource(next, sourceModelId)
+    const target = findResource(next, targetModelId)
+    if (!source || !target) {
+        return { design, connected: false, reason: 'Source or target resource not found.' }
+    }
+    const connection = resolveConnectionField(source.resource, target.type)
+    if (!connection) {
+        return { design, connected: false, reason: `No connection: a ${source.type} has no ${toCamel(target.type)}Id field.` }
+    }
+    if (connection.multi) {
+        const current = Array.isArray(source.resource[connection.field]) ? (source.resource[connection.field] as string[]) : []
+        if (!current.includes(targetModelId)) current.push(targetModelId)
+        source.resource[connection.field] = current
+    } else {
+        source.resource[connection.field] = targetModelId
+    }
+    return { design: next, connected: true, field: connection.field }
+}
