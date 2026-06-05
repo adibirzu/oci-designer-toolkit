@@ -67,11 +67,14 @@
     "@ocd/export": ">=0.3.0",
     "@ocd/import": ">=0.3.0",
     "@ocd/model": ">=0.3.0",
-    "@ocd/query": ">=0.3.0",
     "@ocd/parser": ">=0.3.0",
+    "@ocd/query": ">=0.3.0",
     "@ocd/react": ">=0.3.0",
     "electron-squirrel-startup": "^1.0.1",
     "exceljs": "^4.4.0",
     "oci-sdk": "^2.69.0"
+  },
+  "optionalDependencies": {
+    "appdmg": "^0.6.6"
   }
 }
