@@ -120,3 +120,4 @@ firestore-debug.log*
 .firebase/
 
 # Build
+.a2-verify.log
