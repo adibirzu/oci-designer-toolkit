@@ -1609,3 +1609,28 @@
     font-size: 1rem;
 }
 .ocd-add-frames:hover { background: var(--oracle-white, #FFF); }
+
+/* Designer toolbar 'Connect mode' toggle (drag-to-connect). */
+.ocd-connect-mode {
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 4px;
+    border: 1px solid var(--oracle-border, #E0E0E0);
+    background: var(--oracle-bg, #F5F5F5);
+    position: relative;
+    cursor: pointer;
+}
+.ocd-connect-mode::after {
+    content: '\1F517'; /* link symbol */
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+}
+.ocd-connect-mode:hover { background: var(--oracle-white, #FFF); }
+.ocd-connect-mode.on {
+    background: var(--oracle-red, #C74634);
+    border-color: var(--oracle-red-dark, #A63D2E);
+}

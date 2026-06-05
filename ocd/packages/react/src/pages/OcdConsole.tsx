@@ -238,6 +238,13 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         setOcdDocument(document)
     }
     const onDesignerPage = ocdConsoleConfig.config.displayPage === 'designer'
+    // Drag-to-connect mode toggle. When on, dropping a resource on another wires
+    // their FK association instead of re-parenting.
+    const connectMode = Boolean(ocdConsoleConfig.config.connectMode)
+    const onConnectModeToggle = () => {
+        ocdConsoleConfig.config.connectMode = !connectMode
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
     const showReconcile = canReconcile(ocdDocument.design)
     const reconcileOn = isReconcileEnabled(ocdDocument.design)
     let PageLeftToolbar = OcdEmptyLeftRightToolbar
@@ -300,6 +307,7 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                     </label>}
                     {showReconcile && <div className='ocd-lz-reapply ocd-console-toolbar-icon' title='Re-apply the Realm/AD/FD scaffold now (idempotent)' onClick={onReapplyScaffold} aria-hidden></div>}
                     {onDesignerPage && <div className='ocd-add-frames ocd-console-toolbar-icon' title='Add Realm / Region / AD / FD frames to the canvas' onClick={onAddFramesClick} aria-hidden></div>}
+                    {onDesignerPage && <div className={`ocd-connect-mode ocd-console-toolbar-icon ${connectMode ? 'on' : ''}`} title='Connect mode: drag one resource onto another to wire their association' onClick={onConnectModeToggle} aria-hidden></div>}
                     <div className='cost-estimate ocd-console-toolbar-icon' title='BoM and Cost Estimate' onClick={onEstimateClick} aria-hidden></div>
                 </div>
             </div>

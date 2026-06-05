@@ -23,6 +23,8 @@ export interface OcdConsoleConfiguration {
     visibleProviderPalettes: string[]
     theme: string
     uuid?: string
+    /** Drag-to-connect mode: drop a resource on another to wire their FK association. */
+    connectMode?: boolean
 }
 
 export namespace OcdConsoleConfiguration {
