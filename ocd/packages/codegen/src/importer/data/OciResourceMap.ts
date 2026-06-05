@@ -251,7 +251,23 @@ export const resourceMap: OcdResourceMap = {
     "oci_dns_steering_policy": "dns_steering_policy",
     // Database — Autonomous Container DB + Backup
     "oci_database_autonomous_container_database": "autonomous_container_database",
-    "oci_database_backup": "database_backup"
+    "oci_database_backup": "database_backup",
+    // Batch 4 (168 -> 182): FastConnect, LB sub-resources, Exadata/VM clusters,
+    // DNS view, Email Delivery, DevOps deploy/connection, Data Safe assessment, AI model
+    "oci_core_virtual_circuit": "virtual_circuit",
+    "oci_core_cross_connect": "cross_connect",
+    "oci_core_cross_connect_group": "cross_connect_group",
+    "oci_load_balancer_certificate": "load_balancer_certificate",
+    "oci_load_balancer_path_route_set": "load_balancer_path_route_set",
+    "oci_database_vm_cluster": "vm_cluster",
+    "oci_database_autonomous_vm_cluster": "autonomous_vm_cluster",
+    "oci_database_exadata_infrastructure": "exadata_infrastructure",
+    "oci_dns_view": "dns_view",
+    "oci_email_sender": "email_sender",
+    "oci_devops_deployment": "devops_deployment",
+    "oci_devops_connection": "devops_connection",
+    "oci_data_safe_security_assessment": "data_safe_security_assessment",
+    "oci_ai_anomaly_detection_model": "ai_anomaly_detection_model"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -826,7 +842,6 @@ export const resourceAttributes: OcdIncludedElements = {
         "db_home.database.tde_wallet_password",
         "db_home.database.vault_id",
     ],
-    "oci_database_exadata_infrastructure": [],
     "oci_datascience_notebook_session": [
         "project_id",
         "notebook_session_url",
@@ -2283,5 +2298,150 @@ export const resourceAttributes: OcdIncludedElements = {
     "oci_database_backup": [
         "display_name",
         "database_id"
+    ],
+    "oci_core_virtual_circuit": [
+        "display_name",
+        "type",
+        "bandwidth_shape_name",
+        "customer_asn",
+        "customer_bgp_asn",
+        "gateway_id",
+        "ip_mtu",
+        "is_bfd_enabled",
+        "provider_service_id",
+        "routing_policy",
+        "cross_connect_mappings",
+        "cross_connect_mappings.cross_connect_or_cross_connect_group_id",
+        "cross_connect_mappings.customer_bgp_peering_ip",
+        "cross_connect_mappings.oracle_bgp_peering_ip",
+        "cross_connect_mappings.vlan",
+        "public_prefixes",
+        "public_prefixes.cidr_block"
+    ],
+    "oci_core_cross_connect": [
+        "display_name",
+        "cross_connect_group_id",
+        "customer_reference_name",
+        "location_name",
+        "port_speed_shape_name",
+        "far_cross_connect_or_cross_connect_group_id",
+        "near_cross_connect_or_cross_connect_group_id",
+        "macsec_properties",
+        "macsec_properties.encryption_cipher",
+        "macsec_properties.is_unprotected_traffic_allowed"
+    ],
+    "oci_core_cross_connect_group": [
+        "display_name",
+        "customer_reference_name",
+        "macsec_properties",
+        "macsec_properties.encryption_cipher",
+        "macsec_properties.is_unprotected_traffic_allowed"
+    ],
+    "oci_load_balancer_certificate": [
+        "certificate_name",
+        "load_balancer_id",
+        "ca_certificate",
+        "public_certificate"
+    ],
+    "oci_load_balancer_path_route_set": [
+        "name",
+        "load_balancer_id",
+        "path_routes",
+        "path_routes.backend_set_name",
+        "path_routes.path"
+    ],
+    "oci_database_vm_cluster": [
+        "display_name",
+        "exadata_infrastructure_id",
+        "vm_cluster_network_id",
+        "cpu_core_count",
+        "gi_version",
+        "license_model",
+        "memory_size_in_gbs",
+        "ssh_public_keys",
+        "is_local_backup_enabled",
+        "is_sparse_diskgroup_enabled",
+        "data_collection_options",
+        "data_collection_options.is_diagnostics_events_enabled",
+        "data_collection_options.is_health_monitoring_enabled",
+        "data_collection_options.is_incident_logs_enabled"
+    ],
+    "oci_database_autonomous_vm_cluster": [
+        "display_name",
+        "exadata_infrastructure_id",
+        "vm_cluster_network_id",
+        "autonomous_data_storage_size_in_tbs",
+        "cpu_core_count_per_node",
+        "license_model",
+        "is_mtls_enabled",
+        "memory_per_oracle_compute_unit_in_gbs",
+        "total_container_databases",
+        "time_zone"
+    ],
+    "oci_database_exadata_infrastructure": [
+        "display_name",
+        "shape",
+        "admin_network_cidr",
+        "infini_band_network_cidr",
+        "cloud_control_plane_server1",
+        "cloud_control_plane_server2",
+        "netmask",
+        "gateway",
+        "dns_server",
+        "ntp_server",
+        "compute_count",
+        "storage_count",
+        "time_zone",
+        "contacts",
+        "contacts.name",
+        "contacts.email",
+        "contacts.phone_number",
+        "contacts.is_primary",
+        "maintenance_window",
+        "maintenance_window.preference",
+        "maintenance_window.hours_of_day"
+    ],
+    "oci_dns_view": [
+        "display_name",
+        "scope"
+    ],
+    "oci_email_sender": [
+        "email_address"
+    ],
+    "oci_devops_deployment": [
+        "display_name",
+        "deployment_type",
+        "deploy_pipeline_id",
+        "deploy_stage_id",
+        "previous_deployment_id"
+    ],
+    "oci_devops_connection": [
+        "display_name",
+        "description",
+        "connection_type",
+        "project_id",
+        "base_url",
+        "username",
+        "tls_verify_config",
+        "tls_verify_config.ca_certificate_bundle_id",
+        "tls_verify_config.tls_verify_mode"
+    ],
+    "oci_data_safe_security_assessment": [
+        "display_name",
+        "description",
+        "target_id",
+        "is_assessment_scheduled",
+        "schedule"
+    ],
+    "oci_ai_anomaly_detection_model": [
+        "display_name",
+        "description",
+        "project_id",
+        "model_training_details",
+        "model_training_details.algorithm_hint",
+        "model_training_details.data_asset_ids",
+        "model_training_details.target_fap",
+        "model_training_details.training_fraction",
+        "model_training_details.window_size"
     ]
 }

@@ -54,6 +54,29 @@ ocd/packages/codegen/src/importer/data/OciResourceMap.ts.
   present in schema). Regenerated OCI codegen; STRICT model build clean (exit 0,
   0 TS errors, no TS2349). Active resourceMap entries: 168.
 
+- Iteration 4 (catalog 168 -> 182): added 14 high-value services across
+  networking(FastConnect)/loadbalancer/database(Exadata)/dns/email/devops/security/AI:
+  virtual_circuit (oci_core_virtual_circuit),
+  cross_connect (oci_core_cross_connect),
+  cross_connect_group (oci_core_cross_connect_group),
+  load_balancer_certificate (oci_load_balancer_certificate),
+  load_balancer_path_route_set (oci_load_balancer_path_route_set),
+  vm_cluster (oci_database_vm_cluster),
+  autonomous_vm_cluster (oci_database_autonomous_vm_cluster),
+  exadata_infrastructure (oci_database_exadata_infrastructure),
+  dns_view (oci_dns_view),
+  email_sender (oci_email_sender),
+  devops_deployment (oci_devops_deployment),
+  devops_connection (oci_devops_connection),
+  data_safe_security_assessment (oci_data_safe_security_assessment),
+  ai_anomaly_detection_model (oci_ai_anomaly_detection_model).
+  Notes: removed a pre-existing empty `oci_database_exadata_infrastructure: []`
+  attr stub that collided with the new populated entry (TS1117). Dropped
+  `region` from virtual_circuit and the `private_key`/`passphrase` secret inputs
+  from load_balancer_certificate (collision/secret-hygiene caution). Regenerated
+  OCI codegen; FULL build (model+export+import+react) clean: exit 0, 0 TS errors,
+  no TS2416/TS2349. Active resourceMap entries: 182.
+
 ## Next
 - Pick services NOT already in OciResourceMap.ts; curate ~14/batch.
 - Before curating: confirm each candidate exists in
