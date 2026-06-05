@@ -1634,3 +1634,21 @@
     background: var(--oracle-red, #C74634);
     border-color: var(--oracle-red-dark, #A63D2E);
 }
+
+/* Drag-to-connect: rubber-band line while dragging in connect mode. */
+.ocd-connect-rubber-band {
+    stroke: var(--oracle-red, #C74634);
+    stroke-width: 2;
+    stroke-dasharray: 6 4;
+    fill: none;
+    pointer-events: none;
+    opacity: 0.85;
+}
+/* Connect-mode handle on each resource (visual grab cue). */
+.ocd-connect-handle {
+    fill: var(--oracle-red, #C74634);
+    stroke: var(--oracle-white, #FFF);
+    stroke-width: 1.5;
+    cursor: crosshair;
+}
+.ocd-connect-handle:hover { fill: var(--oracle-red-dark, #A63D2E); }
