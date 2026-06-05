@@ -175,6 +175,36 @@ ocd/packages/codegen/src/importer/data/OciResourceMap.ts.
   Regenerated OCI codegen; FULL build (model+export+import+react) clean: exit 0,
   0 TS errors, no TS2416/TS2349/TS2300. Active resourceMap entries: 224.
 
+- Iteration 8 (catalog 224 -> 238): added 14 high-value services across
+  database(Migration,Exascale)/VMware(OCVP)/service-mesh/data-science/AI(Vision,
+  Document Understanding)/artifact-registry/health-checks/log-analytics/
+  networking(VTAP)/streaming/dns:
+  database_migration (oci_database_migration_migration),
+  ocvp_sddc (oci_ocvp_sddc),
+  service_mesh_virtual_service (oci_service_mesh_virtual_service),
+  service_mesh_virtual_deployment (oci_service_mesh_virtual_deployment),
+  datascience_pipeline (oci_datascience_pipeline),
+  ai_vision_model (oci_ai_vision_model),
+  ai_document_processor_job (oci_ai_document_processor_job),
+  generic_artifact (oci_artifacts_generic_artifact),
+  health_checks_ping_monitor (oci_health_checks_ping_monitor),
+  log_analytics_object_collection_rule (oci_log_analytics_log_analytics_object_collection_rule),
+  exadb_vm_cluster (oci_database_exadb_vm_cluster),
+  vtap (oci_core_vtap),
+  connect_harness (oci_streaming_connect_harness),
+  dns_tsig_key (oci_dns_tsig_key).
+  Notes:
+  * All 14 confirmed present in resource_schemas of the vendored tf-schema.json
+    (grep count 2 each) before curation; candidates with count 0/1 (data-source-
+    only, e.g. oci_goldengate_deployment, oci_data_flow_application) were skipped.
+  * Secret hygiene: dropped dns_tsig_key `secret` (TSIG shared key) — same class
+    as prior password/token drops.
+  * Curated lists omit compartment_id/defined_tags/freeform_tags/id (covered by
+    `common` + base); no attr hits the known region/home_region base collisions.
+    display_name/name/description verified safe (already used by existing entries).
+  Regenerated OCI codegen; FULL build (model+export+import+react) clean: exit 0,
+  0 TS errors, no TS2416/TS2349/TS2300. Active resourceMap entries: 238.
+
 ## Next
 - Pick services NOT already in OciResourceMap.ts; curate ~14/batch.
 - Before curating: confirm each candidate exists in

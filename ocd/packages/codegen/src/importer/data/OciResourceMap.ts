@@ -315,7 +315,21 @@ export const resourceMap: OcdResourceMap = {
     "oci_waas_waas_policy": "waas_policy",
     "oci_ai_language_endpoint": "ai_language_endpoint",
     "oci_certificates_management_ca_bundle": "certificates_ca_bundle",
-    "oci_nosql_table_replica": "nosql_table_replica"
+    "oci_nosql_table_replica": "nosql_table_replica",
+    "oci_database_migration_migration": "database_migration",
+    "oci_ocvp_sddc": "ocvp_sddc",
+    "oci_service_mesh_virtual_service": "service_mesh_virtual_service",
+    "oci_service_mesh_virtual_deployment": "service_mesh_virtual_deployment",
+    "oci_datascience_pipeline": "datascience_pipeline",
+    "oci_ai_vision_model": "ai_vision_model",
+    "oci_ai_document_processor_job": "ai_document_processor_job",
+    "oci_artifacts_generic_artifact": "generic_artifact",
+    "oci_health_checks_ping_monitor": "health_checks_ping_monitor",
+    "oci_log_analytics_log_analytics_object_collection_rule": "log_analytics_object_collection_rule",
+    "oci_database_exadb_vm_cluster": "exadb_vm_cluster",
+    "oci_core_vtap": "vtap",
+    "oci_streaming_connect_harness": "connect_harness",
+    "oci_dns_tsig_key": "dns_tsig_key"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -2848,5 +2862,128 @@ export const resourceAttributes: OcdIncludedElements = {
         "table_name_or_id",
         "max_read_units",
         "max_write_units"
+    ],
+    "oci_database_migration_migration": [
+        "display_name",
+        "description",
+        "type",
+        "database_combination",
+        "source_database_connection_id",
+        "source_container_database_connection_id",
+        "target_database_connection_id"
+    ],
+    "oci_ocvp_sddc": [
+        "display_name",
+        "compute_availability_domain",
+        "esxi_hosts_count",
+        "vmware_software_version",
+        "initial_sku",
+        "is_hcx_enabled",
+        "ssh_authorized_keys",
+        "provisioning_subnet_id",
+        "nsx_vtep_vlan_id",
+        "vmotion_vlan_id",
+        "vsan_vlan_id",
+        "vsphere_vlan_id",
+        "workload_network_cidr"
+    ],
+    "oci_service_mesh_virtual_service": [
+        "name",
+        "description",
+        "hosts",
+        "mesh_id"
+    ],
+    "oci_service_mesh_virtual_deployment": [
+        "name",
+        "description",
+        "virtual_service_id"
+    ],
+    "oci_datascience_pipeline": [
+        "display_name",
+        "description",
+        "project_id"
+    ],
+    "oci_ai_vision_model": [
+        "display_name",
+        "description",
+        "model_type",
+        "model_version",
+        "is_quick_mode",
+        "max_training_duration_in_hours",
+        "project_id"
+    ],
+    "oci_ai_document_processor_job": [
+        "display_name"
+    ],
+    "oci_artifacts_generic_artifact": [
+        "artifact_id"
+    ],
+    "oci_health_checks_ping_monitor": [
+        "display_name",
+        "interval_in_seconds",
+        "is_enabled",
+        "port",
+        "protocol",
+        "targets",
+        "timeout_in_seconds",
+        "vantage_point_names"
+    ],
+    "oci_log_analytics_log_analytics_object_collection_rule": [
+        "name",
+        "description",
+        "namespace",
+        "log_group_id",
+        "log_source_name",
+        "log_type",
+        "os_bucket_name",
+        "os_namespace",
+        "collection_type",
+        "entity_id",
+        "char_encoding",
+        "is_enabled"
+    ],
+    "oci_database_exadb_vm_cluster": [
+        "display_name",
+        "availability_domain",
+        "cluster_name",
+        "hostname",
+        "shape",
+        "license_model",
+        "system_version",
+        "time_zone",
+        "grid_image_id",
+        "ssh_public_keys",
+        "subnet_id",
+        "backup_subnet_id",
+        "nsg_ids",
+        "backup_network_nsg_ids",
+        "private_zone_id",
+        "exascale_db_storage_vault_id",
+        "scan_listener_port_tcp",
+        "scan_listener_port_tcp_ssl",
+        "domain"
+    ],
+    "oci_core_vtap": [
+        "display_name",
+        "vcn_id",
+        "source_id",
+        "target_id",
+        "target_ip",
+        "source_type",
+        "target_type",
+        "capture_filter_id",
+        "encapsulation_protocol",
+        "is_vtap_enabled",
+        "max_packet_size",
+        "traffic_mode",
+        "vxlan_network_identifier",
+        "source_private_endpoint_subnet_id"
+    ],
+    "oci_streaming_connect_harness": [
+        "name"
+    ],
+    "oci_dns_tsig_key": [
+        "name",
+        "algorithm"
     ]
 }
