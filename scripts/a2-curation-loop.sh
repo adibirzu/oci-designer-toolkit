@@ -61,12 +61,17 @@ verify() {
   # Gate-aware verify: strict model tsc + dependent builds + tests + web build.
   # All output is teed to .a2-verify.log so a failure is diagnosable (the gate
   # can flake if it races codegen settling — re-run once before treating as real).
-  local log=".a2-verify.log"; : > "$log"
-  ( cd ocd && npm run compile-for-codegen ) >>"../$log" 2>&1 || return 1
+  # Absolute log path so the redirect resolves the same regardless of the
+  # subshell cwd (a relative ../ path would land in the parent dir).
+  local log; log="$(pwd)/.a2-verify.log"; : > "$log"
+  ( cd ocd && npm run compile-for-codegen ) >>"$log" 2>&1 || return 1
+  # Full build INCLUDING @ocd/export — the terraform exporter catches base-property
+  # collisions (e.g. a home_region attr -> homeRegion vs OciTerraformResource) that
+  # the model build alone does not.
   ( cd ocd && npm run build --workspace=packages/model --workspace=packages/export \
-      --workspace=packages/import --workspace=packages/react ) >>"../$log" 2>&1 || return 1
-  ( cd ocd && npm test ) >>"../$log" 2>&1 || return 1
-  ( cd ocd && OCD_PAGES_BASE=/ npm run build:pages ) >>"../$log" 2>&1 || return 1
+      --workspace=packages/import --workspace=packages/react ) >>"$log" 2>&1 || return 1
+  ( cd ocd && npm test ) >>"$log" 2>&1 || return 1
+  ( cd ocd && OCD_PAGES_BASE=/ npm run build:pages ) >>"$log" 2>&1 || return 1
 }
 
 for ((i = 1; i <= MAX_RUNS; i++)); do
@@ -80,14 +85,27 @@ for ((i = 1; i <= MAX_RUNS; i++)); do
   # --print; avoids positional-arg parsing breaking when flags are present).
   PROMPT="You are curating OCI services into the OKIT catalog (A2). Read $NOTES
 for rules and progress. Add the NEXT $BATCH high-value OCI services that are NOT
-already present in ocd/packages/codegen/src/importer/data/OciResourceMap.ts:
-add a resourceMap entry + curated resourceAttributes (the key user-set fields +
-relationship *Id FKs; never an attribute literally named resources/resource/results).
-Then regenerate via 'cd ocd && npm run compile-for-codegen && npm run
-import-and-generate-oci --workspace=packages/codegen-cli'. Update the Progress
-section of $NOTES with the services you added and the new resource count. Do NOT
-commit, do NOT run the full 'npm run build', do NOT npm install. If no further
-high-value services remain to curate, output the exact token ${COMPLETION_SIGNAL}."
+already present in ocd/packages/codegen/src/importer/data/OciResourceMap.ts.
+RULES for each service:
+- It MUST exist in ocd/packages/codegen-cli/schema/oci/tf-schema.json (grep the
+  oci_* name; count >0). A map entry for a non-existent type silently generates
+  nothing.
+- Add a resourceMap entry + curated resourceAttributes (the key user-set fields +
+  relationship *Id FKs).
+- NEVER use an attribute whose name is (or whose camelCase form collides with) a
+  reserved/base identifier: 'resources'/'resource'/'results' (validator param),
+  or 'home_region' (-> homeRegion collides with the base OciTerraformResource).
+  When unsure, drop the attribute.
+Then regenerate: 'cd ocd && npm run compile-for-codegen && npm run
+import-and-generate-oci --workspace=packages/codegen-cli'. Then VERIFY the FULL
+build (not just model): 'cd ocd && npm run build --workspace=packages/model
+--workspace=packages/export --workspace=packages/import --workspace=packages/react'
+must exit 0 — the export build catches base-property collisions the model build
+misses. If it fails, fix or drop the offending attribute and re-verify before
+finishing. Update the Progress section of $NOTES with the services added + new
+count. Do NOT commit, do NOT run the appdmg-breaking plain 'npm run build' at the
+ocd root, do NOT npm install. If no further high-value services remain, output the
+exact token ${COMPLETION_SIGNAL}."
   OUT=$(printf '%s' "$PROMPT" | claude -p --permission-mode acceptEdits \
     --allowedTools "Read,Edit,Write,Glob,Grep,Bash")
 
