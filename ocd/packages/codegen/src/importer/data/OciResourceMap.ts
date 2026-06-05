@@ -201,7 +201,33 @@ export const resourceMap: OcdResourceMap = {
     "oci_opsi_operations_insights_warehouse": "opsi_warehouse",
     "oci_opsi_opsi_configuration": "opsi_configuration",
     // Management Agent
-    "oci_management_agent_management_agent": "management_agent"
+    "oci_management_agent_management_agent": "management_agent",
+    // Batch 2 — Identity Domains
+    "oci_identity_domain": "identity_domain",
+    // Cloud Guard (Security)
+    "oci_cloud_guard_target": "cloud_guard_target",
+    "oci_cloud_guard_detector_recipe": "cloud_guard_detector_recipe",
+    // Data Safe (Database Security)
+    "oci_data_safe_target_database": "data_safe_target_database",
+    // Database — Pluggable DB + Data Guard
+    "oci_database_pluggable_database": "pluggable_database",
+    "oci_database_data_guard_association": "data_guard_association",
+    // Java Management Service
+    "oci_jms_fleet": "jms_fleet",
+    // Stack Monitoring (Observability)
+    "oci_stack_monitoring_monitored_resource": "stack_monitoring_resource",
+    // APM Synthetics
+    "oci_apm_synthetics_monitor": "apm_synthetics_monitor",
+    // Full Stack Disaster Recovery
+    "oci_disaster_recovery_dr_protection_group": "dr_protection_group",
+    // Compute — Custom Image
+    "oci_core_image": "custom_image",
+    // Networking — Reserved Public IP
+    "oci_core_public_ip": "public_ip",
+    // Object Storage — Lifecycle Policy
+    "oci_objectstorage_object_lifecycle_policy": "object_lifecycle_policy",
+    // AI Anomaly Detection
+    "oci_ai_anomaly_detection_project": "ai_anomaly_detection_project"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -1944,5 +1970,176 @@ export const resourceAttributes: OcdIncludedElements = {
         "deploy_plugins_id",
         "install_key_id",
         "is_agent_auto_upgradable"
+    ],
+    "oci_identity_domain": [
+        "display_name",
+        "description",
+        "home_region",
+        "license_type",
+        "admin_email",
+        "admin_first_name",
+        "admin_last_name",
+        "admin_user_name",
+        "is_hidden_on_login",
+        "is_notification_bypassed",
+        "is_primary_email_required"
+    ],
+    "oci_cloud_guard_target": [
+        "display_name",
+        "description",
+        "target_resource_id",
+        "target_resource_type",
+        "state",
+        "target_detector_recipes",
+        "target_detector_recipes.detector_recipe_id",
+        "target_responder_recipes",
+        "target_responder_recipes.responder_recipe_id"
+    ],
+    "oci_cloud_guard_detector_recipe": [
+        "display_name",
+        "description",
+        "source_detector_recipe_id",
+        "detector_rules",
+        "detector_rules.detector_rule_id"
+    ],
+    "oci_data_safe_target_database": [
+        "display_name",
+        "description",
+        "database_details",
+        "database_details.database_type",
+        "database_details.infrastructure_type",
+        "database_details.autonomous_database_id",
+        "database_details.db_system_id",
+        "database_details.vm_cluster_id",
+        "database_details.instance_id",
+        "database_details.listener_port",
+        "database_details.service_name",
+        "connection_option",
+        "connection_option.connection_type",
+        "connection_option.datasafe_private_endpoint_id",
+        "connection_option.on_prem_connector_id",
+        "credentials",
+        "credentials.user_name"
+    ],
+    "oci_database_pluggable_database": [
+        "pdb_name",
+        "container_database_id",
+        "should_pdb_admin_account_be_locked",
+        "pdb_creation_type_details",
+        "pdb_creation_type_details.creation_type",
+        "pdb_creation_type_details.source_pluggable_database_id"
+    ],
+    "oci_database_data_guard_association": [
+        "display_name",
+        "database_id",
+        "creation_type",
+        "protection_mode",
+        "transport_type",
+        "delete_standby_db_home_on_delete",
+        "is_active_data_guard_enabled",
+        "peer_db_system_id",
+        "peer_db_home_id",
+        "peer_vm_cluster_id",
+        "subnet_id",
+        "nsg_ids",
+        "shape",
+        "license_model",
+        "hostname"
+    ],
+    "oci_jms_fleet": [
+        "display_name",
+        "description",
+        "is_advanced_features_enabled",
+        "inventory_log",
+        "inventory_log.log_group_id",
+        "inventory_log.log_id",
+        "operation_log",
+        "operation_log.log_group_id",
+        "operation_log.log_id"
+    ],
+    "oci_stack_monitoring_monitored_resource": [
+        "name",
+        "type",
+        "display_name",
+        "host_name",
+        "management_agent_id",
+        "external_id",
+        "external_resource_id",
+        "resource_time_zone",
+        "license",
+        "database_connection_details",
+        "database_connection_details.connector_id",
+        "database_connection_details.db_id",
+        "database_connection_details.service_name",
+        "database_connection_details.port",
+        "database_connection_details.protocol",
+        "properties",
+        "properties.name",
+        "properties.value"
+    ],
+    "oci_apm_synthetics_monitor": [
+        "apm_domain_id",
+        "display_name",
+        "monitor_type",
+        "repeat_interval_in_seconds",
+        "status",
+        "target",
+        "script_id",
+        "timeout_in_seconds",
+        "scheduling_policy",
+        "vantage_points",
+        "vantage_points.name",
+        "configuration",
+        "configuration.config_type",
+        "configuration.request_method",
+        "configuration.protocol"
+    ],
+    "oci_disaster_recovery_dr_protection_group": [
+        "display_name",
+        "log_location",
+        "log_location.bucket",
+        "log_location.namespace",
+        "association",
+        "association.peer_id",
+        "association.peer_region",
+        "association.role",
+        "members",
+        "members.member_id",
+        "members.member_type",
+        "members.destination_compartment_id",
+        "members.destination_load_balancer_id"
+    ],
+    "oci_core_image": [
+        "display_name",
+        "instance_id",
+        "launch_mode",
+        "image_source_details",
+        "image_source_details.source_type",
+        "image_source_details.bucket_name",
+        "image_source_details.namespace_name",
+        "image_source_details.object_name",
+        "image_source_details.operating_system",
+        "image_source_details.source_uri"
+    ],
+    "oci_core_public_ip": [
+        "display_name",
+        "lifetime",
+        "private_ip_id",
+        "public_ip_pool_id"
+    ],
+    "oci_objectstorage_object_lifecycle_policy": [
+        "bucket",
+        "namespace",
+        "rules",
+        "rules.action",
+        "rules.is_enabled",
+        "rules.name",
+        "rules.target",
+        "rules.time_amount",
+        "rules.time_unit"
+    ],
+    "oci_ai_anomaly_detection_project": [
+        "display_name",
+        "description"
     ]
 }
