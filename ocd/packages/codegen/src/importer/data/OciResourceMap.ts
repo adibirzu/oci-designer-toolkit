@@ -227,7 +227,31 @@ export const resourceMap: OcdResourceMap = {
     // Object Storage — Lifecycle Policy
     "oci_objectstorage_object_lifecycle_policy": "object_lifecycle_policy",
     // AI Anomaly Detection
-    "oci_ai_anomaly_detection_project": "ai_anomaly_detection_project"
+    "oci_ai_anomaly_detection_project": "ai_anomaly_detection_project",
+    // Batch 3 — Generative AI (inference service)
+    "oci_generative_ai_dedicated_ai_cluster": "genai_dedicated_cluster",
+    "oci_generative_ai_endpoint": "genai_endpoint",
+    // Database — DB Home
+    "oci_database_db_home": "db_home",
+    // Compute — HPC/RDMA Compute Cluster
+    "oci_core_compute_cluster": "compute_cluster",
+    // Object Storage — PAR + Replication Policy
+    "oci_objectstorage_preauthrequest": "preauthenticated_request",
+    "oci_objectstorage_replication_policy": "replication_policy",
+    // Networking — Private IP + HPC Cluster Network
+    "oci_core_private_ip": "private_ip",
+    "oci_core_cluster_network": "cluster_network",
+    // Observability — Unified Monitoring Agent configuration
+    "oci_logging_unified_agent_configuration": "unified_agent_configuration",
+    // Identity — Network Source (IAM allow-list)
+    "oci_identity_network_source": "network_source",
+    // Cloud Guard — Responder Recipe
+    "oci_cloud_guard_responder_recipe": "cloud_guard_responder_recipe",
+    // DNS — Steering (Traffic Management) Policy
+    "oci_dns_steering_policy": "dns_steering_policy",
+    // Database — Autonomous Container DB + Backup
+    "oci_database_autonomous_container_database": "autonomous_container_database",
+    "oci_database_backup": "database_backup"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -1974,7 +1998,6 @@ export const resourceAttributes: OcdIncludedElements = {
     "oci_identity_domain": [
         "display_name",
         "description",
-        "home_region",
         "license_type",
         "admin_email",
         "admin_first_name",
@@ -2141,5 +2164,124 @@ export const resourceAttributes: OcdIncludedElements = {
     "oci_ai_anomaly_detection_project": [
         "display_name",
         "description"
+    ],
+    "oci_generative_ai_dedicated_ai_cluster": [
+        "display_name",
+        "description",
+        "type",
+        "unit_count",
+        "unit_shape"
+    ],
+    "oci_generative_ai_endpoint": [
+        "display_name",
+        "description",
+        "dedicated_ai_cluster_id",
+        "model_id",
+        "content_moderation_config",
+        "content_moderation_config.is_enabled"
+    ],
+    "oci_database_db_home": [
+        "display_name",
+        "db_system_id",
+        "vm_cluster_id",
+        "db_version",
+        "source",
+        "database",
+        "database.db_name",
+        "database.db_unique_name",
+        "database.pdb_name",
+        "database.character_set",
+        "database.ncharacter_set"
+    ],
+    "oci_core_compute_cluster": [
+        "display_name",
+        "availability_domain"
+    ],
+    "oci_objectstorage_preauthrequest": [
+        "bucket",
+        "namespace",
+        "name",
+        "access_type",
+        "object_name",
+        "time_expires",
+        "bucket_listing_action"
+    ],
+    "oci_objectstorage_replication_policy": [
+        "bucket",
+        "namespace",
+        "name",
+        "destination_bucket_name",
+        "destination_region_name"
+    ],
+    "oci_core_private_ip": [
+        "display_name",
+        "hostname_label",
+        "ip_address",
+        "vnic_id",
+        "vlan_id"
+    ],
+    "oci_core_cluster_network": [
+        "display_name",
+        "placement_configuration",
+        "placement_configuration.availability_domain",
+        "placement_configuration.primary_subnet_id",
+        "placement_configuration.secondary_vnic_subnets",
+        "cluster_configuration",
+        "cluster_configuration.hpc_island_id",
+        "cluster_configuration.network_block_ids"
+    ],
+    "oci_logging_unified_agent_configuration": [
+        "display_name",
+        "description",
+        "is_enabled",
+        "group_association",
+        "group_association.group_list",
+        "service_configuration",
+        "service_configuration.configuration_type"
+    ],
+    "oci_identity_network_source": [
+        "name",
+        "description",
+        "public_source_list",
+        "virtual_source_list",
+        "services"
+    ],
+    "oci_cloud_guard_responder_recipe": [
+        "display_name",
+        "description",
+        "source_responder_recipe_id",
+        "responder_rules",
+        "responder_rules.responder_rule_id",
+        "responder_rules.details",
+        "responder_rules.details.is_enabled",
+        "responder_rules.details.mode"
+    ],
+    "oci_dns_steering_policy": [
+        "display_name",
+        "template",
+        "health_check_monitor_id",
+        "ttl",
+        "answers",
+        "answers.name",
+        "answers.rdata",
+        "answers.rtype",
+        "answers.pool",
+        "rules",
+        "rules.rule_type"
+    ],
+    "oci_database_autonomous_container_database": [
+        "display_name",
+        "cloud_autonomous_vm_cluster_id",
+        "autonomous_vm_cluster_id",
+        "patch_model",
+        "db_unique_name",
+        "db_version",
+        "service_level_agreement_type",
+        "backup_config",
+        "backup_config.recovery_window_in_days"
+    ],
+    "oci_database_backup": [
+        "display_name",
+        "database_id"
     ]
 }

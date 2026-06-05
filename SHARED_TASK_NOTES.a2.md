@@ -32,5 +32,30 @@ ocd/packages/codegen/src/importer/data/OciResourceMap.ts.
   Regenerated OCI codegen; STRICT model build clean (no TS2349). Active
   resourceMap entries: 154.
 
+- Iteration 3 (catalog 154 -> 168): added 14 high-value services across
+  genai/database/compute/networking/storage/observability/security/dns:
+  genai_dedicated_cluster (oci_generative_ai_dedicated_ai_cluster),
+  genai_endpoint (oci_generative_ai_endpoint),
+  db_home (oci_database_db_home),
+  compute_cluster (oci_core_compute_cluster),
+  preauthenticated_request (oci_objectstorage_preauthrequest),
+  replication_policy (oci_objectstorage_replication_policy),
+  private_ip (oci_core_private_ip),
+  cluster_network (oci_core_cluster_network),
+  unified_agent_configuration (oci_logging_unified_agent_configuration),
+  network_source (oci_identity_network_source),
+  cloud_guard_responder_recipe (oci_cloud_guard_responder_recipe),
+  dns_steering_policy (oci_dns_steering_policy),
+  autonomous_container_database (oci_database_autonomous_container_database),
+  database_backup (oci_database_backup).
+  Note: oci_generative_ai_agent_agent + _knowledge_base were dropped — the
+  vendored oci/tf-schema.json predates the GenAI Agent resource types, so the
+  generator silently skips them. Substituted db_home + compute_cluster (both
+  present in schema). Regenerated OCI codegen; STRICT model build clean (exit 0,
+  0 TS errors, no TS2349). Active resourceMap entries: 168.
+
 ## Next
 - Pick services NOT already in OciResourceMap.ts; curate ~14/batch.
+- Before curating: confirm each candidate exists in
+  packages/codegen-cli/schema/oci/tf-schema.json (grep count >0), else the
+  generator skips it silently and the map entry is dead.
