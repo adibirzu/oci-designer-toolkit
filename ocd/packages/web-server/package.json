@@ -1,6 +1,6 @@
 {
   "name": "@ocd/web-server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "OKIT Open Cloud Designer local web backend (read-only OCI discovery for the browser build)",
   "title": "OKIT Open Cloud Designer Web Backend",
   "author": {
