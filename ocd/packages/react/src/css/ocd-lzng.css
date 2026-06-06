@@ -1350,6 +1350,18 @@
     color: var(--oracle-text-muted);
     max-width: 70ch;
 }
+.ocd-lzng-update-copied {
+    margin: 0 0 4px;
+    font-weight: 600;
+    color: var(--oracle-text, #312D2A);
+}
+.ocd-lzng-update-changes {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    list-style: disc;
+}
+.ocd-lzng-update-changes li { margin: 2px 0; }
+.ocd-lzng-update-changes code { font-size: 12px; }
 
 .ocd-lzng-update-banner-actions {
     display: inline-flex;

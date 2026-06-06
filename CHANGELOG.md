@@ -19,6 +19,7 @@
 - **Import LZNG output files** (File ▸ Import ▸ *OCI Landing Zone (LZNG)*): a multi-file picker reads pre-generated `iam.json` / `network.json` / … and rebuilds them into an editable, `lzOrigin`-flagged design — the upload counterpart to the wizard handoff.
 - **Import draw.io diagrams** (File ▸ Import ▸ *draw.io Diagram*): parse an uncompressed `.drawio` / `.xml` diagram, map each shape to an OCI resource (keyword/shape heuristics), and recreate the architecture **with its relations** — edges and container nesting become FK associations; the design is then auto-arranged. Compressed `.drawio` files prompt to re-export as uncompressed XML.
 - **draw.io-style drag-and-link.** In connect mode, the resource under the cursor highlights green (valid drop target — the source has an FK for its type) or red (invalid) while dragging, with an animated "marching ants" rubber-band.
+- **One-click LZ update.** The "OCI Landing Zone updates available" banner gains an **Update now** button that copies the re-vendor command (`npm run setup-lz:latest`), lists exactly which sources changed (`from → to` with GitHub compare links) and which pin files to bump, and re-runs the update check. (The OE jsonnet sources are bundled at build time, so applying still requires the re-vendor + rebuild — the button makes that step one click and fully spelled out.)
 
 
 ## Enhanced Fork Release (v0.4.0)

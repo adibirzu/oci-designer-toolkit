@@ -246,6 +246,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                     statuses={statuses}
                     onDismiss={() => setBannerDismissed(true)}
                     onOpenPanel={() => setShowSources(true)}
+                    onRefresh={() => refreshUpdates(true)}
                 />
             )}
 

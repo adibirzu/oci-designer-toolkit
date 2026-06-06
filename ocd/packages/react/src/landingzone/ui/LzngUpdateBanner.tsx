@@ -13,27 +13,63 @@
 
 import React, { useState } from 'react'
 import { LzUpdateStatus } from '../OcdLzUpdateCheck'
+import { buildUpdatePlan, shortRef as planShortRef } from '../OcdLzUpdatePlan'
 
 export interface LzngUpdateBannerProps {
     statuses: LzUpdateStatus[]
     onDismiss: () => void
     /** Opens the full Sources & Updates panel. */
     onOpenPanel: () => void
+    /** Re-run the update check after the user applies an update. */
+    onRefresh?: () => void
 }
 
 function shortRef(value: string): string {
-    if (!value) return '(unpinned)'
-    return value.length > 12 ? value.slice(0, 12) : value
+    return planShortRef(value)
 }
 
-export function LzngUpdateBanner({ statuses, onDismiss, onOpenPanel }: LzngUpdateBannerProps): JSX.Element | null {
+/** Copy text to the clipboard, tolerating environments without the async API. */
+async function copyToClipboard(text: string): Promise<boolean> {
+    try {
+        if (navigator?.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text)
+            return true
+        }
+    } catch {
+        /* fall through to the legacy path */
+    }
+    try {
+        const el = document.createElement('textarea')
+        el.value = text
+        el.style.position = 'fixed'
+        el.style.opacity = '0'
+        document.body.appendChild(el)
+        el.select()
+        const ok = document.execCommand('copy')
+        document.body.removeChild(el)
+        return ok
+    } catch {
+        return false
+    }
+}
+
+export function LzngUpdateBanner({ statuses, onDismiss, onOpenPanel, onRefresh }: LzngUpdateBannerProps): JSX.Element | null {
     const [showHow, setShowHow] = useState(false)
+    const [updateState, setUpdateState] = useState<'idle' | 'copied' | 'failed'>('idle')
 
     const available = statuses.filter((status) => status.updateAvailable)
     if (available.length === 0) return null
 
     const primary = available[0]
     const extra = available.length - 1
+    const plan = buildUpdatePlan(statuses)
+
+    const onUpdateNow = async (): Promise<void> => {
+        const ok = await copyToClipboard(plan.command)
+        setUpdateState(ok ? 'copied' : 'failed')
+        setShowHow(true)
+        onRefresh?.()
+    }
 
     return (
         <div className='ocd-lzng-update-banner' role='status' aria-live='polite'>
@@ -48,15 +84,47 @@ export function LzngUpdateBanner({ statuses, onDismiss, onOpenPanel }: LzngUpdat
                     <code>{primary.latestShort || shortRef(primary.latest)}</code>
                     {extra > 0 && <span className='ocd-lzng-update-banner-more'> (+{extra} more)</span>}
                     {showHow && (
-                        <p className='ocd-lzng-update-banner-how'>
-                            Run <code>npm run setup-lz:latest</code> to re-vendor the sources at the latest version,
-                            then update the pin in <code>OcdLzSources.ts</code> and <code>UPSTREAM_SHA</code> in{' '}
-                            <code>scripts/setup_landing_zone.mjs</code> to the SHA the script prints.
-                        </p>
+                        <div className='ocd-lzng-update-banner-how'>
+                            {updateState === 'copied' && (
+                                <p className='ocd-lzng-update-copied'>✓ Copied <code>{plan.command}</code> to the clipboard.</p>
+                            )}
+                            {updateState === 'failed' && (
+                                <p className='ocd-lzng-update-copied'>Run this command in the repo root:</p>
+                            )}
+                            <p>
+                                Run <code>{plan.command}</code> to re-vendor the sources at the latest version, rebuild,
+                                then bump the pinned ref in{' '}
+                                {plan.pinFiles.map((file, i) => (
+                                    <React.Fragment key={file}>
+                                        {i > 0 && ' and '}
+                                        <code>{file.split('/').pop()}</code>
+                                    </React.Fragment>
+                                ))}{' '}
+                                to the SHA the script prints.
+                            </p>
+                            {plan.items.length > 0 && (
+                                <ul className='ocd-lzng-update-changes'>
+                                    {plan.items.map((item) => (
+                                        <li key={item.key}>
+                                            {item.label}: <code>{shortRef(item.fromRef)}</code> → <code>{item.toRefShort}</code>{' '}
+                                            <a href={item.compareUrl} target='_blank' rel='noreferrer'>compare ↗</a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>
             <div className='ocd-lzng-update-banner-actions'>
+                <button
+                    type='button'
+                    className='ocd-lzng-btn ocd-lzng-btn-primary'
+                    onClick={onUpdateNow}
+                    title='Copy the re-vendor command and show exactly what changed'
+                >
+                    {updateState === 'copied' ? '✓ Command copied' : 'Update now'}
+                </button>
                 <a
                     className='ocd-lzng-btn'
                     href={primary.url}
@@ -71,7 +139,7 @@ export function LzngUpdateBanner({ statuses, onDismiss, onOpenPanel }: LzngUpdat
                     aria-expanded={showHow}
                     onClick={() => setShowHow((value) => !value)}
                 >
-                    How to update
+                    Details
                 </button>
                 <button type='button' className='ocd-lzng-btn' onClick={onOpenPanel}>
                     Sources &amp; Updates
