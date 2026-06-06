@@ -1638,7 +1638,8 @@
     border-color: var(--oracle-red-dark, #A63D2E);
 }
 
-/* Drag-to-connect: rubber-band line while dragging in connect mode. */
+/* Drag-to-connect: rubber-band line while dragging in connect mode.
+   "Marching ants" dash animation gives the draw.io live-link feel. */
 .ocd-connect-rubber-band {
     stroke: var(--oracle-red, #C74634);
     stroke-width: 2;
@@ -1646,6 +1647,10 @@
     fill: none;
     pointer-events: none;
     opacity: 0.85;
+    animation: ocd-connect-march 0.5s linear infinite;
+}
+@keyframes ocd-connect-march {
+    to { stroke-dashoffset: -20; }
 }
 /* Connect-mode handle on each resource (visual grab cue). */
 .ocd-connect-handle {
@@ -1655,3 +1660,17 @@
     cursor: crosshair;
 }
 .ocd-connect-handle:hover { fill: var(--oracle-red-dark, #A63D2E); }
+
+/* Drag-to-connect: live drop-target highlight (draw.io style). While dragging a
+   connection, the resource under the cursor glows green when it is a valid drop
+   target (the source has an FK for it) or red when it is not. The class is set
+   on the resource <g>; a drop-shadow filter highlights it regardless of the
+   inner rect/foreignObject structure. */
+.ocd-designer-resource.ocd-connect-target-valid {
+    filter: drop-shadow(0 0 5px #3A9B4E) drop-shadow(0 0 2px #3A9B4E);
+    cursor: alias;
+}
+.ocd-designer-resource.ocd-connect-target-invalid {
+    filter: drop-shadow(0 0 5px var(--oracle-red, #C74634));
+    cursor: no-drop;
+}
