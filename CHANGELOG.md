@@ -5,6 +5,18 @@
 > (e.g. 0.4.5 → 0.4.5.1). Major/minor jumps (e.g. → 0.5.0, → 1.0.0) are set by the maintainer.
 
 
+## Enhanced Fork Release (v0.4.5.4)
+
+### Oracle Designer Toolkit - OCTO
+
+#### Enterprise IAM + Policy blueprint
+- **New Designer add-on** (toolbar, LZ-origin designs) that applies an idempotent enterprise IAM blueprint: 5 groups (`lz-administrators`, `lz-network-admins`, `lz-security-admins`, `lz-developers`, `lz-auditors`), least-privilege **policy bundles** whose statements are scoped to the design's compartments by name, and an **`lz-governance` tag namespace** with cost-tracking tags (`cost-centre`, `environment`, `owner`). Mirrors the DB-Observability / OKE-native add-on pattern (`OcdLzIamBlueprint.ts`, `applyIamBlueprintOverlay`); lands editable model resources; idempotent re-apply; 16 Vitest specs.
+
+#### Build & toolchain
+- **Node 26 across CI** — `pages.yml` 22→26; desktop build matrices `latest`→`26` (`macos-dmg.yml` already pinned 26).
+- **Durable macOS `.dmg` builds on Node 26 behind EDR.** appdmg's `hdiutil detach` is patched (committed `ocd/patches/appdmg+0.6.6.patch` applied via `patch-package` on `postinstall`) to use `hdiutil detach -force` and retry on **any** error, surviving CrowdStrike's transient lock on the freshly-mounted build volume (previously "Operation not permitted"). appdmg stays an optional dependency, so non-macOS installs degrade cleanly to the ZIP maker. Verified end-to-end: `ocd-0.4.5-arm64.dmg` (116 MB) builds, mounts, and detaches cleanly.
+
+
 ## Enhanced Fork Release (v0.4.5.3)
 
 ### Oracle Designer Toolkit - OCTO
