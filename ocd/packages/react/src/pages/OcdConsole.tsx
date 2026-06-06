@@ -43,6 +43,7 @@ import { canReconcile, isReconcileEnabled, reconcileOnEdit, LZ_RECONCILE_ENABLED
 import { reconcileLzScaffold, addRealmAdFdFrames } from '../landingzone/OcdLzScaffold'
 import { applyObservabilityOverlay, LZ_OBSERVABILITY_ENABLED_KEY } from '../landingzone/OcdLzObservability'
 import { applyOkeNativeOverlay, LZ_OKE_NATIVE_ENABLED_KEY } from '../landingzone/OcdLzOke'
+import { applyIamBlueprintOverlay, LZ_IAM_BLUEPRINT_ENABLED_KEY } from '../landingzone/OcdLzIamBlueprint'
 import { isLzOriginDesign } from '../landingzone/OcdLzPlacement'
 // Context Providers
 import { CacheProvider, useCache, useCacheDispatch } from '../contexts/OcdCacheContext'
@@ -271,6 +272,15 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         document.design.userDefined[LZ_OKE_NATIVE_ENABLED_KEY] = true
         setOcdDocument(document)
     }
+    // Add the Enterprise IAM blueprint (admin/network/security/dev/auditor groups,
+    // least-privilege policy bundles scoped to the LZ compartments, and an
+    // lz-governance tag namespace + cost-tracking tags) to an LZ-origin design.
+    const onApplyIamBlueprint = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design = applyIamBlueprintOverlay(document.design)
+        document.design.userDefined[LZ_IAM_BLUEPRINT_ENABLED_KEY] = true
+        setOcdDocument(document)
+    }
     const onDesignerPage = ocdConsoleConfig.config.displayPage === 'designer'
     const isLzOrigin = isLzOriginDesign(ocdDocument.design)
     // Drag-to-connect mode toggle. When on, dropping a resource on another wires
@@ -349,6 +359,7 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                     {onDesignerPage && <div className='ocd-add-frames ocd-console-toolbar-icon' title='Add Realm / Region / AD / FD frames to the canvas' onClick={onAddFramesClick} aria-hidden></div>}
                     {onDesignerPage && isLzOrigin && <div className='ocd-lz-observability ocd-console-toolbar-icon' title='Add DB Observability add-on (DBM/OPSI endpoints, Database Insight, Management Agent)' onClick={onApplyObservability} aria-hidden></div>}
                     {onDesignerPage && isLzOrigin && <div className='ocd-lz-oke ocd-console-toolbar-icon' title='Add OKE-native add-on (native subnets, enhanced cluster, node pool, workload identity, Vault)' onClick={onApplyOke} aria-hidden></div>}
+                    {onDesignerPage && isLzOrigin && <div className='ocd-lz-iam ocd-console-toolbar-icon' title='Add Enterprise IAM blueprint (groups, least-privilege policies, governance tag namespace)' onClick={onApplyIamBlueprint} aria-hidden></div>}
                     {onDesignerPage && <div className={`ocd-connect-mode ocd-console-toolbar-icon ${connectMode ? 'on' : ''}`} title='Connect mode: drag one resource onto another to wire their association' onClick={onConnectModeToggle} aria-hidden></div>}
                     <div className='cost-estimate ocd-console-toolbar-icon' title='BoM and Cost Estimate' onClick={onEstimateClick} aria-hidden></div>
                 </div>
