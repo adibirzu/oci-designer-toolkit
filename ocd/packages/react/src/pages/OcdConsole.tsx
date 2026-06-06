@@ -35,6 +35,9 @@ import { OcdExportToResourceManagerDialog } from '../components/dialogs/OcdExpor
 import { ocdThemes } from '../data/OcdThemes'
 import { canReconcile, isReconcileEnabled, reconcileOnEdit, LZ_RECONCILE_ENABLED_KEY } from '../landingzone/OcdLzReconcile'
 import { reconcileLzScaffold, addRealmAdFdFrames } from '../landingzone/OcdLzScaffold'
+import { applyObservabilityOverlay, LZ_OBSERVABILITY_ENABLED_KEY } from '../landingzone/OcdLzObservability'
+import { applyOkeNativeOverlay, LZ_OKE_NATIVE_ENABLED_KEY } from '../landingzone/OcdLzOke'
+import { isLzOriginDesign } from '../landingzone/OcdLzPlacement'
 // Context Providers
 import { CacheProvider, useCache, useCacheDispatch } from '../contexts/OcdCacheContext'
 import { defaultTheme, ThemeProvider, useThemeDispatch } from '../contexts/OcdThemeContext'
@@ -237,7 +240,25 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         document.design = addRealmAdFdFrames(document.design)
         setOcdDocument(document)
     }
+    // Add the DB Observability add-on (DBM/OPSI private endpoints, Database
+    // Insight, Management Agent) to an LZ-origin design from the Designer
+    // (idempotent — re-applying is a no-op). Editable in the properties panel.
+    const onApplyObservability = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design = applyObservabilityOverlay(document.design)
+        document.design.userDefined[LZ_OBSERVABILITY_ENABLED_KEY] = true
+        setOcdDocument(document)
+    }
+    // Add the OKE-native add-on (VCN-native subnets, enhanced cluster, node
+    // pool, workload-identity dynamic group + policy, NSG, Vault + Key).
+    const onApplyOke = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design = applyOkeNativeOverlay(document.design)
+        document.design.userDefined[LZ_OKE_NATIVE_ENABLED_KEY] = true
+        setOcdDocument(document)
+    }
     const onDesignerPage = ocdConsoleConfig.config.displayPage === 'designer'
+    const isLzOrigin = isLzOriginDesign(ocdDocument.design)
     // Drag-to-connect mode toggle. When on, dropping a resource on another wires
     // their FK association instead of re-parenting.
     const connectMode = Boolean(ocdConsoleConfig.config.connectMode)
@@ -307,6 +328,8 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                     </label>}
                     {showReconcile && <div className='ocd-lz-reapply ocd-console-toolbar-icon' title='Re-apply the Realm/AD/FD scaffold now (idempotent)' onClick={onReapplyScaffold} aria-hidden></div>}
                     {onDesignerPage && <div className='ocd-add-frames ocd-console-toolbar-icon' title='Add Realm / Region / AD / FD frames to the canvas' onClick={onAddFramesClick} aria-hidden></div>}
+                    {onDesignerPage && isLzOrigin && <div className='ocd-lz-observability ocd-console-toolbar-icon' title='Add DB Observability add-on (DBM/OPSI endpoints, Database Insight, Management Agent)' onClick={onApplyObservability} aria-hidden></div>}
+                    {onDesignerPage && isLzOrigin && <div className='ocd-lz-oke ocd-console-toolbar-icon' title='Add OKE-native add-on (native subnets, enhanced cluster, node pool, workload identity, Vault)' onClick={onApplyOke} aria-hidden></div>}
                     {onDesignerPage && <div className={`ocd-connect-mode ocd-console-toolbar-icon ${connectMode ? 'on' : ''}`} title='Connect mode: drag one resource onto another to wire their association' onClick={onConnectModeToggle} aria-hidden></div>}
                     <div className='cost-estimate ocd-console-toolbar-icon' title='BoM and Cost Estimate' onClick={onEstimateClick} aria-hidden></div>
                 </div>
