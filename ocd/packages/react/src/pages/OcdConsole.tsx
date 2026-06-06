@@ -25,6 +25,12 @@ import OcdDocumentation from './OcdDocumentation'
 import { loadDesign } from '../components/Menu'
 import { OcdValidationResult, OcdValidator } from '@ocd/model'
 import OcdValidation from './OcdValidation'
+import OcdGovernancePanel from '../governance/OcdGovernancePanel'
+import { evaluateGovernance, applyRemediation, type GovernanceFinding } from '../governance/OcdGovernanceChecks'
+import { evaluateReachability } from '../analysis/OcdReachability'
+import OcdLzPlanPage from './OcdLzPlanPage'
+import OcdTemplateGallery from '../landingzone/templates/OcdTemplateGallery'
+import { findTemplate } from '../landingzone/templates/OcdArchitectureTemplates'
 import { buildDetails } from '../data/OcdBuildDetails'
 import OcdHelp from './OcdHelp'
 import OcdCommonTags from './OcdCommonTags'
@@ -212,6 +218,14 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         ocdConsoleConfig.config.displayPage = 'validation'
         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
     }
+    const onGovernanceClick = () => {
+        ocdConsoleConfig.config.displayPage = 'governance'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onPlanClick = () => {
+        ocdConsoleConfig.config.displayPage = 'plan'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
     const onEstimateClick = () => {
         ocdConsoleConfig.config.displayPage = 'bom'
         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
@@ -320,8 +334,13 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                         ocdDocument={ocdDocument} 
                         setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} 
                         />
+                    <button className='ocd-lz-hero-cta' title='Open the Landing Zone Next-Gen Wizard' onClick={onLandingZoneClick}>
+                        <span className='ocd-lz-hero-cta-icon' aria-hidden></span>
+                        <span className='ocd-lz-hero-cta-label'>Landing Zone Next-Gen</span>
+                    </button>
                     <div className={validateClassName} title={validateTitle} onClick={onValidateClick} aria-hidden></div>
-                    <div className='landing-zone ocd-console-toolbar-icon' title='Landing Zone Wizard' onClick={onLandingZoneClick} aria-hidden></div>
+                    <div className='governance ocd-console-toolbar-icon' title='Governance &amp; Compliance posture' onClick={onGovernanceClick} aria-hidden></div>
+                    <div className='ocd-lz-plan ocd-console-toolbar-icon' title='Landing Zone Plan / Diff (compare current design with imported LZ)' onClick={onPlanClick} aria-hidden></div>
                     {showReconcile && <label className={`ocd-lz-reconcile-toggle ${reconcileOn ? 'on' : ''}`} title='LZ live reconcile: when on (with the wizard scaffold tick), edits re-apply the Realm/AD/FD scaffold idempotently.'>
                         <input type='checkbox' checked={reconcileOn} onChange={onReconcileToggle} />
                         <span>LZ sync</span>
@@ -340,10 +359,49 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
 
 const OcdEmptyLeftRightToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, setOcdDocument}: ConsolePageProps): JSX.Element => {return (<></>)}
 
+// Governance & compliance posture page: runs the pure governance rule set over
+// the current design model and renders the findings (mirrors OcdValidation).
+const OcdGovernance = ({ ocdDocument, setOcdDocument }: ConsolePageProps): JSX.Element => {
+    // Governance posture + graph-based connectivity/reachability findings share
+    // the same finding shape and panel; merge both into one list.
+    const findings = [...evaluateGovernance(ocdDocument.design), ...evaluateReachability(ocdDocument.design)]
+    // Apply a safe one-field remediation to the model and persist; the panel
+    // re-renders and evaluateGovernance recomputes so the finding clears.
+    const handleApplyFix = (finding: GovernanceFinding) => {
+        const fixedDesign = applyRemediation(ocdDocument.design, finding)
+        if (fixedDesign === ocdDocument.design) return // no-op for guidance-only findings
+        const clone = OcdDocument.clone(ocdDocument)
+        clone.design = fixedDesign
+        setOcdDocument(clone)
+    }
+    return <OcdGovernancePanel findings={findings} design={ocdDocument.design} onApplyFix={handleApplyFix} />
+}
+
 const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, setOcdDocument }: ConsolePageProps): JSX.Element => {
+    const { setActiveFile } = useContext(ActiveFileContext)
     const showQueryDialog = ocdDocument.query
     const showReferenceDataQueryDialog = ocdConsoleConfig.queryReferenceData
     const showExportToResourceManagerDialog = ocdDocument.dialog.resourceManager
+    const showTemplateGallery = ocdDocument.dialog.templateGallery
+    // Seed the chosen architecture template into a fresh design, lay it out, and
+    // drop the user on the Designer page (mirrors the LZ Open-in-Designer flow).
+    const onTemplateSelect = (templateId: string) => {
+        const template = findTemplate(templateId)
+        if (!template) return
+        const clone = OcdDocument.clone(ocdDocument)
+        clone.design = template.build()
+        clone.dialog.templateGallery = false
+        clone.autoLayout(clone.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle ?? 'dynamic-columns')
+        setOcdDocument(clone)
+        setActiveFile({ name: `${template.title}.okit`, modified: true })
+        ocdConsoleConfig.config.displayPage = 'designer'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onTemplateGalleryClose = () => {
+        const clone = OcdDocument.clone(ocdDocument)
+        clone.dialog.templateGallery = false
+        setOcdDocument(clone)
+    }
     console.debug('OcdConsoleBody: Dialogs: Query', showQueryDialog, 'ReferenceData', showReferenceDataQueryDialog, 'Resource Manager', showExportToResourceManagerDialog)
     // Widened so an eager page component and the lazy-loaded OcdLandingZone
     // (a LazyExoticComponent) are both assignable.
@@ -379,6 +437,12 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
         case 'validation':
             DisplayPage = OcdValidation
             break;
+        case 'governance':
+            DisplayPage = OcdGovernance
+            break;
+        case 'plan':
+            DisplayPage = OcdLzPlanPage
+            break;
         case 'help':
             DisplayPage = OcdHelp
             break;
@@ -408,9 +472,13 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
                 ocdDocument={ocdDocument} 
                 setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} 
             />}
-            {showExportToResourceManagerDialog && <OcdExportToResourceManagerDialog 
-                ocdDocument={ocdDocument} 
-                setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} 
+            {showExportToResourceManagerDialog && <OcdExportToResourceManagerDialog
+                ocdDocument={ocdDocument}
+                setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)}
+            />}
+            {showTemplateGallery && <OcdTemplateGallery
+                onSelect={onTemplateSelect}
+                onClose={onTemplateGalleryClose}
             />}
         </div>
     )

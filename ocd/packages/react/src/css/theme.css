@@ -83,6 +83,422 @@ details[open] > summary.summary-background {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iNCIgeT0iNiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjEwIiByeD0iMiIgc3Ryb2tlPSIjMTYxNTEzIiBzdHJva2Utd2lkdGg9IjMiLz48cmVjdCB4PSI5IiB5PSIyMCIgd2lkdGg9IjIyIiBoZWlnaHQ9IjYiIHJ4PSIxLjUiIHN0cm9rZT0iIzE2MTUxMyIgc3Ryb2tlLXdpZHRoPSIzIi8+PHJlY3QgeD0iOSIgeT0iMjkiIHdpZHRoPSIyMiIgaGVpZ2h0PSI2IiByeD0iMS41IiBzdHJva2U9IiMxNjE1MTMiIHN0cm9rZS13aWR0aD0iMyIvPjwvc3ZnPg==");
 }
 
+/* ------------------------------------------------------------------
+   Landing Zone Next-Gen — primary hero CTA.
+   Promoted from a 15px toolbar icon to a labeled red pill so the
+   flagship Landing Zone wizard is the unmistakable primary action.
+   Tokens (--oracle-*) live on :root in ocd-redwood-ng-theme.css
+   (inert until consumed), so this reads correctly in every theme.
+------------------------------------------------------------------ */
+.ocd-lz-hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 23px;
+    padding: 0 13px 0 10px;
+    margin: 0 4px;
+    border: none;
+    border-radius: 12px;
+    background: var(--oracle-red, #C74634);
+    color: var(--oracle-white, #FFFFFF);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(199, 70, 52, 0.4);
+    transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+    vertical-align: middle;
+    align-self: center;
+}
+
+.ocd-lz-hero-cta:hover {
+    background: var(--oracle-red-dark, #A63D2E);
+    box-shadow: 0 3px 10px rgba(199, 70, 52, 0.5);
+    transform: translateY(-1px);
+}
+
+.ocd-lz-hero-cta:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(199, 70, 52, 0.45);
+}
+
+.ocd-lz-hero-cta:focus-visible {
+    outline: 2px solid var(--oracle-bark, #312D2A);
+    outline-offset: 2px;
+}
+
+.ocd-lz-hero-cta-icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 16px;
+    /* White-stroke variant of the .landing-zone glyph for contrast on red. */
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='4' y='6' width='32' height='10' rx='2' stroke='%23FFFFFF' stroke-width='3'/%3E%3Crect x='9' y='20' width='22' height='6' rx='1.5' stroke='%23FFFFFF' stroke-width='3'/%3E%3Crect x='9' y='29' width='22' height='6' rx='1.5' stroke='%23FFFFFF' stroke-width='3'/%3E%3C/svg%3E");
+}
+
+.ocd-lz-hero-cta-label {
+    letter-spacing: 0.01em;
+}
+
+/* One-time attention pulse on first mount; respects reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+    .ocd-lz-hero-cta {
+        animation: ocd-lz-cta-pulse 2.6s ease-in-out 1.2s 3;
+    }
+}
+
+@keyframes ocd-lz-cta-pulse {
+    0%, 100% { box-shadow: 0 1px 3px rgba(199, 70, 52, 0.4); }
+    50% { box-shadow: 0 0 0 4px rgba(199, 70, 52, 0.22), 0 2px 8px rgba(199, 70, 52, 0.5); }
+}
+
+/* Governance & Compliance toolbar icon — shield + check glyph. */
+.governance {
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 3l14 5v9c0 9-6 15-14 18-8-3-14-9-14-18V8l14-5z' stroke='%23161513' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M14 20l4 4 8-9' stroke='%23161513' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ------------------------------------------------------------------
+   Architecture Template Gallery — modal picker of starter designs.
+   Reuses the existing .ocd-dialog-* shell; adds the card grid layer.
+------------------------------------------------------------------ */
+.ocd-template-gallery-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(49, 45, 42, 0.45);
+}
+
+.ocd-template-gallery {
+    width: min(900px, 92vw);
+    max-height: 86vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--oracle-white, #FFFFFF);
+    border: 1px solid var(--oracle-border, #E0E0E0);
+    border-radius: 10px;
+    box-shadow: 0 18px 50px rgba(49, 45, 42, 0.28);
+    overflow: hidden;
+}
+
+.ocd-template-gallery-intro {
+    margin: 0;
+    padding: 4px 4px 12px;
+    color: var(--oracle-text-muted, #5C5C5C);
+    font-size: 13px;
+}
+
+.ocd-template-gallery-body {
+    overflow-y: auto;
+}
+
+.ocd-template-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    padding: 4px;
+}
+
+.ocd-template-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid var(--oracle-border, #E0E0E0);
+    border-radius: 8px;
+    background: var(--oracle-bg, #F5F5F5);
+    cursor: pointer;
+    transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.ocd-template-card:hover,
+.ocd-template-card.selected {
+    border-color: var(--oracle-red, #C74634);
+    box-shadow: 0 4px 14px rgba(199, 70, 52, 0.18);
+    transform: translateY(-2px);
+}
+
+.ocd-template-card-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--oracle-bark, #312D2A);
+}
+
+.ocd-template-card-description {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--oracle-text-muted, #5C5C5C);
+}
+
+.ocd-template-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+}
+
+.ocd-template-tag {
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(199, 70, 52, 0.10);
+    color: var(--oracle-red-dark, #A63D2E);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* ------------------------------------------------------------------
+   Governance panel extras — most styling is inherited from the
+   .ocd-validation-* page classes the panel reuses.
+------------------------------------------------------------------ */
+.ocd-governance-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 8px 0 14px;
+}
+
+.ocd-governance-severity-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(49, 45, 42, 0.08);
+    color: var(--oracle-bark, #312D2A);
+}
+
+.ocd-governance-severity-badge.critical { background: rgba(199, 70, 52, 0.16); color: var(--oracle-red-dark, #A63D2E); }
+.ocd-governance-severity-badge.high { background: rgba(214, 122, 32, 0.16); color: #9a5a17; }
+.ocd-governance-severity-badge.medium { background: rgba(193, 160, 30, 0.18); color: #7d6810; }
+.ocd-governance-severity-badge.low { background: rgba(46, 125, 50, 0.14); color: var(--oracle-success, #2e7d32); }
+
+.ocd-governance-category-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--oracle-text-muted, #5C5C5C);
+}
+
+.ocd-governance-resource-name {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    color: var(--oracle-text-muted, #5C5C5C);
+}
+
+.ocd-governance-empty-group {
+    padding: 10px 0;
+    color: var(--oracle-success, #2e7d32);
+    font-size: 13px;
+}
+
+/* Remediation block under each finding: fix summary + Copy Terraform / Apply fix. */
+.ocd-governance-remediation {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--oracle-border, #E0E0E0);
+}
+
+.ocd-governance-remediation-summary {
+    margin: 0 0 6px;
+    font-size: 12px;
+    color: var(--oracle-text, #312D2A);
+}
+
+.ocd-governance-remediation-summary::before {
+    content: 'Fix: ';
+    font-weight: 700;
+    color: var(--oracle-red-dark, #A63D2E);
+}
+
+.ocd-governance-remediation-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ocd-governance-remediation-copy-btn,
+.ocd-governance-remediation-apply-btn {
+    padding: 3px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 120ms ease, box-shadow 120ms ease;
+}
+
+.ocd-governance-remediation-copy-btn {
+    border: 1px solid var(--oracle-border, #E0E0E0);
+    background: var(--oracle-white, #FFFFFF);
+    color: var(--oracle-text, #312D2A);
+}
+
+.ocd-governance-remediation-copy-btn:hover {
+    background: var(--oracle-bg, #F5F5F5);
+}
+
+.ocd-governance-remediation-apply-btn {
+    border: none;
+    background: var(--oracle-red, #C74634);
+    color: var(--oracle-white, #FFFFFF);
+}
+
+.ocd-governance-remediation-apply-btn:hover {
+    background: var(--oracle-red-dark, #A63D2E);
+    box-shadow: 0 2px 8px rgba(199, 70, 52, 0.4);
+}
+
+/* Landing Zone Plan / Diff toolbar icon — two overlapping documents (compare). */
+.ocd-lz-plan {
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='5' y='5' width='20' height='26' rx='2' stroke='%23161513' stroke-width='3'/%3E%3Crect x='15' y='11' width='20' height='26' rx='2' fill='white' stroke='%23161513' stroke-width='3'/%3E%3Cpath d='M20 19h10M20 25h10M20 31h6' stroke='%23161513' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* ------------------------------------------------------------------
+   Landing Zone Plan / Diff page + panel.
+------------------------------------------------------------------ */
+.ocd-plan-view {
+    padding: 12px 16px;
+    overflow-y: auto;
+}
+
+.ocd-plan-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.ocd-plan-load-btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--oracle-red, #C74634);
+    color: var(--oracle-white, #FFFFFF);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 120ms ease, box-shadow 120ms ease;
+}
+
+.ocd-plan-load-btn:hover {
+    background: var(--oracle-red-dark, #A63D2E);
+    box-shadow: 0 3px 10px rgba(199, 70, 52, 0.4);
+}
+
+.ocd-plan-toolbar-hint {
+    font-size: 12px;
+    color: var(--oracle-text-muted, #5C5C5C);
+}
+
+.ocd-plan-empty,
+.ocd-plan-error {
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.ocd-plan-empty {
+    background: var(--oracle-bg, #F5F5F5);
+    color: var(--oracle-text-muted, #5C5C5C);
+}
+
+.ocd-plan-error {
+    background: rgba(199, 70, 52, 0.10);
+    color: var(--oracle-red-dark, #A63D2E);
+}
+
+.ocd-plan-summary-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 8px 0 14px;
+}
+
+.ocd-plan-summary-create,
+.ocd-plan-summary-update,
+.ocd-plan-summary-delete,
+.ocd-plan-summary-noop {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ocd-plan-summary-create { background: rgba(46, 125, 50, 0.14); color: var(--oracle-success, #2e7d32); }
+.ocd-plan-summary-update { background: rgba(193, 160, 30, 0.18); color: #7d6810; }
+.ocd-plan-summary-delete { background: rgba(199, 70, 52, 0.16); color: var(--oracle-red-dark, #A63D2E); }
+.ocd-plan-summary-noop { background: rgba(49, 45, 42, 0.08); color: var(--oracle-text-muted, #5C5C5C); }
+
+.ocd-plan-group-body {
+    padding: 4px 0 8px;
+}
+
+.ocd-plan-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 4px 6px;
+    border-left: 3px solid transparent;
+    font-size: 13px;
+}
+
+.ocd-plan-action-create { border-left-color: var(--oracle-success, #2e7d32); }
+.ocd-plan-action-update { border-left-color: #c1a01e; }
+.ocd-plan-action-delete { border-left-color: var(--oracle-red, #C74634); }
+.ocd-plan-action-noop { border-left-color: var(--oracle-border, #E0E0E0); }
+
+.ocd-plan-symbol {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 700;
+    width: 1.2em;
+    text-align: center;
+}
+
+.ocd-plan-action-create .ocd-plan-symbol { color: var(--oracle-success, #2e7d32); }
+.ocd-plan-action-update .ocd-plan-symbol { color: #7d6810; }
+.ocd-plan-action-delete .ocd-plan-symbol { color: var(--oracle-red, #C74634); }
+
+.ocd-plan-entry-type {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--oracle-text-muted, #5C5C5C);
+}
+
+.ocd-plan-entry-name { font-weight: 600; color: var(--oracle-bark, #312D2A); }
+.ocd-plan-entry-key,
+.ocd-plan-change-count { font-size: 11px; color: var(--oracle-text-muted, #5C5C5C); }
+
+.ocd-plan-field-changes {
+    margin: 2px 0 6px 1.6em;
+    padding-left: 10px;
+    border-left: 1px dashed var(--oracle-border, #E0E0E0);
+}
+
+.ocd-plan-field-change {
+    font-size: 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.ocd-plan-field-name { color: var(--oracle-bark, #312D2A); font-weight: 600; }
+.ocd-plan-field-from { color: var(--oracle-red-dark, #A63D2E); }
+.ocd-plan-field-arrow { color: var(--oracle-text-muted, #5C5C5C); padding: 0 4px; }
+.ocd-plan-field-to { color: var(--oracle-success, #2e7d32); }
+
 .eye-show {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDIiIGhlaWdodD0iMzMiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTIxIDJDMTIuMiAyIDUuMzMzIDExLjMzMyAzIDE2YzUuNiAxMS4yIDE0LjMzMyAxNCAxOCAxNCA4LjguOCAxNS42NjctOSAxOC0xNEMzNC4yIDQuOCAyNSAyIDIxIDJ6IiBzdHJva2U9IiMxNjE1MTMiIHN0cm9rZS13aWR0aD0iNCIvPjxwYXRoIGQ9Ik0yNyAxNmE2IDYgMCAxMS0xMiAwIDYgNiAwIDAxMTIgMHoiIHN0cm9rZT0iIzE2MTUxMyIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+");
 }

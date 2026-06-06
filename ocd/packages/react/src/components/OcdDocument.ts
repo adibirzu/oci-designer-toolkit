@@ -33,7 +33,8 @@ export class OcdDocument {
         this.query = false
         this.dialog = {
             resourceManager: false,
-            query: false
+            query: false,
+            templateGallery: false
         }
     }
 
