@@ -1,9 +1,9 @@
 {
   "name": "ocd",
   "productName": "ocd",
-  "version": "0.4.0",
-  "description": "OKIT Open Cloud Designer Desktop",
-  "title": "OKIT Open Cloud Designer Desktop",
+  "version": "0.4.5",
+  "description": "Oracle Designer Toolkit - OCTO",
+  "title": "Oracle Designer Toolkit - OCTO",
   "author": {
     "name": "Andrew Hopkinson",
     "email": "andrew.hopkinson@oracle.com",

@@ -1,5 +1,19 @@
 # Release Notes
 
+> **Versioning scheme (enhanced fork).** Each new major add-on bumps the patch by `0.0.5`
+> (e.g. 0.4.0 → 0.4.5). Smaller changes bump the 4th component `0.0.x.x`
+> (e.g. 0.4.5 → 0.4.5.1). Major/minor jumps (e.g. → 0.5.0, → 1.0.0) are set by the maintainer.
+
+
+## Enhanced Fork Release (v0.4.5)
+
+### Oracle Designer Toolkit - OCTO
+#### Rebrand
+- Product renamed **Oracle Designer Toolkit - OCTO** (window title, in-app headers, LZ wizard header, favicon). OCTO octopus brand mark wired into the Designer console header and the Landing Zone wizard header. Internal package id / Electron bundle kept as `ocd` for artifact + CI stability.
+
+#### Fixes
+- **Landing Zone generation restored in web/Pages builds.** The Go WASM runtime shim (`globalThis.Go`) was being tree-shaken out of production bundles because `@ocd/react`'s `sideEffects` allow-list only covered CSS; the side-effect-only `import './wasm/wasmExec'` was dropped, so `libjsonnet.wasm` could not instantiate ("Go WASM runtime did not initialize"). Added the shim to the `sideEffects` allow-list. LZ generation and **Open in Designer** now work in the static web build.
+
 
 ## Enhanced Fork Release (v0.4.0)
 

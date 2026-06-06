@@ -196,7 +196,7 @@ export namespace OcdDesign {
                 ocdSchemaVersion: schemaVersion,
                 ocdModelId: `ocd-model-${uuidv4()}`,
                 platform: 'oci',
-                title: 'Untitled - Edge Cloud Design',
+                title: 'Untitled - Oracle Designer Toolkit - OCTO',
                 documentation: '',
                 created: `${date} ${time}`,
                 updated: '',

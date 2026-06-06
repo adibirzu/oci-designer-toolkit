@@ -1,6 +1,6 @@
 {
   "name": "@ocd/codegen-cli",
-  "version": "0.4.0",
+  "version": "0.4.5",
   "description": "OKIT Open Cloud DesignerCodegen Command-line",
   "title": "OKIT Open Cloud Designer Codegen Command-linetop",
   "author": {
