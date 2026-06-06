@@ -5,6 +5,43 @@
 > (e.g. 0.4.5 → 0.4.5.1). Major/minor jumps (e.g. → 0.5.0, → 1.0.0) are set by the maintainer.
 
 
+## Enhanced Fork Release (v0.4.5.3)
+
+### Oracle Designer Toolkit - OCTO
+
+#### Smart connectivity / reachability analysis
+- **Network-intent checks merged into the Governance page.** A new pure graph analysis (`analysis/OcdReachability.ts`, `evaluateReachability(design)`) walks subnets ↔ route tables ↔ gateways ↔ databases and flags: subnet with no egress route, dangling route target (rule points at an absent gateway), internet-reachable database (0.0.0.0/0 → Internet Gateway in front of a DB), database in a public subnet, and subnet referencing a missing route table / security list. Findings reuse the `GovernanceFinding` shape (category `network`, guidance-only remediation + Terraform) and are concatenated into the Governance page alongside the posture checks. 32 Vitest specs.
+
+#### Landing Zone Plan / Diff
+- **Compare the current design against an imported Landing Zone** (new toolbar action → Plan page). A pure `diffDesigns(base, target)` (`landingzone/plan/OcdLzPlan.ts`) matches resources across two designs by `resourceType`+`displayName` (id fallback) and produces a terraform-plan-style **create / update / delete / no-op** list, excluding volatile fields (`id`, `ocid`, `okitReference`, `region`, and `*Id`/`*Ids` uuid cross-refs) so only semantic changes show. `OcdLzPlanPanel` renders the plan grouped by action with per-field `from → to` diffs; the Plan page loads the comparison target via the existing LZNG file picker (`buildDesignFromLzUpload`). 22 Vitest specs.
+
+> Both shipped via parallel agents on disjoint modules, integrated in one pass: `tsc --noEmit` clean, `build:pages` green, 271/271 Vitest, both surfaces verified headless.
+
+
+## Enhanced Fork Release (v0.4.5.2)
+
+### Oracle Designer Toolkit - OCTO
+
+#### Governance remediation generator
+- **Findings are now actionable.** Each governance finding carries a `remediation` (a one-line *Fix:* summary plus an illustrative Terraform snippet, copied via **Copy Terraform**). Where a fix is deterministic and safe, an **Apply fix** button edits the design model in place and the finding clears on re-evaluation. Auto-fixable rules: public subnet → `prohibitPublicIpOnVnic = true`, public bucket → `accessType = 'NoPublicAccess'`, public instance → `createVnicDetails.assignPublicIp = false`. The remaining checks (open ingress, missing NSG/Budget/compartment, DB subnet placement, tags) are guidance-only — no safe deterministic default, so they get Terraform + summary without auto-apply. `applyRemediation(design, finding)` is pure/immutable (id-safe no-op when the resource is gone); covered by Vitest (governance suite now 45 specs, 217 total). Wired through the `OcdGovernance` page adapter → `setOcdDocument`.
+
+
+## Enhanced Fork Release (v0.4.5.1)
+
+### Oracle Designer Toolkit - OCTO
+
+#### Landing Zone Next-Gen hero CTA
+- **Promoted LZ wizard entry point.** The Landing Zone Next-Gen wizard is now accessible via a prominent labeled red-pill button — `.ocd-lz-hero-cta` — rendered in the OcdConsole home area. The previous entry point was a 15 px toolbar icon (title="Landing Zone Wizard"); the new CTA pairs a glyph with a visible text label ("Landing Zone Next-Gen"), making the primary action immediately discoverable at any viewport width. Clicking the CTA sets `displayPage = 'landingzone'` and lazy-loads `OcdLandingZone` exactly as before.
+- **E2E coverage added.** `e2e/specs/lzng-hero-cta.spec.ts` verifies: the `.ocd-lz-hero-cta` button is visible with label text "Landing Zone Next-Gen", is not disabled, and clicking it opens the wizard on the Foundation step (`.ocd-lzng`, stepper nav, `aria-current="step"` → Foundation, `Step 1 of 5` subtitle).
+
+#### Enterprise architecture lanes
+- **Architecture template gallery** (File ▸ *New from Template…*). A modal picker of curated starter architectures (hub-spoke network, three-tier web app, OKE platform, secure landing-zone-lite). Selecting a template builds a fresh, valid `OcdDesign` via the model resource factories, auto-arranges it, and drops the user on the Designer — the wireframe-tool "start from a template" entry point. New modules under `landingzone/templates/` (`OcdArchitectureTemplates.ts`, `OcdTemplateGallery.tsx`); the gallery reuses the existing `ocd-dialog-*` shell plus new `ocd-template-*` card styles.
+- **Upstream OKIT feature-sync banner.** The Landing Zone updates banner now also detects when the public upstream `oracle/oci-designer-toolkit` has new commits / model resources beyond this fork's baseline, and surfaces a read-only **"new upstream features available"** row with a compare link and a copy-to-clipboard, spelled-out curation path (re-vendor + which curation file to extend) — guided, never an automatic regen (the catalog is a curated allow-list). New modules under `upstream/` (`OcdUpstreamCheck.ts`, `useUpstreamFeatureCheck.ts`); unauthenticated GitHub REST with a 6 h cache and rate-limit-tolerant degradation.
+- **Governance & compliance posture overlay.** A new **Governance** toolbar action (shield icon) + page runs a pure rule set (`governance/OcdGovernanceChecks.ts`) over the current design and lists findings grouped by severity — ~12 CIS-OCI-style checks across network exposure (public subnets, `0.0.0.0/0` ingress), public buckets, missing cost-tracking tags, single-compartment segmentation, DB/LB without NSG/private subnet, and missing Budget. Mirrors the validation page surface; covered by Vitest specs.
+
+> The Landing Zone Next-Gen hero CTA, template gallery, upstream feature-sync banner, and governance overlay were developed in parallel across four isolated lanes and integrated together: full `tsc --noEmit` clean, `build:pages` green, 194/194 Vitest tests passing, and all four surfaces verified in a headless-browser screenshot pass.
+
+
 ## Enhanced Fork Release (v0.4.5)
 
 ### Oracle Designer Toolkit - OCTO
