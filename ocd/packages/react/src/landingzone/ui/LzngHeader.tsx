@@ -68,7 +68,7 @@ export function LzngHeader({ layout, onLayoutChange, onExit }: LzngHeaderProps):
                 </button>
                 <span className='ocd-lzng-brand-divider' aria-hidden />
                 <span className='ocd-lzng-logo' aria-hidden />
-                <span className='ocd-lzng-brand-name'>Oracle Cloud Infrastructure</span>
+                <span className='ocd-lzng-brand-name'>Oracle Designer Toolkit - OCTO</span>
                 <span className='ocd-lzng-brand-divider' aria-hidden />
                 <span className='ocd-lzng-brand-sub'>Landing Zone Next Gen</span>
             </div>
