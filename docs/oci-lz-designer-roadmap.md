@@ -6,6 +6,7 @@ Captures the larger, multi-phase work requested for the enhanced toolkit. Each p
 - ✅ Oracle Redwood (Next-Gen) theme; live cost estimator (cetools pricing); modern 5-step Landing Zone Wizard (Foundation→Review) with live React-Flow diagram + real Operating-Entities jsonnet generation.
 - ✅ OCI stencil palette restored (was commented out upstream); web Terraform import; Back-to-Designer exit; in-app LZ update notifications (GitHub) + `setup-lz`.
 - ✅ Issue fixes (#434/#633/#563/#369/#452/#741/#543, etc.).
+- ✅ **Landing Zone wizard promoted to hero entry point** (v0.4.5.1). The 15 px toolbar icon was replaced by a labeled primary red-pill button (`.ocd-lz-hero-cta`, text "Landing Zone Next-Gen") rendered in the console home area. E2E coverage added: `e2e/specs/lzng-hero-cta.spec.ts`.
 
 ## Phase A — Stencils: full catalog + official icons (L3)
 - ✅ A1. Auto-generate the OCI palette from ALL model resources — `OcdPalette.ts` from the model registry, grouped, using the `oci-*` icon classes; flags resources without an icon. (commit `6f6f5429`)
@@ -31,6 +32,19 @@ Browsers cannot read `~/.oci/config` or call the OCI SDK (CORS). Needs a backend
 
 ## Recommended sequence
 ✅ Done: B1 → A1 → B3 → A3 → B2 → C. **Remaining:** A5 (palette → LZ attach) → A4 (per-stencil TF preview + relations) → A2 (full-schema service catalog regen). Quality follow-ups (not original roadmap): web bundle code-splitting, JS/TS test runner (Vitest), wizard E2E.
+
+## Phase D — Enterprise entry-point lanes (in flight)
+
+These lanes are under active development in parallel branches and are expected to land shortly after v0.4.5.1.
+
+### D1. Architecture Template Gallery ◐
+A curated library of OCI reference architecture templates (hub-and-spoke, multi-region HA, security zones, data platform, etc.) surfaced as a picker inside the Designer / wizard onboarding flow. Selecting a template pre-populates the wizard state or directly seeds the designer canvas, reducing the time-to-first-design for standard topologies. Templates are bundled as static JSON/jsonnet snapshots; custom templates can be added to `ocd/library/`.
+
+### D2. Upstream OKIT Feature-Sync Banner ◐
+Extends the existing "OCI Landing Zone updates available" notification pattern to cover upstream OKIT releases. The banner appears when the upstream `okit-oci` main branch has commits not yet cherry-picked into this fork. It displays a diff summary (new resources, property changes, bug fixes), links to the upstream GitHub compare view, and provides a guided re-vendor command. Ensures the enhanced fork does not drift silently from upstream improvements.
+
+### D3. Governance & Compliance Overlay ◐
+An optional designer overlay that annotates the canvas with policy and IAM guardrail recommendations based on a selected compliance framework (CIS OCI Foundations Benchmark, DISA-STIG, internal enterprise baselines). Compliance rules are declared as JSON rule sets in `ocd/library/compliance/`; the overlay adds visual badges to non-compliant resources and generates a remediation checklist. Complements the existing DB-Observability and OKE-native overlays.
 
 ## Notes
 - Discovery, canvas drag/connect, and OCI SDK calls are Electron-runtime (fs + SDK + no CORS). The web preview covers the wizard, palette, and Terraform import.
