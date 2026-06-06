@@ -69,9 +69,12 @@ describe('categorizeLzResource', () => {
         expect(categorizeLzResource('compartment')).toBe('other')
     })
 
-    it('classifies an unknown type as other', () => {
-        expect(categorizeLzResource('instance')).toBe('other')
-        expect(categorizeLzResource('completely_unknown')).toBe('other')
+    it('classifies non-LZ resources (Compute, OKE, DB) as workload', () => {
+        expect(categorizeLzResource('instance')).toBe('workload')
+        expect(categorizeLzResource('oke_cluster')).toBe('workload')
+        expect(categorizeLzResource('autonomous_database')).toBe('workload')
+        expect(categorizeLzResource('db_system')).toBe('workload')
+        expect(categorizeLzResource('completely_unknown')).toBe('workload')
     })
 })
 
@@ -106,8 +109,15 @@ describe('resolveLzPlacement', () => {
         expect(resolveLzPlacement('compartment', allCompartments)).toBe('cmp-root')
     })
 
-    it('places an unknown resource type in the fallback (root) compartment', () => {
-        expect(resolveLzPlacement('instance', allCompartments)).toBe('cmp-root')
+    it('places non-LZ workload resources (Compute/OKE/DB) in the workload compartment', () => {
+        expect(resolveLzPlacement('instance', allCompartments)).toBe('cmp-wrk')
+        expect(resolveLzPlacement('oke_cluster', allCompartments)).toBe('cmp-wrk')
+        expect(resolveLzPlacement('autonomous_database', allCompartments)).toBe('cmp-wrk')
+    })
+
+    it('falls back to root for a workload resource when no workload compartment exists', () => {
+        const cmps = [rootCmp, networkCmp, securityCmp]
+        expect(resolveLzPlacement('instance', cmps)).toBe('cmp-root')
     })
 
     it('falls back to root when no network compartment is present', () => {

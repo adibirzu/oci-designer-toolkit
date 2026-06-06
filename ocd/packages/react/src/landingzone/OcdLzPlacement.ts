@@ -54,20 +54,33 @@ export function isLzOriginDesign(design: { userDefined?: Record<string, unknown>
 }
 
 /**
- * Categorise an OCD model resource type into one of the three LZ placement
- * categories derived from the B3 name map.
+ * Categorise an OCD model resource type into one of the LZ placement categories.
+ *
+ *   - 'network' / 'iam'  : driven by the B3 OcdLzResourceMap oeKind prefix.
+ *   - 'other'            : a bare `compartment` stencil (added at the active layer).
+ *   - 'workload'         : ANY resource the OE/LZ generator does not emit — i.e.
+ *                          the user's own additions (Compute, OKE, DB, Storage,
+ *                          Load Balancer, …). These belong in a workload /
+ *                          application / project compartment, not at the root.
  */
-export type LzResourceCategory = 'iam' | 'network' | 'other'
+export type LzResourceCategory = 'iam' | 'network' | 'workload' | 'other'
 
 export function categorizeLzResource(ocdModelType: string): LzResourceCategory {
     if (ocdModelType === 'compartment') return 'other'
     const entry = byOcdModelType(ocdModelType)
-    if (!entry) return 'other'
+    // Not an OE/LZ-generated resource → a user workload addition.
+    if (!entry) return 'workload'
     const firstKind = entry.oeKinds[0] ?? ''
     if (firstKind.startsWith('network.')) return 'network'
     if (firstKind.startsWith('iam.')) return 'iam'
-    return 'other'
+    return 'workload'
 }
+
+/**
+ * Compartment-name fragments (case-insensitive) that identify a compartment
+ * suitable for application/workload resources in a generated LZ hierarchy.
+ */
+const WORKLOAD_COMPARTMENT_HINTS = ['workload', 'application', 'project', 'compute', 'app-'] as const
 
 /**
  * Resolve the best compartment id for a dropped palette stencil inside an
@@ -107,6 +120,16 @@ export function resolveLzPlacement(
         return iamCmp ? iamCmp.id : fallback
     }
 
-    // 'other' (compartment stencil + anything not in the B3 map): use fallback.
+    if (category === 'workload') {
+        // Prefer a workload / application / project compartment for user-added
+        // non-LZ resources (Compute, OKE, DB, …). Fall back to root otherwise.
+        const wrkCmp = compartments.find((c) => {
+            const name = c.displayName?.toLowerCase() ?? ''
+            return WORKLOAD_COMPARTMENT_HINTS.some((hint) => name.includes(hint))
+        })
+        return wrkCmp ? wrkCmp.id : fallback
+    }
+
+    // 'other' (bare compartment stencil): use fallback (the root / active layer).
     return fallback
 }
