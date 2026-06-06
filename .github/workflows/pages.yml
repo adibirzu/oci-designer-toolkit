@@ -42,7 +42,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 26
 
       # The repo ships the workspaces but NOT the generated resource files
       # (provider resources.ts, etc. are gitignored) nor the OE jsonnet sources
