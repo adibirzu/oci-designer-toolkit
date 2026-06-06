@@ -69,6 +69,23 @@ export const menuItems: MenuItem[] = [
                 }
             },
             {
+                label: 'New from Template…',
+                click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function, activeFile: Record<string, any>, setActiveFile: Function) => {
+                    const openGallery = () => {
+                        const document: OcdDocument = OcdDocument.clone(ocdDocument)
+                        document.dialog.templateGallery = true
+                        setOcdDocument(document)
+                    }
+                    if (activeFile.modified) {
+                        OcdDesignFacade.discardConfirmation().then((discard) => {
+                            if (discard) openGallery()
+                        }).catch((resp) => {console.warn('Discard Failed with', resp)})
+                    } else {
+                        openGallery()
+                    }
+                }
+            },
+            {
                 label: 'Open',
                 click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function, activeFile: Record<string, any>, setActiveFile: Function) => {
                     if (activeFile.modified) {

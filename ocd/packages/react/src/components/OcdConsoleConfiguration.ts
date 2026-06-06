@@ -9,7 +9,7 @@ export interface OcdConsoleConfiguration {
     showModelPalette: boolean
     showProvidersPalette: string[]
     verboseProviderPalette: boolean
-    displayPage: 'bom' | 'designer' | 'documentation' | 'help' | 'landingzone' | 'library' | 'markdown' | 'tabular' | 'tags' | 'terraform' | 'variables' | 'validation'
+    displayPage: 'bom' | 'designer' | 'documentation' | 'governance' | 'help' | 'landingzone' | 'library' | 'markdown' | 'plan' | 'tabular' | 'tags' | 'terraform' | 'variables' | 'validation'
     helpPage?: 'releasenotes' | 'userguide'
     detailedResource: boolean
     showPreviousViewOnStart: boolean
