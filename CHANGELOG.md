@@ -17,6 +17,7 @@
 #### Designer & Landing Zone
 - **Continue in the Designer with non-LZ resources.** After Open-in-Designer, dropping a non-LZ stencil (Compute, OKE, DB, storage, LB — anything the OE/LZ generator does not emit) now routes it to a workload/application/project compartment instead of the root.
 - **Import LZNG output files** (File ▸ Import ▸ *OCI Landing Zone (LZNG)*): a multi-file picker reads pre-generated `iam.json` / `network.json` / … and rebuilds them into an editable, `lzOrigin`-flagged design — the upload counterpart to the wizard handoff.
+- **Import draw.io diagrams** (File ▸ Import ▸ *draw.io Diagram*): parse an uncompressed `.drawio` / `.xml` diagram, map each shape to an OCI resource (keyword/shape heuristics), and recreate the architecture **with its relations** — edges and container nesting become FK associations; the design is then auto-arranged. Compressed `.drawio` files prompt to re-export as uncompressed XML.
 - **draw.io-style drag-and-link.** In connect mode, the resource under the cursor highlights green (valid drop target — the source has an FK for its type) or red (invalid) while dragging, with an animated "marching ants" rubber-band.
 
 
