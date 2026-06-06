@@ -14,6 +14,7 @@ import { autoLayoutOptions } from '../data/OcdAutoLayoutOptions'
 import { getSvgCssData } from '../data/OcdSvgCssData'
 import { OcdExternalFacade } from '../facade/OcdExternalFacade'
 import { buildDesignFromLzUpload } from '../landingzone/OcdLzFileImport'
+import { buildDesignFromDrawio } from '../import/OcdDrawioImport'
 // import { OcdDesign } from '../../../model/lib/cjs'
 
 // const ociSvgThemeCss = svgCssData['oci-theme.css']
@@ -277,6 +278,12 @@ export const menuItems: MenuItem[] = [
                         label: 'OCI Landing Zone (LZNG)',
                         click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
                             importFromLandingZoneFiles(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig)
+                        }
+                    },
+                    {
+                        label: 'draw.io Diagram',
+                        click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                            importFromDrawio(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig)
                         }
                     },
                     // {
@@ -781,6 +788,50 @@ export const importFromLandingZoneFiles = (setOcdDocument: Function, ocdConsoleC
         // AbortError = user dismissed the picker; only surface real failures.
         if (reason?.name === 'AbortError') return
         console.warn('LZ import failed:', reason?.message ?? reason)
+        if (reason?.message) alert(reason.message)
+    })
+}
+
+/**
+ * Import a draw.io (diagrams.net) diagram and recreate it in the Designer.
+ *
+ * Reads a single uncompressed .drawio / .xml file, maps each shape to an OCI
+ * resource, wires edges + container nesting into FK associations, then
+ * auto-arranges and switches to the Designer. Compressed .drawio files raise a
+ * clear "re-export uncompressed" error.
+ */
+export const importFromDrawio = (setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function): Promise<any> => {
+    const pickFile = async (): Promise<{ name: string; content: string }> => {
+        const options = {
+            multiple: false,
+            types: [
+                {
+                    description: 'draw.io diagram (uncompressed XML)',
+                    accept: { 'application/xml': ['.drawio', '.xml'] },
+                },
+            ],
+        }
+        // @ts-ignore - File System Access API
+        const [handle] = await window.showOpenFilePicker(options)
+        const file = await handle.getFile()
+        return { name: file.name, content: await file.text() }
+    }
+    return pickFile().then(({ name, content }) => {
+        const title = name.replace(/\.(drawio|xml)$/i, '')
+        const { design, topCompartmentIds } = buildDesignFromDrawio(content, `Imported ${title}`)
+        const ocdDocument = OcdDocument.new()
+        ocdDocument.design = design
+        const layerIds: string[] = topCompartmentIds.length > 0
+            ? topCompartmentIds
+            : [design.model.oci.resources.compartment?.[0]?.id].filter(Boolean)
+        layerIds.forEach((id: string, i: number) => ocdDocument.addLayer(id, i === 0))
+        ocdDocument.autoLayout(ocdDocument.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle)
+        setOcdDocument(ocdDocument)
+        ocdConsoleConfig.config.displayPage = 'designer'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }).catch((reason: any) => {
+        if (reason?.name === 'AbortError') return
+        console.warn('draw.io import failed:', reason?.message ?? reason)
         if (reason?.message) alert(reason.message)
     })
 }
