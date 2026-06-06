@@ -72,6 +72,7 @@ import { buildDrawioXml } from '../landingzone/ui/LzngDrawioExport'
 import { LzngUpdateBanner } from '../landingzone/ui/LzngUpdateBanner'
 import { LzngSourcesPanel } from '../landingzone/ui/LzngSourcesPanel'
 import { useLzUpdateCheck } from '../landingzone/useLzUpdateCheck'
+import { useUpstreamFeatureCheck } from '../upstream/useUpstreamFeatureCheck'
 
 const SETUP_NOTICE = 'Run `npm run setup-lz` to enable Landing Zone generation.'
 const DEFAULT_TITLE = 'Untitled Landing Zone'
@@ -102,6 +103,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
     const [notice, setNotice] = useState<{ kind: 'info' | 'error'; text: string } | null>(null)
     const [busy, setBusy] = useState(false)
     const { statuses, loading: updatesLoading, anyUpdate, refresh: refreshUpdates } = useLzUpdateCheck()
+    const { status: upstreamStatus, hasNewFeatures: hasNewUpstreamFeatures } = useUpstreamFeatureCheck()
     const [bannerDismissed, setBannerDismissed] = useState(false)
     const [showSources, setShowSources] = useState(false)
     const [showDebug, setShowDebug] = useState(false)
@@ -241,12 +243,14 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         <div className='ocd-lzng' data-testid='lzng-wizard'>
             <LzngHeader layout={layout} onLayoutChange={setLayout} onExit={onExit} />
 
-            {anyUpdate && !bannerDismissed && (
+            {(anyUpdate || hasNewUpstreamFeatures) && !bannerDismissed && (
                 <LzngUpdateBanner
                     statuses={statuses}
                     onDismiss={() => setBannerDismissed(true)}
                     onOpenPanel={() => setShowSources(true)}
                     onRefresh={() => refreshUpdates(true)}
+                    upstreamStatus={upstreamStatus}
+                    hasNewUpstreamFeatures={hasNewUpstreamFeatures}
                 />
             )}
 
