@@ -41,6 +41,7 @@ import { OcdDesign, OciModelResources } from '@ocd/model'
 import { GeneratedFile } from './OcdLzGenerator'
 import { byOeKind } from './OcdLzResourceMap'
 import { LandingZoneConfig } from './OcdLzConfig'
+import { mapObservabilityJson } from './OcdLzObservabilityBridge'
 
 /**
  * `design.userDefined` key used by the canvas placement resolver (A5).
@@ -601,6 +602,17 @@ export function buildOcdDesignFromLz(files: GeneratedFile[], title = 'Landing Zo
     } else {
         notes.push('No network.json found; only IAM compartments were mapped.')
     }
+
+    // --- Observability: events rules, notification topics, service connectors,
+    // log groups + logs (observability.json). Parented to the root compartment. ---
+    const observability = mapObservabilityJson(findFile(files, 'observability.json'), compartmentRootId)
+    for (const [type, list] of Object.entries(observability.resources)) {
+        for (const resource of list) push(type, resource)
+    }
+    for (const [type, count] of Object.entries(observability.counts)) {
+        counts[type] = (counts[type] ?? 0) + count
+    }
+    notes.push(...observability.notes)
 
     // Mark the design as LZ-origin so the canvas placement resolver (A5) can
     // route dropped stencils into the correct LZ compartment automatically.
