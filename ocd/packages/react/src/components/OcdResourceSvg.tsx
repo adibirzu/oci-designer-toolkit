@@ -12,6 +12,7 @@ import { ResourceRectProps, ResourceForeignObjectProps, ResourceSvgProps, Resour
 import { OcdContextMenu } from './OcdCanvas'
 import { ActiveFileContext, SelectedResourceContext } from '../pages/OcdConsole'
 import { OcdDragResource, OcdSelectedResource } from '../types/Console'
+import { canConnectResources } from './OcdConnect'
 
 export const OcdSvgContextMenu = ({ contextMenu, setContextMenu, ocdDocument, setOcdDocument, resource }: ResourceSvgContextMenuProps): JSX.Element => {
     console.info('OcdResourceSvg: OcdSvgContextMenu')
@@ -386,6 +387,8 @@ export const OcdResourceSvg = ({ ocdConsoleConfig, ocdDocument, setOcdDocument, 
     const hidden = !visibleResourceIds.includes(resource.ocid)
     const [dragging, setDragging] = useState(false)
     const [origin, setOrigin] = useState({ x: 0, y: 0 })
+    // Draw.io-style drop-target hint while dragging a connection over this resource.
+    const [connectHint, setConnectHint] = useState<'none' | 'valid' | 'invalid'>('none')
     const containerLayout = (resource.container && (!resource.detailsStyle || resource.detailsStyle === 'default'))
     const SvgRect = containerLayout ? OcdContainerRect : OcdSimpleRect
     const gX = resource.x
@@ -460,6 +463,7 @@ export const OcdResourceSvg = ({ ocdConsoleConfig, ocdDocument, setOcdDocument, 
                 if (resource.id !== ocdDocument.dragResource.resource.id) {
                     ocdDocument.dragResource.connectTarget = resource
                 }
+                setConnectHint('none')
                 return
             }
             if (resource.container) {
@@ -472,16 +476,27 @@ export const OcdResourceSvg = ({ ocdConsoleConfig, ocdDocument, setOcdDocument, 
         }
     }
     const onNooPEvent = (e: React.MouseEvent<SVGElement>) => {}
-    const onResourceMouseEnter = (e: React.MouseEvent<SVGElement>) => {}
+    // Draw.io-style live drop-target highlight: while a connection drag is in
+    // progress (connect mode + a drag source recorded), entering another resource
+    // glows it green (the source has an FK for this type) or red (it does not).
+    const onResourceMouseEnter = (e: React.MouseEvent<SVGElement>) => {
+        const dragSource = ocdDocument.dragResource?.resource
+        if (!ocdConsoleConfig.config.connectMode || !dragSource?.ocid || dragSource.ocid === resource.ocid) return
+        setConnectHint(canConnectResources(ocdDocument.design, dragSource.ocid, resource.ocid) ? 'valid' : 'invalid')
+    }
     const onResourceMouseMove = (e: React.MouseEvent<SVGElement>) => {}
-    const onResourceMouseLeave = (e: React.MouseEvent<SVGElement>) => {}
+    const onResourceMouseLeave = (e: React.MouseEvent<SVGElement>) => {
+        if (connectHint !== 'none') setConnectHint('none')
+    }
     console.debug(`>> OcdResourceSvg: OcdResourceSvg: Render(${resource.id})`, resource.class, resource.ocid)
     return (
-        <g className='ocd-designer-resource' 
-            id={resource.id} 
+        <g className={`ocd-designer-resource${connectHint !== 'none' ? ` ocd-connect-target-${connectHint}` : ''}`}
+            id={resource.id}
             transform={`translate(${gX}, ${gY})`}
             onMouseDown={!hidden ? onResourceDragStart : onNooPEvent}
             onMouseUp={!hidden ? onResourceMouseUp : onNooPEvent}
+            onMouseEnter={!hidden ? onResourceMouseEnter : onNooPEvent}
+            onMouseLeave={!hidden ? onResourceMouseLeave : onNooPEvent}
             onClick={!hidden ? onResourceClick : onNooPEvent}
             onContextMenu={!hidden ? onResourceRightClick : onNooPEvent}
             >

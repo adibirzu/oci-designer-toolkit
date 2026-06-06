@@ -64,6 +64,21 @@ export interface ConnectResult {
 }
 
 /**
+ * Read-only predicate: would connecting `source` -> `target` succeed?
+ *
+ * True when source and target are distinct existing resources and the source has
+ * an FK field referencing the target's type. Used for the draw.io-style live
+ * drop-target highlight during a connect drag (no clone, no mutation).
+ */
+export function canConnectResources(design: OcdDesign, sourceModelId: string, targetModelId: string): boolean {
+    if (!sourceModelId || !targetModelId || sourceModelId === targetModelId) return false
+    const source = findResource(design, sourceModelId)
+    const target = findResource(design, targetModelId)
+    if (!source || !target) return false
+    return resolveConnectionField(source.resource, target.type) !== undefined
+}
+
+/**
  * Connect source -> target by setting the source's FK field for the target's
  * type. Pure (clones the design). Returns connected=false (and the original
  * design) when no FK field exists for that target type, or on self-connect.

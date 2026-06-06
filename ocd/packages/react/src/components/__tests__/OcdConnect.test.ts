@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from 'vitest'
 import { OcdDesign, OciModelResources } from '@ocd/model'
-import { connectResources, resolveConnectionField, toCamel } from '../OcdConnect'
+import { canConnectResources, connectResources, resolveConnectionField, toCamel } from '../OcdConnect'
 
 /** Minimal design with a VCN, subnet, route table, and security list. */
 function makeDesign(): { design: OcdDesign; ids: Record<string, string> } {
@@ -83,6 +83,32 @@ describe('OcdConnect', () => {
         const { design, ids } = makeDesign()
         const before = JSON.stringify(design)
         connectResources(design, ids.subnet, ids.vcn)
+        expect(JSON.stringify(design)).toBe(before)
+    })
+
+    // --- canConnectResources (drop-target validity predicate) ---
+    it('canConnectResources is true for a valid source -> target (subnet -> vcn)', () => {
+        const { design, ids } = makeDesign()
+        expect(canConnectResources(design, ids.subnet, ids.vcn)).toBe(true)
+        expect(canConnectResources(design, ids.subnet, ids.route_table)).toBe(true)
+    })
+
+    it('canConnectResources is false for an incompatible direction (vcn -> subnet)', () => {
+        const { design, ids } = makeDesign()
+        expect(canConnectResources(design, ids.vcn, ids.subnet)).toBe(false)
+    })
+
+    it('canConnectResources is false for self / missing ids', () => {
+        const { design, ids } = makeDesign()
+        expect(canConnectResources(design, ids.subnet, ids.subnet)).toBe(false)
+        expect(canConnectResources(design, ids.subnet, 'does-not-exist')).toBe(false)
+        expect(canConnectResources(design, '', ids.vcn)).toBe(false)
+    })
+
+    it('canConnectResources does not mutate the design', () => {
+        const { design, ids } = makeDesign()
+        const before = JSON.stringify(design)
+        canConnectResources(design, ids.subnet, ids.vcn)
         expect(JSON.stringify(design)).toBe(before)
     })
 })
