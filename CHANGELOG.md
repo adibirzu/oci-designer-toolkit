@@ -14,6 +14,11 @@
 #### Fixes
 - **Landing Zone generation restored in web/Pages builds.** The Go WASM runtime shim (`globalThis.Go`) was being tree-shaken out of production bundles because `@ocd/react`'s `sideEffects` allow-list only covered CSS; the side-effect-only `import './wasm/wasmExec'` was dropped, so `libjsonnet.wasm` could not instantiate ("Go WASM runtime did not initialize"). Added the shim to the `sideEffects` allow-list. LZ generation and **Open in Designer** now work in the static web build.
 
+#### Designer & Landing Zone
+- **Continue in the Designer with non-LZ resources.** After Open-in-Designer, dropping a non-LZ stencil (Compute, OKE, DB, storage, LB — anything the OE/LZ generator does not emit) now routes it to a workload/application/project compartment instead of the root.
+- **Import LZNG output files** (File ▸ Import ▸ *OCI Landing Zone (LZNG)*): a multi-file picker reads pre-generated `iam.json` / `network.json` / … and rebuilds them into an editable, `lzOrigin`-flagged design — the upload counterpart to the wizard handoff.
+- **draw.io-style drag-and-link.** In connect mode, the resource under the cursor highlights green (valid drop target — the source has an FK for its type) or red (invalid) while dragging, with an animated "marching ants" rubber-band.
+
 
 ## Enhanced Fork Release (v0.4.0)
 
