@@ -13,6 +13,7 @@ import { OcdViewLayer, OcdViewPage, OciModelResources } from '@ocd/model'
 import { autoLayoutOptions } from '../data/OcdAutoLayoutOptions'
 import { getSvgCssData } from '../data/OcdSvgCssData'
 import { OcdExternalFacade } from '../facade/OcdExternalFacade'
+import { buildDesignFromLzUpload } from '../landingzone/OcdLzFileImport'
 // import { OcdDesign } from '../../../model/lib/cjs'
 
 // const ociSvgThemeCss = svgCssData['oci-theme.css']
@@ -270,6 +271,12 @@ export const menuItems: MenuItem[] = [
                                 ocdDocument.autoLayout(ocdDocument.getActivePage().id)
                                 setOcdDocument(ocdDocument)
                             }).catch((reason) => {console.debug(reason)})
+                        }
+                    },
+                    {
+                        label: 'OCI Landing Zone (LZNG)',
+                        click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                            importFromLandingZoneFiles(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig)
                         }
                     },
                     // {
@@ -729,8 +736,57 @@ export const importFromTerraform = (setOcdDocument: Function, ocdConsoleConfig: 
     }).catch((resp) => {console.warn('Load Design Failed with', resp)})
 }
 
+/**
+ * Import pre-generated OCI Landing Zone Next Gen (LZNG) JSON files (iam.json,
+ * network.json, …) from a multi-file picker and open them in the Designer.
+ *
+ * Mirrors importFromTerraform: build an OcdDocument, add one layer per top-level
+ * compartment, auto-arrange, then switch to the Designer page. The resulting
+ * design is flagged lzOrigin=true (by buildOcdDesignFromLz), so further non-LZ
+ * stencils dropped onto it route through the LZ placement resolver.
+ */
+export const importFromLandingZoneFiles = (setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function): Promise<any> => {
+    const pickFiles = async (): Promise<{ name: string; content: string }[]> => {
+        const options = {
+            multiple: true,
+            types: [
+                {
+                    description: 'Landing Zone JSON (iam.json, network.json, …)',
+                    accept: { 'application/json': ['.json'] },
+                },
+            ],
+        }
+        // @ts-ignore - File System Access API
+        const handles = await window.showOpenFilePicker(options)
+        return Promise.all(
+            handles.map(async (handle: any) => {
+                const file = await handle.getFile()
+                return { name: file.name, content: await file.text() }
+            }),
+        )
+    }
+    return pickFiles().then((uploads) => {
+        const { design, topCompartmentIds } = buildDesignFromLzUpload(uploads)
+        const ocdDocument = OcdDocument.new()
+        ocdDocument.design = design
+        const layerIds: string[] = topCompartmentIds.length > 0
+            ? topCompartmentIds
+            : [design.model.oci.resources.compartment?.[0]?.id].filter(Boolean)
+        layerIds.forEach((id: string, i: number) => ocdDocument.addLayer(id, i === 0))
+        ocdDocument.autoLayout(ocdDocument.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle)
+        setOcdDocument(ocdDocument)
+        ocdConsoleConfig.config.displayPage = 'designer'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }).catch((reason: any) => {
+        // AbortError = user dismissed the picker; only surface real failures.
+        if (reason?.name === 'AbortError') return
+        console.warn('LZ import failed:', reason?.message ?? reason)
+        if (reason?.message) alert(reason.message)
+    })
+}
+
 
 
 export const saveDesign = () => {
-    
+
 }
