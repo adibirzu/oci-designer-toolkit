@@ -1,0 +1,31 @@
+import { test, expect } from '@playwright/test'
+
+test.describe('Architecture Agent smoke', () => {
+  test('generates an OCI architecture from chat and applies it to the designer', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('.ocd-console')).toBeVisible({ timeout: 20_000 })
+
+    const agentButton = page.getByRole('button', { name: 'AI Architect' })
+    await expect(agentButton).toBeVisible({ timeout: 10_000 })
+    await agentButton.click()
+
+    await expect(page.getByRole('heading', { name: 'Architecture Agent' })).toBeVisible({ timeout: 30_000 })
+
+    await page.getByLabel('Architecture request').fill(
+      'Create a secure OKE platform with a private worker subnet, pod subnet, vault, logging, monitoring, and budget controls.',
+    )
+    await page.getByRole('button', { name: 'Generate Plan' }).click()
+
+    await expect(page.getByRole('heading', { name: 'Agent OKE Platform Architecture' })).toBeVisible()
+    await expect(page.getByRole('cell', { name: 'OKE Enhanced Cluster' })).toBeVisible()
+    await expect(page.getByRole('cell', { name: 'oke_cluster' })).toBeVisible()
+    await expect(page.getByRole('cell', { name: 'OKE Private Node Pool' })).toBeVisible()
+    await expect(page.getByRole('cell', { name: 'oke_node_pool' })).toBeVisible()
+
+    await page.getByRole('button', { name: 'Apply to Designer' }).click()
+
+    await expect(page.locator('#ocd_document_title')).toHaveValue('Agent OKE Platform Architecture')
+    await expect(page.locator('.ocd-designer')).toBeVisible({ timeout: 20_000 })
+    await expect(page.locator('.ocd-designer-resource').first()).toBeVisible({ timeout: 20_000 })
+  })
+})

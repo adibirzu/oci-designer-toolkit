@@ -14,6 +14,9 @@ import OcdBom from './OcdBom'
 // generator and is a distinct, mutually-exclusive page. Code-splitting it keeps
 // it out of the initial entry chunk (it loads only when the wizard is opened).
 const OcdLandingZone = React.lazy(() => import('./OcdLandingZone'))
+const OcdDiscovery = React.lazy(() => import('./OcdDiscovery'))
+const OcdClassicParity = React.lazy(() => import('./OcdClassicParity'))
+const OcdArchitectureAgent = React.lazy(() => import('./OcdArchitectureAgent'))
 import OcdMarkdown, { OcdMarkdownLeftToolbar } from './OcdMarkdown'
 import OcdTabular, { OcdTabularLeftToolbar } from './OcdTabular'
 import OcdTerraform, { OcdTerraformLeftToolbar } from './OcdTerraform'
@@ -235,6 +238,18 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         ocdConsoleConfig.config.displayPage = 'landingzone'
         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
     }
+    const onDiscoveryClick = () => {
+        ocdConsoleConfig.config.displayPage = 'discovery'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onClassicClick = () => {
+        ocdConsoleConfig.config.displayPage = 'classic'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onAgentClick = () => {
+        ocdConsoleConfig.config.displayPage = 'agent'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
     // Designer 'LZ live reconcile' tick: records that edits should re-apply the
     // Realm/AD/FD scaffold. Only meaningful together with the wizard scaffold tick.
     const onReconcileToggle = () => {
@@ -348,6 +363,18 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                         <span className='ocd-lz-hero-cta-icon' aria-hidden></span>
                         <span className='ocd-lz-hero-cta-label'>Landing Zone Next-Gen</span>
                     </button>
+                    <button className='ocd-discovery-cta' title='Open OCI Discovery Workbench' onClick={onDiscoveryClick}>
+                        <span className='ocd-discovery-cta-icon' aria-hidden></span>
+                        <span className='ocd-discovery-cta-label'>Discovery</span>
+                    </button>
+                    <button className='ocd-classic-cta' title='Open OKIT Classic 0.70 parity map' onClick={onClassicClick}>
+                        <span className='ocd-classic-cta-icon' aria-hidden></span>
+                        <span className='ocd-classic-cta-label'>Classic 0.70</span>
+                    </button>
+                    <button className='ocd-agent-cta' title='Open Architecture Agent' onClick={onAgentClick}>
+                        <span className='ocd-agent-cta-icon' aria-hidden></span>
+                        <span className='ocd-agent-cta-label'>AI Architect</span>
+                    </button>
                     <div className={validateClassName} title={validateTitle} onClick={onValidateClick} aria-hidden></div>
                     <div className='governance ocd-console-toolbar-icon' title='Governance &amp; Compliance posture' onClick={onGovernanceClick} aria-hidden></div>
                     <div className='ocd-lz-plan ocd-console-toolbar-icon' title='Landing Zone Plan / Diff (compare current design with imported LZ)' onClick={onPlanClick} aria-hidden></div>
@@ -424,8 +451,17 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
         case 'designer':
             DisplayPage = OcdDesigner
             break;
+        case 'classic':
+            DisplayPage = OcdClassicParity
+            break;
+        case 'agent':
+            DisplayPage = OcdArchitectureAgent
+            break;
         case 'documentation':
             DisplayPage = OcdDocumentation
+            break;
+        case 'discovery':
+            DisplayPage = OcdDiscovery
             break;
         case 'landingzone':
             DisplayPage = OcdLandingZone

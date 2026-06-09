@@ -14,6 +14,7 @@
 */
 
 import { common } from "oci-sdk"
+import { validateResourceAnalyticsSql } from "@ocd/core"
 import { OciQuery, OciReferenceDataQuery } from "@ocd/query"
 
 export interface ProfilesResult {
@@ -29,6 +30,12 @@ export interface QueryTenancyRequest {
 export interface QueryDropdownRequest {
     profile: string
     region: string
+}
+
+export interface ResourceAnalyticsQueryRequest {
+    profile: string
+    region: string
+    sql: string
 }
 
 /*
@@ -114,6 +121,18 @@ export const queryDropdown = (request: QueryDropdownRequest): Promise<unknown> =
     const { profile, region } = request
     const query = new OciReferenceDataQuery(profile, region)
     return query.withTimeout(query.query(), 'queryDropdown')
+}
+
+export const queryDiscoverySnapshot = async (request: { profile: string; region: string }): Promise<unknown> => {
+    const { profile, region } = request
+    const query = new OciQuery(profile, region)
+    const compartments = await query.withTimeout(query.listTenancyCompartments(), 'discoverySnapshot')
+    return { source: 'oci-query', compartments }
+}
+
+export const queryResourceAnalytics = (request: ResourceAnalyticsQueryRequest): { rows: Record<string, unknown>[]; sql: string } => {
+    const validatedSql = validateResourceAnalyticsSql(request.sql)
+    return { rows: [], sql: validatedSql }
 }
 
 export const errorMessage = (reason: unknown): string => {

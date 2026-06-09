@@ -329,7 +329,36 @@ export const resourceMap: OcdResourceMap = {
     "oci_database_exadb_vm_cluster": "exadb_vm_cluster",
     "oci_core_vtap": "vtap",
     "oci_streaming_connect_harness": "connect_harness",
-    "oci_dns_tsig_key": "dns_tsig_key"
+    "oci_dns_tsig_key": "dns_tsig_key",
+    // Batch 7 — Discovery and migration planning
+    "oci_cloud_bridge_agent": "cloud_bridge_agent",
+    "oci_cloud_bridge_agent_dependency": "cloud_bridge_agent_dependency",
+    "oci_cloud_bridge_agent_plugin": "cloud_bridge_agent_plugin",
+    "oci_cloud_bridge_asset": "cloud_bridge_asset",
+    "oci_cloud_bridge_asset_source": "cloud_bridge_asset_source",
+    "oci_cloud_bridge_discovery_schedule": "cloud_bridge_discovery_schedule",
+    "oci_cloud_bridge_environment": "cloud_bridge_environment",
+    "oci_cloud_bridge_inventory": "cloud_bridge_inventory",
+    "oci_cloud_migrations_migration": "cloud_migrations_migration",
+    "oci_cloud_migrations_migration_asset": "cloud_migrations_migration_asset",
+    "oci_cloud_migrations_migration_plan": "cloud_migrations_migration_plan",
+    "oci_cloud_migrations_replication_schedule": "cloud_migrations_replication_schedule",
+    "oci_cloud_migrations_target_asset": "cloud_migrations_target_asset",
+    "oci_stack_monitoring_discovery_job": "stack_monitoring_discovery_job",
+    "oci_stack_monitoring_monitored_resource_task": "stack_monitoring_monitored_resource_task",
+    "oci_stack_monitoring_monitored_resource_type": "stack_monitoring_monitored_resource_type",
+    "oci_log_analytics_log_analytics_entity": "log_analytics_entity",
+    // Batch 7 (+10): ADM + AI Document/Language/Anomaly Detection
+    "oci_adm_knowledge_base": "adm_knowledge_base",
+    "oci_adm_vulnerability_audit": "adm_vulnerability_audit",
+    "oci_adm_remediation_recipe": "adm_remediation_recipe",
+    "oci_adm_remediation_run": "adm_remediation_run",
+    "oci_ai_document_project": "ai_document_project",
+    "oci_ai_document_model": "ai_document_model",
+    "oci_ai_language_model": "ai_language_model",
+    "oci_ai_anomaly_detection_ai_private_endpoint": "ai_anomaly_detection_private_endpoint",
+    "oci_ai_anomaly_detection_data_asset": "ai_anomaly_detection_data_asset",
+    "oci_ai_anomaly_detection_detect_anomaly_job": "ai_anomaly_detection_job"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -840,7 +869,7 @@ export const resourceAttributes: OcdIncludedElements = {
         "subnet_id",
         "backup_network_nsg_ids",
         "cluster_name",
-        "data_collection_options", 
+        "data_collection_options",
         "data_collection_options.is_diagnostics_events_enabled",
         "data_collection_options.is_health_monitoring_enabled",
         "data_collection_options.is_incident_logs_enabled",
@@ -2985,5 +3014,271 @@ export const resourceAttributes: OcdIncludedElements = {
     "oci_dns_tsig_key": [
         "name",
         "algorithm"
+    ],
+    "oci_adm_knowledge_base": [
+        "display_name"
+    ],
+    "oci_adm_vulnerability_audit": [
+        "build_type",
+        "display_name",
+        "knowledge_base_id",
+        "application_dependencies",
+        "application_dependencies.application_dependency_node_ids",
+        "application_dependencies.gav",
+        "application_dependencies.node_id",
+        "application_dependencies.purl",
+        "configuration",
+        "configuration.exclusions",
+        "configuration.max_permissible_cvss_v2score",
+        "configuration.max_permissible_cvss_v3score",
+        "configuration.max_permissible_severity",
+        "source",
+        "source.description",
+        "source.oci_resource_id",
+        "source.type",
+        "usage_data",
+        "usage_data.bucket",
+        "usage_data.namespace",
+        "usage_data.source_type"
+    ],
+    "oci_adm_remediation_recipe": [
+        "display_name",
+        "is_run_triggered_on_kb_change",
+        "knowledge_base_id",
+        "state",
+        "detect_configuration",
+        "detect_configuration.exclusions",
+        "detect_configuration.max_permissible_cvss_v2score",
+        "detect_configuration.max_permissible_cvss_v3score",
+        "detect_configuration.max_permissible_severity",
+        "detect_configuration.upgrade_policy",
+        "network_configuration",
+        "network_configuration.nsg_ids",
+        "network_configuration.subnet_id",
+        "scm_configuration",
+        "scm_configuration.branch",
+        "scm_configuration.build_file_location",
+        "scm_configuration.external_scm_type",
+        "scm_configuration.is_automerge_enabled",
+        "scm_configuration.oci_code_repository_id",
+        "scm_configuration.pat_secret_id",
+        "scm_configuration.repository_url",
+        "scm_configuration.scm_type",
+        "scm_configuration.username",
+        "verify_configuration",
+        "verify_configuration.additional_parameters",
+        "verify_configuration.build_service_type",
+        "verify_configuration.jenkins_url",
+        "verify_configuration.job_name",
+        "verify_configuration.pat_secret_id",
+        "verify_configuration.pipeline_id",
+        "verify_configuration.repository_url",
+        "verify_configuration.trigger_secret_id",
+        "verify_configuration.username",
+        "verify_configuration.workflow_name"
+    ],
+    "oci_adm_remediation_run": [
+        "display_name",
+        "remediation_recipe_id"
+    ],
+    "oci_ai_document_project": [
+        "display_name",
+        "description"
+    ],
+    "oci_ai_document_model": [
+        "display_name",
+        "description",
+        "is_quick_mode",
+        "max_training_time_in_hours",
+        "model_id",
+        "model_type",
+        "model_version",
+        "project_id",
+        "component_models",
+        "component_models.model_id",
+        "testing_dataset",
+        "testing_dataset.bucket",
+        "testing_dataset.dataset_id",
+        "testing_dataset.dataset_type",
+        "testing_dataset.namespace",
+        "training_dataset",
+        "training_dataset.bucket",
+        "training_dataset.dataset_id",
+        "training_dataset.dataset_type",
+        "training_dataset.namespace",
+        "validation_dataset",
+        "validation_dataset.bucket",
+        "validation_dataset.dataset_id",
+        "validation_dataset.dataset_type",
+        "validation_dataset.namespace"
+    ],
+    "oci_ai_language_model": [
+        "display_name",
+        "description",
+        "project_id",
+        "model_details",
+        "model_details.language_code",
+        "model_details.model_type",
+        "model_details.version",
+        "test_strategy",
+        "test_strategy.strategy_type",
+        "training_dataset",
+        "training_dataset.dataset_id",
+        "training_dataset.dataset_type"
+    ],
+    "oci_ai_anomaly_detection_ai_private_endpoint": [
+        "display_name",
+        "dns_zones",
+        "subnet_id"
+    ],
+    "oci_ai_anomaly_detection_data_asset": [
+        "display_name",
+        "description",
+        "private_endpoint_id",
+        "project_id",
+        "data_source_details",
+        "data_source_details.atp_password_secret_id",
+        "data_source_details.atp_user_name",
+        "data_source_details.bucket",
+        "data_source_details.cwallet_file_secret_id",
+        "data_source_details.data_source_type",
+        "data_source_details.database_name",
+        "data_source_details.ewallet_file_secret_id",
+        "data_source_details.key_store_file_secret_id",
+        "data_source_details.measurement_name",
+        "data_source_details.namespace",
+        "data_source_details.ojdbc_file_secret_id",
+        "data_source_details.password_secret_id",
+        "data_source_details.table_name",
+        "data_source_details.tnsnames_file_secret_id",
+        "data_source_details.truststore_file_secret_id",
+        "data_source_details.url",
+        "data_source_details.user_name",
+        "data_source_details.wallet_password_secret_id"
+    ],
+    "oci_ai_anomaly_detection_detect_anomaly_job": [
+        "description",
+        "display_name",
+        "model_id",
+        "sensitivity",
+        "input_details",
+        "input_details.content",
+        "input_details.content_type",
+        "input_details.input_type",
+        "input_details.signal_names",
+        "output_details",
+        "output_details.bucket",
+        "output_details.namespace",
+        "output_details.output_type",
+        "output_details.prefix"
+    ],
+    "oci_cloud_bridge_agent": [
+        "display_name",
+        "agent_type",
+        "agent_version",
+        "environment_id"
+    ],
+    "oci_cloud_bridge_agent_dependency": [
+        "display_name",
+        "dependency_name",
+        "dependency_version",
+        "description",
+        "namespace",
+        "bucket",
+        "object",
+        "checksum"
+    ],
+    "oci_cloud_bridge_agent_plugin": [
+        "agent_id",
+        "plugin_name",
+        "plugin_version",
+        "desired_state",
+        "name"
+    ],
+    "oci_cloud_bridge_asset": [
+        "display_name",
+        "asset_type",
+        "asset_source_ids",
+        "inventory_id",
+        "external_asset_key",
+        "source_key"
+    ],
+    "oci_cloud_bridge_asset_source": [
+        "display_name",
+        "environment_id",
+        "inventory_id",
+        "assets_compartment_id",
+        "discovery_schedule_id",
+        "are_historical_metrics_collected",
+        "are_realtime_metrics_collected"
+    ],
+    "oci_cloud_bridge_discovery_schedule": [
+        "display_name",
+        "execution_recurrences"
+    ],
+    "oci_cloud_bridge_environment": [
+        "display_name"
+    ],
+    "oci_cloud_bridge_inventory": [
+        "display_name"
+    ],
+    "oci_cloud_migrations_migration": [
+        "display_name",
+        "replication_schedule_id",
+        "is_completed"
+    ],
+    "oci_cloud_migrations_migration_asset": [
+        "display_name",
+        "migration_id",
+        "inventory_asset_id",
+        "replication_schedule_id",
+        "replication_compartment_id",
+        "snap_shot_bucket_name",
+        "availability_domain",
+        "notifications",
+        "depended_on_by",
+        "migration_asset_depends_on"
+    ],
+    "oci_cloud_migrations_migration_plan": [
+        "display_name",
+        "migration_id",
+        "source_migration_plan_id"
+    ],
+    "oci_cloud_migrations_replication_schedule": [
+        "display_name",
+        "execution_recurrences"
+    ],
+    "oci_cloud_migrations_target_asset": [
+        "display_name",
+        "migration_plan_id",
+        "is_excluded_from_execution",
+        "preferred_shape_type",
+        "ms_license"
+    ],
+    "oci_stack_monitoring_discovery_job": [
+        "discovery_client",
+        "discovery_type",
+        "should_propagate_tags_to_discovered_resources"
+    ],
+    "oci_stack_monitoring_monitored_resource_task": [
+        "name",
+        "work_request_ids"
+    ],
+    "oci_stack_monitoring_monitored_resource_type": [
+        "name",
+        "display_name",
+        "description",
+        "resource_category",
+        "source_type",
+        "metric_namespace"
+    ],
+    "oci_log_analytics_log_analytics_entity": [
+        "name",
+        "entity_type_name",
+        "entity_type_internal_name",
+        "hostname",
+        "management_agent_id",
+        "management_agent_compartment_id",
+        "are_logs_collected"
     ]
 }

@@ -34,7 +34,7 @@ export const UPSTREAM_REPO = 'oracle/oci-designer-toolkit'
  * sync when you manually cherry-pick upstream changes into the fork.
  * '' = not yet baselined (will always report behind).
  */
-export const OCTO_BASELINE_REF = ''
+export const OCTO_BASELINE_REF: string = ''
 
 /**
  * Number of Terraform resource entries in OciResourceMap.ts at the baseline.
@@ -42,11 +42,12 @@ export const OCTO_BASELINE_REF = ''
  * downloading the full file.  Update when you re-baseline.
  *
  * Current value = count of `"oci_*": "name"` lines in this fork's
- * `ocd/packages/codegen/src/importer/data/OciResourceMap.ts` (239 as of HEAD
- * 58bc68c9, 2026-06). Re-derive with:
+ * `ocd/packages/codegen/src/importer/data/OciResourceMap.ts` (249 after the
+ * ADM + AI catalog batch, 2026-06). This uses the same simple line-pattern
+ * count as parseResourceMap, including data-map entries. Re-derive with:
  *   grep -cE '^\s*"oci_[^"]+"\s*:\s*"[^"]+"' ocd/packages/codegen/src/importer/data/OciResourceMap.ts
  */
-export const OCTO_BASELINE_RESOURCE_COUNT = 239
+export const OCTO_BASELINE_RESOURCE_COUNT = 249
 
 /** Raw-content URL for the upstream resource map — used for resource hints. */
 const UPSTREAM_RESOURCE_MAP_RAW_URL =

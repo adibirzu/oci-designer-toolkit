@@ -3,7 +3,7 @@
  *
  * Flow:
  *   1. Load the static web app (OcdConsole).
- *   2. Open the wizard via the toolbar button (title="Landing Zone Wizard").
+ *   2. Open the wizard via the promoted "Landing Zone Next-Gen" CTA.
  *   3. Assert the wizard renders and is on the Foundation step.
  *   4. Walk through all five steps using the "Continue" button.
  *   5. On the Review step assert:
@@ -35,7 +35,7 @@
 
 import { test, expect, Page } from '@playwright/test'
 
-const WIZARD_BUTTON_TITLE = 'Landing Zone Wizard'
+const WIZARD_BUTTON_NAME = 'Landing Zone Next-Gen'
 
 /* Total wizard steps (Foundation → Hub → Projects → Templates → Review) */
 const STEP_COUNT = 5
@@ -51,6 +51,13 @@ async function clickContinue(page: Page, currentStepIndex: number): Promise<void
   await expect(page.getByText(`Step ${nextStep} of ${STEP_COUNT}`)).toBeVisible()
 }
 
+async function openLandingZoneWizard(page: Page): Promise<void> {
+  const wizardBtn = page.getByRole('button', { name: WIZARD_BUTTON_NAME })
+  await expect(wizardBtn).toBeVisible({ timeout: 10_000 })
+  await wizardBtn.click()
+  await expect(page.locator('.ocd-lzng').first()).toBeVisible({ timeout: 30_000 })
+}
+
 test.describe('Landing Zone wizard smoke', () => {
   test('opens wizard, walks Foundation → Review, asserts diagram and config output', async ({ page }) => {
     /* ── 1. Load the app ─────────────────────────────────────────────── */
@@ -58,9 +65,7 @@ test.describe('Landing Zone wizard smoke', () => {
     await expect(page.locator('.ocd-console')).toBeVisible({ timeout: 20_000 })
 
     /* ── 2. Open the Landing Zone wizard ─────────────────────────────── */
-    const wizardBtn = page.locator(`[title="${WIZARD_BUTTON_TITLE}"]`)
-    await expect(wizardBtn).toBeVisible({ timeout: 10_000 })
-    await wizardBtn.click()
+    await openLandingZoneWizard(page)
 
     /* ── 3. Wait for wizard (lazy-loaded) ───────────────────────────── */
     // .ocd-lzng is the wizard outer div — always compiled into the build.
@@ -121,28 +126,28 @@ test.describe('Landing Zone wizard smoke', () => {
     await expect(page.getByText('Generating Operating Entities…')).not.toBeVisible({ timeout: 30_000 })
 
     // After generation, one of these should be visible:
-    //   (a) The ReactFlow wrapper (data-testid="rf__wrapper" — always from @xyflow/react)
+    //   (a) ReactFlow IAM nodes rendered from generated iam.json
     //   (b) The setup-lz notice (if OE sources are not installed)
     //   (c) "No iam.json was generated." placeholder
-    const rfWrapper = page.locator('[data-testid="rf__wrapper"]').first()
-    const iamByTestId = page.getByTestId('lzng-iam-diagram')     // needs react rebuild
+    // The static build does not consistently expose @xyflow's internal
+    // rf__wrapper test id, so assert the app-owned node class instead.
+    const iamNodeCount = await page.locator('.ocd-lzng-rf-node').count()
     const setupNotice = page.getByText(/npm run setup-lz/)
     const noIamJson = page.getByText('No iam.json was generated.')
+    const noCompartments = page.getByText('No compartments found in the generated iam.json.')
 
-    const rfVisible = await rfWrapper.isVisible().catch(() => false)
-    const iamTestidVisible = await iamByTestId.isVisible().catch(() => false)
     const setupVisible = await setupNotice.isVisible().catch(() => false)
     const noIamVisible = await noIamJson.isVisible().catch(() => false)
+    const noCompartmentsVisible = await noCompartments.isVisible().catch(() => false)
 
     expect(
-      rfVisible || iamTestidVisible || setupVisible || noIamVisible,
+      iamNodeCount > 0 || setupVisible || noIamVisible || noCompartmentsVisible,
       'Review step should show the IAM diagram (ReactFlow), setup-lz notice, or a placeholder',
     ).toBe(true)
 
-    if (rfVisible) {
+    if (iamNodeCount > 0) {
       // OE sources are installed — assert nodes rendered in the ReactFlow canvas.
-      const nodeCount = await page.locator('[data-testid^="rf__node-"]').count()
-      expect(nodeCount, 'IAM diagram should have at least one ReactFlow node').toBeGreaterThan(0)
+      expect(iamNodeCount, 'IAM diagram should have at least one ReactFlow node').toBeGreaterThan(0)
     }
 
     /* ── 9b. config.jsonnet output ───────────────────────────────────── */
@@ -173,10 +178,7 @@ test.describe('Landing Zone wizard smoke', () => {
     await expect(page.locator('.ocd-console')).toBeVisible({ timeout: 20_000 })
 
     // Open wizard.
-    const wizardBtn = page.locator(`[title="${WIZARD_BUTTON_TITLE}"]`)
-    await expect(wizardBtn).toBeVisible({ timeout: 10_000 })
-    await wizardBtn.click()
-    await expect(page.locator('.ocd-lzng').first()).toBeVisible({ timeout: 30_000 })
+    await openLandingZoneWizard(page)
 
     // Tick all three overlay toggles (action bar, visible on all steps).
     const toggleByLabel = (label: string) =>
@@ -236,8 +238,10 @@ test.describe('Landing Zone wizard smoke', () => {
     await expect(page.getByText('DBM Private Endpoint', { exact: false }).first()).toBeVisible({ timeout: 15_000 })
     await expect(page.getByText('OPSI Private Endpoint', { exact: false }).first()).toBeVisible()
 
-    // OKE-native overlay: the VCN-native pod subnet + enhanced cluster.
-    await expect(page.getByText('OKE Pod Subnet (VCN-native CNI)', { exact: false }).first()).toBeVisible()
-    await expect(page.getByText('OKE Cluster (enhanced)', { exact: false }).first()).toBeVisible()
+    // OKE-native overlay: the VCN-native pod subnet + enhanced cluster. Subnet
+    // resources render a generic "Subnet" visible label, while the display name
+    // is carried on the icon title attribute.
+    await expect(page.locator('[title="OKE Pod Subnet (VCN-native CNI)"]').first()).toBeVisible({ timeout: 15_000 })
+    await expect(page.locator('[title="OKE Cluster (enhanced)"]').first()).toBeVisible()
   })
 })

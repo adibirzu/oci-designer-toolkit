@@ -110,7 +110,7 @@ function upsertRole(design: OcdDesign, spec: RoleSpec, compartmentId: string): R
     const userDefined = (resource.userDefined as Record<string, unknown>) ?? {}
     resource.userDefined = { ...userDefined, [OKE_ROLE_KEY]: spec.role }
     resource.compartmentId = compartmentId
-    if (!resource.displayName || resource.displayName === '') resource.displayName = spec.displayName
+    resource.displayName = spec.displayName
     return resource
 }
 

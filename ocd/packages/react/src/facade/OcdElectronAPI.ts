@@ -19,6 +19,8 @@ export interface OcdElectronAPI {
     listTenancyCompartments: (profile: string) => Promise<void>
     queryTenancy: (profile: string, compartmentIds: string[], region: string) => Promise<void>
     queryDropdown: (profile: string, region: string) => Promise<void>
+    queryDiscoverySnapshot: (profile: string, region: string) => Promise<any>
+    queryResourceAnalytics: (profile: string, region: string, sql: string) => Promise<{ rows: Record<string, unknown>[]; sql: string }>
     listStacks: (profile: string, region: string, compartmentId: string) => Promise<void>
     createStack: (profile: string, region: string, compartmentId: string, stackName: string, data: OutputDataStringArray, apply: boolean) => Promise<void>
     updateStack: (profile: string, region: string, stackId: string, data: OutputDataStringArray, apply: boolean) => Promise<void>

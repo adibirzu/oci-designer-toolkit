@@ -2,7 +2,8 @@
  * Playwright configuration for the OCD Landing Zone wizard smoke tests.
  *
  * The test suite serves the pre-built static web-dist from
- * ocd/packages/desktop/web-dist using `npx serve` (port 4173 by default).
+ * ocd/packages/desktop/web-dist using the local Node static server
+ * in e2e/scripts/serve-static.mjs (port 4173 by default).
  *
  * To rebuild web-dist before running:
  *   cd ocd && OCD_PAGES_BASE=/ npm run build:pages
@@ -30,7 +31,7 @@ export default defineConfig({
 
   use: {
     /* Base URL picks up the port the static server binds to. */
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: `http://127.0.0.1:${PORT}`,
     /* Capture traces on first retry so failures are diagnosable. */
     trace: 'on-first-retry',
     /* Give lazy-loaded WASM assets extra time. */
@@ -51,12 +52,12 @@ export default defineConfig({
 
   /*
    * webServer: serve the static build at the expected port before tests start.
-   * npx serve is available via the global serve@14 already in the environment.
-   * The `-s` flag enables SPA fallback (rewrites unknown paths to index.html).
+   * The local helper keeps E2E offline-friendly and enables SPA fallback
+   * (rewrites unknown paths to index.html).
    */
   webServer: {
-    command: `npx serve -s "${WEB_DIST}" -l ${PORT}`,
-    url: `http://localhost:${PORT}`,
+    command: `node ./scripts/serve-static.mjs "${WEB_DIST}" ${PORT}`,
+    url: `http://127.0.0.1:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 20_000,
   },

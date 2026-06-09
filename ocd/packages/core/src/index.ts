@@ -6,3 +6,4 @@
 
 export { OcdUtils } from "./OcdUtils.js"
 export { ociNoneVisualResources, azureNoneVisualResources, awsNoneVisualResources, googleNoneVisualResources } from "./OcdNoneVisualResources.js"
+export { validateResourceAnalyticsSql } from "./OcdResourceAnalyticsSql.js"

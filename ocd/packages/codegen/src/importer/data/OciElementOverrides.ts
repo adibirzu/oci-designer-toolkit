@@ -176,6 +176,40 @@ export const elementOverrides: OcdElementOverrides = {
         "oci_datascience_notebook_session": {
             "project_id": {"list": "datascience_project", "element": "id"}
         },
+        "oci_cloud_bridge_agent": {
+            "environment_id": {"list": "cloud_bridge_environment", "element": "id"}
+        },
+        "oci_cloud_bridge_agent_plugin": {
+            "agent_id": {"list": "cloud_bridge_agent", "element": "id"}
+        },
+        "oci_cloud_bridge_asset": {
+            "asset_source_ids": {"list": "cloud_bridge_asset_source", "element": "id"},
+            "inventory_id": {"list": "cloud_bridge_inventory", "element": "id"}
+        },
+        "oci_cloud_bridge_asset_source": {
+            "assets_compartment_id": {"list": "compartment", "element": "id"},
+            "discovery_schedule_id": {"list": "cloud_bridge_discovery_schedule", "element": "id"},
+            "environment_id": {"list": "cloud_bridge_environment", "element": "id"},
+            "inventory_id": {"list": "cloud_bridge_inventory", "element": "id"}
+        },
+        "oci_cloud_migrations_migration": {
+            "replication_schedule_id": {"list": "cloud_migrations_replication_schedule", "element": "id"}
+        },
+        "oci_cloud_migrations_migration_asset": {
+            "inventory_asset_id": {"list": "cloud_bridge_asset", "element": "id"},
+            "migration_id": {"list": "cloud_migrations_migration", "element": "id"},
+            "replication_schedule_id": {"list": "cloud_migrations_replication_schedule", "element": "id"}
+        },
+        "oci_cloud_migrations_migration_plan": {
+            "migration_id": {"list": "cloud_migrations_migration", "element": "id"},
+            "source_migration_plan_id": {"list": "cloud_migrations_migration_plan", "element": "id"}
+        },
+        "oci_cloud_migrations_target_asset": {
+            "migration_plan_id": {"list": "cloud_migrations_migration_plan", "element": "id"}
+        },
+        "oci_log_analytics_log_analytics_entity": {
+            "management_agent_compartment_id": {"list": "compartment", "element": "id"}
+        },
         "oci_load_balancer_listener": {
             "default_backend_set_name": {"list": "load_balancer_backend_set", "element": "name"}
         }
