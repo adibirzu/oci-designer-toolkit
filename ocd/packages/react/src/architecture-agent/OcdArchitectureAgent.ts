@@ -19,6 +19,15 @@ export type ArchitectureResourceKind =
     | 'budget'
     | 'policy'
     | 'dynamic_group'
+    | 'api_gateway'
+    | 'functions_application'
+    | 'functions_function'
+    | 'web_app_firewall'
+    | 'data_safe_target_database'
+    | 'data_safe_security_assessment'
+    | 'cloud_guard_target'
+    | 'log_analytics_log_group'
+    | 'service_connector'
 
 export interface ArchitecturePlanResource {
     readonly kind: ArchitectureResourceKind
@@ -63,6 +72,15 @@ const SUPPORTED_KINDS: ArchitectureResourceKind[] = [
     'budget',
     'policy',
     'dynamic_group',
+    'api_gateway',
+    'functions_application',
+    'functions_function',
+    'web_app_firewall',
+    'data_safe_target_database',
+    'data_safe_security_assessment',
+    'cloud_guard_target',
+    'log_analytics_log_group',
+    'service_connector',
 ]
 
 export function buildArchitectureAgentPrompt(userPrompt: string): string {
@@ -73,6 +91,8 @@ export function buildArchitectureAgentPrompt(userPrompt: string): string {
         'Schema: {"title": string, "summary": string, "assumptions": string[], "resources": [{"kind": string, "displayName": string, "cidrBlock"?: string, "tier"?: string, "public"?: boolean, "count"?: number, "notes"?: string}]}',
         `Supported resource kinds: ${SUPPORTED_KINDS.join(', ')}.`,
         'Prefer secure private subnets, explicit network tiers, observability, governance tags, and cost controls when relevant.',
+        'For agentic AI or Zero Trust requests, separate reasoning from execution: reasoning proposes, policy decides, and a scoped identity executes.',
+        'For agentic AI or Zero Trust requests, include API Gateway, Functions policy gate, dynamic group, IAM policy, Vault, Data Safe, Cloud Guard, Logging Analytics, and Service Connector resources when relevant.',
         `User request: ${userPrompt}`,
     ].join('\n')
 }
@@ -120,6 +140,7 @@ export function parseArchitecturePlanResponse(response: string): ArchitecturePla
 
 export function createArchitecturePlanFromPrompt(prompt: string): ArchitecturePlan {
     const text = prompt.toLowerCase()
+    if (text.includes('zero trust') || text.includes('agentic') || text.includes('policy gate') || text.includes('scoped identity')) return buildAgenticZeroTrustPlan(prompt)
     if (text.includes('oke') || text.includes('kubernetes') || text.includes('container')) return buildOkePlan(prompt)
     if (text.includes('hub') && text.includes('spoke')) return buildHubSpokePlan(prompt)
     return buildThreeTierPlan(prompt)
@@ -166,6 +187,9 @@ export function buildDesignFromArchitecturePlan(plan: ArchitecturePlan): OcdDesi
     const publicSubnetId = subnetIds['load-balancer'] ?? subnetIds['public'] ?? firstSubnetId
     const appSubnetId = subnetIds['app'] ?? subnetIds['application'] ?? firstSubnetId
     const dbSubnetId = subnetIds['database'] ?? subnetIds['db'] ?? appSubnetId
+    let loadBalancerId = ''
+    let functionsApplicationId = ''
+    let dbSystemId = ''
 
     plan.resources.forEach((resource) => {
         switch (resource.kind) {
@@ -199,6 +223,7 @@ export function buildDesignFromArchitecturePlan(plan: ArchitecturePlan): OcdDesi
                 item.compartmentId = compartment.id
                 item.subnetIds = publicSubnetId ? [publicSubnetId] : []
                 push(design, 'load_balancer', item)
+                loadBalancerId = item.id
                 break
             }
             case 'instance': {
@@ -218,6 +243,7 @@ export function buildDesignFromArchitecturePlan(plan: ArchitecturePlan): OcdDesi
                 item.compartmentId = compartment.id
                 item.subnetId = dbSubnetId
                 push(design, 'db_system', item)
+                dbSystemId = item.id
                 break
             }
             case 'oke_cluster': {
@@ -287,6 +313,91 @@ export function buildDesignFromArchitecturePlan(plan: ArchitecturePlan): OcdDesi
                 push(design, 'dynamic_group', item)
                 break
             }
+            case 'api_gateway': {
+                const item = OciModelResources.OciApiGateway.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.endpointType = resource.public ? 'PUBLIC' : 'PRIVATE'
+                item.subnetId = publicSubnetId || appSubnetId
+                push(design, 'api_gateway', item)
+                break
+            }
+            case 'functions_application': {
+                const item = OciModelResources.OciFunctionsApplication.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.subnetIds = appSubnetId ? [appSubnetId] : []
+                if (item.traceConfig) item.traceConfig.isEnabled = true
+                push(design, 'functions_application', item)
+                functionsApplicationId = item.id
+                break
+            }
+            case 'functions_function': {
+                const item = OciModelResources.OciFunctionsFunction.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.applicationId = functionsApplicationId
+                item.memoryInMbs = '512'
+                item.timeoutInSeconds = 60
+                push(design, 'functions_function', item)
+                break
+            }
+            case 'web_app_firewall': {
+                const item = OciModelResources.OciWebAppFirewall.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.backendType = 'LOAD_BALANCER'
+                item.loadBalancerId = loadBalancerId
+                push(design, 'web_app_firewall', item)
+                break
+            }
+            case 'data_safe_target_database': {
+                const item = OciModelResources.OciDataSafeTargetDatabase.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.description = resource.notes ?? 'Data Safe target for agentic architecture evidence.'
+                if (item.databaseDetails) {
+                    item.databaseDetails.databaseType = 'DATABASE_CLOUD_SERVICE'
+                    item.databaseDetails.infrastructureType = 'ORACLE_CLOUD'
+                    item.databaseDetails.dbSystemId = dbSystemId
+                }
+                push(design, 'data_safe_target_database', item)
+                break
+            }
+            case 'data_safe_security_assessment': {
+                const item = OciModelResources.OciDataSafeSecurityAssessment.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                push(design, 'data_safe_security_assessment', item)
+                break
+            }
+            case 'cloud_guard_target': {
+                const item = OciModelResources.OciCloudGuardTarget.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.description = resource.notes ?? 'Cloud Guard target for posture and responder evidence.'
+                item.targetResourceId = compartment.id
+                item.targetResourceType = 'COMPARTMENT'
+                push(design, 'cloud_guard_target', item)
+                break
+            }
+            case 'log_analytics_log_group': {
+                const item = OciModelResources.OciLogAnalyticsLogGroup.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.description = resource.notes ?? 'Logging Analytics group for agent action and policy decision evidence.'
+                item.namespace = '<LA_NAMESPACE>'
+                push(design, 'log_analytics_log_group', item)
+                break
+            }
+            case 'service_connector': {
+                const item = OciModelResources.OciServiceConnector.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.description = resource.notes ?? 'Routes audit, logging, and policy decision events to evidence storage and SIEM.'
+                push(design, 'service_connector', item)
+                break
+            }
             default:
                 break
         }
@@ -328,6 +439,48 @@ function extractJsonObject(text: string): string {
     const end = candidate.lastIndexOf('}')
     if (start < 0 || end < start) throw new Error('Architecture agent response did not contain a JSON object.')
     return candidate.slice(start, end + 1)
+}
+
+function buildAgenticZeroTrustPlan(_prompt: string): ArchitecturePlan {
+    return {
+        title: 'Agentic Zero Trust Architecture',
+        summary: 'OCI-native architecture that separates AI reasoning from action execution through a deterministic policy gate, scoped identity, and continuous evidence loop.',
+        assumptions: [
+            'Reasoning proposes actions but holds no standing privilege.',
+            'A Functions policy gate validates identity, data class, tool, destination, and approval tier before execution.',
+            'Execution uses short-lived resource principals, Vault-backed secrets, and complete Audit, Logging, and Logging Analytics evidence.',
+            'ZPR and Security Zones are modeled as required controls because they are not editable designer resources yet.',
+        ],
+        resources: [
+            { kind: 'vcn', displayName: 'Agentic Zero Trust VCN', cidrBlock: '10.70.0.0/16' },
+            { kind: 'subnet', displayName: 'Authenticated API Gateway Subnet', cidrBlock: '10.70.1.0/24', tier: 'load-balancer', public: true },
+            { kind: 'subnet', displayName: 'Private Agent Sandbox Subnet', cidrBlock: '10.70.2.0/24', tier: 'app', public: false },
+            { kind: 'subnet', displayName: 'Private Data Control Subnet', cidrBlock: '10.70.3.0/24', tier: 'database', public: false },
+            { kind: 'internet_gateway', displayName: 'Controlled Internet Gateway' },
+            { kind: 'nat_gateway', displayName: 'Agent Egress NAT Gateway' },
+            { kind: 'service_gateway', displayName: 'Private OCI Service Gateway' },
+            { kind: 'load_balancer', displayName: 'Agent Tool Ingress Load Balancer' },
+            { kind: 'web_app_firewall', displayName: 'Agent Tool Web Application Firewall' },
+            { kind: 'api_gateway', displayName: 'Agent Tool API Gateway', public: true },
+            { kind: 'functions_application', displayName: 'Policy Gate Functions Application' },
+            { kind: 'functions_function', displayName: 'Deterministic Policy Decision Function' },
+            { kind: 'oke_cluster', displayName: 'Reasoning Sandbox OKE Cluster' },
+            { kind: 'oke_node_pool', displayName: 'Private Agent Runtime Node Pool' },
+            { kind: 'dynamic_group', displayName: 'Scoped Agent Execution Dynamic Group' },
+            { kind: 'policy', displayName: 'Least Agency Execution Policy' },
+            { kind: 'vault', displayName: 'Agent Secret Vault' },
+            { kind: 'key', displayName: 'Agent Evidence Encryption Key' },
+            { kind: 'db_system', displayName: 'Protected Enterprise Database' },
+            { kind: 'data_safe_target_database', displayName: 'Data Safe Protected Database Target' },
+            { kind: 'data_safe_security_assessment', displayName: 'Data Safe Security Assessment' },
+            { kind: 'cloud_guard_target', displayName: 'Agentic Compartment Cloud Guard Target' },
+            { kind: 'log_group', displayName: 'Agent Action Log Group' },
+            { kind: 'log_analytics_log_group', displayName: 'Agent Evidence Analytics Log Group' },
+            { kind: 'service_connector', displayName: 'Evidence Service Connector' },
+            { kind: 'monitoring_alarm', displayName: 'Policy Gate Health Alarm' },
+            { kind: 'budget', displayName: 'Agentic AI Cost Guardrail Budget' },
+        ],
+    }
 }
 
 function buildThreeTierPlan(prompt: string): ArchitecturePlan {

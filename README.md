@@ -17,6 +17,7 @@ Current enhanced fork release: [v0.4.5.8](CHANGELOG.md#enhanced-fork-release-v04
 - **Real OCI cost estimation** using Oracle public list-pricing data, compute shape SKU mapping, multi-currency support, and snapshot fallback.
 - **Discovery Workbench** for inventory, dependency topology, utilization and cost rollups, OCI target mapping, migration waves, Landing Zone recommendations, and Resource Analytics.
 - **Architecture Agent** for chat-driven OCI architecture generation. It works offline with deterministic local planning and can call any OpenAI-compatible LLM endpoint that the user provides at runtime, then applies the generated plan directly to the Designer canvas.
+- **Agentic Zero Trust architecture generation** with Redwood-styled reasoning -> policy -> scoped-execution UX, prompt templates, and editable OCI controls for API Gateway, Functions, Dynamic Groups, IAM policies, Vault, Data Safe, Cloud Guard, Logging Analytics, and Service Connector evidence pipelines.
 - **Oracle Resource Analytics integration** through desktop IPC and web-server endpoints with shared SELECT-only SQL validation in `@ocd/core`.
 - **Governance, remediation, and reachability analysis** for public exposure, weak segmentation, missing tags/budgets, unsafe DB placement, route-table gaps, dangling route targets, and internet-reachable databases.
 - **Enterprise IAM and policy blueprint overlay** for Landing Zone groups, compartment-scoped policy bundles, and governance tags.
@@ -38,7 +39,7 @@ No OCIDs, tenancy names, or secrets are stored in this repository. You supply yo
 - `v0.4.5.5`: ADM and AI Document/Language/Anomaly Detection catalog curation plus catalog guard tests.
 - `v0.4.5.6`: Discovery Workbench, Resource Analytics integration, Landing Zone discovery recommendations, E2E coverage, and discovery/migration catalog curation.
 - `v0.4.5.7`: Product rename to `oci-designer-toolkit-next-gen`, OKIT Classic 0.70 parity workbench, codegen test runner, audit hygiene, and updated Next Gen documentation.
-- `v0.4.5.8`: BYO-LLM Architecture Agent, local deterministic planner fallback, chat-to-design generation, toolbar/View menu entry, and Playwright E2E coverage for applying generated designs.
+- `v0.4.5.8`: BYO-LLM Architecture Agent, local deterministic planner fallback, chat-to-design generation, Agentic Zero Trust prompt/control mapping, Redwood UX refresh, toolbar/View menu entry, and Playwright E2E coverage for applying generated designs.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system architecture and [docs/oci-lz-designer-roadmap.md](docs/oci-lz-designer-roadmap.md) for the roadmap.
 
