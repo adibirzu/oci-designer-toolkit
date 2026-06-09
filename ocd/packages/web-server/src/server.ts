@@ -27,7 +27,9 @@ import {
     listTenancyCompartments,
     loadProfile,
     loadProfileNames,
+    queryDiscoverySnapshot,
     queryDropdown,
+    queryResourceAnalytics,
     queryTenancy
 } from './handlers.js'
 
@@ -197,6 +199,25 @@ const handleRequest = async (req: http.IncomingMessage, res: http.ServerResponse
             const result = await queryDropdown({
                 profile: body.profile ?? 'DEFAULT',
                 region: body.region ?? ''
+            })
+            sendOk(res, result)
+            return
+        }
+        if (method === 'POST' && pathname === '/api/oci/discovery/snapshot') {
+            const body = await parseJsonBody<{ profile?: string; region?: string }>(req)
+            const result = await queryDiscoverySnapshot({
+                profile: body.profile ?? 'DEFAULT',
+                region: body.region ?? ''
+            })
+            sendOk(res, result)
+            return
+        }
+        if (method === 'POST' && pathname === '/api/oci/resource-analytics/query') {
+            const body = await parseJsonBody<{ profile?: string; region?: string; sql?: string }>(req)
+            const result = queryResourceAnalytics({
+                profile: body.profile ?? 'DEFAULT',
+                region: body.region ?? '',
+                sql: typeof body.sql === 'string' ? body.sql : ''
             })
             sendOk(res, result)
             return

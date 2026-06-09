@@ -7,13 +7,23 @@ Captures the larger, multi-phase work requested for the enhanced toolkit. Each p
 - ✅ OCI stencil palette restored (was commented out upstream); web Terraform import; Back-to-Designer exit; in-app LZ update notifications (GitHub) + `setup-lz`.
 - ✅ Issue fixes (#434/#633/#563/#369/#452/#741/#543, etc.).
 - ✅ **Landing Zone wizard promoted to hero entry point** (v0.4.5.1). The 15 px toolbar icon was replaced by a labeled primary red-pill button (`.ocd-lz-hero-cta`, text "Landing Zone Next-Gen") rendered in the console home area. E2E coverage added: `e2e/specs/lzng-hero-cta.spec.ts`.
+- ✅ **Architecture template gallery** (v0.4.5.1). File ▸ **New from Template...** creates a fresh design from curated OCI starter architectures.
+- ✅ **Upstream OKIT feature-sync banner** (v0.4.5.1). Landing Zone update checks now also surface upstream OKIT commits/resources that need manual fork curation.
+- ✅ **Governance, remediation, and reachability** (v0.4.5.1-v0.4.5.3). The Governance page now reports posture findings, provides Terraform guidance, applies deterministic fixes safely, and includes network reachability checks.
+- ✅ **Landing Zone plan/diff** (v0.4.5.3). Compare the current design against imported LZNG output with create/update/delete/no-op groups and semantic field diffs.
+- ✅ **Enterprise IAM + Policy blueprint** (v0.4.5.4). One Designer add-on applies LZ groups, compartment-scoped policy bundles, and cost-tracking tag namespace/tags idempotently.
+- ✅ **Node 26 and macOS DMG hardening** (v0.4.5.4). Pages/desktop CI is pinned to Node 26, and the macOS arm64 DMG path survives transient EDR locks.
+- ✅ **A2 catalog curation resumed** (v0.4.5.5). Added ADM and AI Document/Language/Anomaly Detection resources and a codegen catalog guard test.
+- ✅ **Discovery Workbench** (v0.4.5.6). Added a console page for application inventory, dependency topology, utilization/cost analytics, OCI target mapping, migration waves, Landing Zone recommendations, and Resource Analytics query views.
+- ✅ **Discovery/migration catalog curation** (v0.4.5.6). Added Cloud Bridge, Cloud Migrations, Stack Monitoring, and Log Analytics resource surfaces with lookup override guards and generated import/export/model/property support.
+- ✅ **Architecture Agent** (v0.4.5.8). Added a chat-driven OCI architecture generator with deterministic offline planning, optional user-provided OpenAI-compatible LLM calls, and direct handoff into the editable Designer canvas.
 
 ## Phase A — Stencils: full catalog + official icons (L3)
 - ✅ A1. Auto-generate the OCI palette from ALL model resources — `OcdPalette.ts` from the model registry, grouped, using the `oci-*` icon classes; flags resources without an icon. (commit `6f6f5429`)
-- ◐ A2. Full OCI service catalog. **Key finding:** the import is an explicit allow-list (`codegen/src/importer/data/OciResourceMap.ts`) with curated `resourceAttributes` per resource — a blind regen against the full 727-resource provider schema yields near-empty skeletons (compartment + tags only), so "all services" is a *curation* effort, not a one-shot regen. Model now at **128 resources** via curated batches (DNS/Logging/Monitoring/Notifications/Functions +8; +16, +14, +14 prior; +14: Data Science Model/Deployment/Job, Data Integration Workspace, Limits Quota, WAA Policy + Acceleration, DevOps Repository/Build Pipeline/Deploy Pipeline/Deploy Environment, Volume Group, Dedicated VM Host, Cloud Exadata Infrastructure). Remaining ~600 provider resources to curate in future batches (~4–20 lines each). Codegen import is deterministic. **Generator gotcha:** a curated attribute whose leaf name collides with the generator's reserved identifiers (`resources`, `resource`, `results`) produces invalid validator TS (TS2349) and a stale model-wrapper `Resources` namespace — caught only by the full `tsc` build, not `build:pages`. Drop such attributes (e.g. Resource Scheduler's `resources` list). Note: each service adds an eagerly-bundled property panel (~+230kB/batch); the #8 source-alias split (index 4.6→3.3MB) bought headroom but it erodes ~230kB per batch — revisit per-provider/panel splitting if the catalog approaches the full provider set.
+- ◐ A2. Full OCI service catalog. **Key finding:** the import is an explicit allow-list (`codegen/src/importer/data/OciResourceMap.ts`) with curated `resourceAttributes` per resource — a blind regen against the full provider schema yields near-empty skeletons (compartment + tags only), so "all services" is a *curation* effort, not a one-shot regen. Model now has **265 curated OCI resources** from the local 727-resource OCI provider schema; **462 provider resources remain**. Latest batches: ADM knowledge base/vulnerability audit/remediation recipe/remediation run; AI Document project/model; AI Language model; AI Anomaly Detection private endpoint/data asset/anomaly job; Cloud Bridge agent/asset/environment/inventory/schedules; Cloud Migrations migration/asset/plan/replication/target assets; Stack Monitoring discovery/resource task/type; and Log Analytics entity. Codegen import is deterministic. **Generator gotchas:** a curated attribute whose leaf name collides with reserved identifiers (`resources`, `resource`, `results`) produces invalid validator TS (TS2349), and nested leaves named `object` can collide with generated object-block helper names (`training_dataset.object` → `trainingDatasetObject`). Empty complex/list blocks should be dropped unless a usable editor/export shape is curated. These are caught by the full `tsc` build, not `build:pages`. Note: each service adds an eagerly-bundled property panel; keep bundle size under watch and revisit per-provider/panel splitting if the catalog approaches the full provider set.
 - ✅ A3. Official Oracle icon set: vendored the official OCI architecture/diagram icons and mapped each resource → official SVG, with a documented refresh. (commits `6c339c69`, `1a2e43e2`; see `docs/oci-icons-refresh.md`)
-- ✅ A4. Per-resource Terraform preview ('Terraform' properties tab via `@ocd/export` `getResourceTerraformHcl`) + resource relationships ('Relationships' tab: valid parents/children/connections from the model's `allowedParentTypes()`). Informational/read-only; not yet interactive canvas connection-drawing.
-- ▢ A5. Link palette → LZ design: drop a stencil and have it attach into the generated Landing Zone model.
+- ✅ A4. Per-resource Terraform preview ('Terraform' properties tab via `@ocd/export` `getResourceTerraformHcl`) + resource relationships ('Relationships' tab: valid parents/children/connections from the model's `allowedParentTypes()`). Drag-to-connect now provides interactive canvas connection-drawing for FK-backed associations.
+- ✅ A5. Link palette → LZ design: dropping non-LZ resources into an LZ-origin design now routes them to a workload/application/project compartment instead of the root, so generated Landing Zones can keep evolving in the Designer.
 
 ## Phase B — Cross-project mapping (single source of truth)
 The connective tissue for stencils + cost + the LZ wizard. A generated canonical map per OCI resource:
@@ -31,21 +41,59 @@ Browsers cannot read `~/.oci/config` or call the OCI SDK (CORS). Needs a backend
 > Known deferred bug: upstream #586 — RM export emits an invalid route-distribution match-criteria statement. Separate from this roadmap; track independently.
 
 ## Recommended sequence
-✅ Done: B1 → A1 → B3 → A3 → B2 → C. **Remaining:** A5 (palette → LZ attach) → A4 (per-stencil TF preview + relations) → A2 (full-schema service catalog regen). Quality follow-ups (not original roadmap): web bundle code-splitting, JS/TS test runner (Vitest), wizard E2E.
+✅ Done: B1 → A1 → B3 → A3 → B2 → C → A4/A5 → D1/D2/D3 → D4/D5/D6 → E1/E2/E3 → F1. **Remaining:** A2 (full-schema service catalog curation). Quality follow-ups (not original roadmap): keep bundle size under watch as the curated catalog grows, keep Playwright coverage on primary LZ/governance/discovery/agent flows, and re-run the redaction gate before pushes.
 
-## Phase D — Enterprise entry-point lanes (in flight)
+## Phase D — Enterprise entry-point lanes ✅
 
-These lanes are under active development in parallel branches and are expected to land shortly after v0.4.5.1.
+These lanes landed across v0.4.5.1 through v0.4.5.4 and are documented in the current changelog.
 
-### D1. Architecture Template Gallery ◐
-A curated library of OCI reference architecture templates (hub-and-spoke, multi-region HA, security zones, data platform, etc.) surfaced as a picker inside the Designer / wizard onboarding flow. Selecting a template pre-populates the wizard state or directly seeds the designer canvas, reducing the time-to-first-design for standard topologies. Templates are bundled as static JSON/jsonnet snapshots; custom templates can be added to `ocd/library/`.
+### D1. Architecture Template Gallery ✅
+A curated library of OCI reference architecture templates surfaced as a picker inside the Designer. Selecting a template seeds a fresh `OcdDesign`, auto-arranges it, and drops the user onto the canvas.
 
-### D2. Upstream OKIT Feature-Sync Banner ◐
-Extends the existing "OCI Landing Zone updates available" notification pattern to cover upstream OKIT releases. The banner appears when the upstream `okit-oci` main branch has commits not yet cherry-picked into this fork. It displays a diff summary (new resources, property changes, bug fixes), links to the upstream GitHub compare view, and provides a guided re-vendor command. Ensures the enhanced fork does not drift silently from upstream improvements.
+### D2. Upstream OKIT Feature-Sync Banner ✅
+Extends the existing "OCI Landing Zone updates available" notification pattern to cover upstream OKIT changes. The banner links to the GitHub compare view and guides the manual curation path for new upstream resources/features.
 
-### D3. Governance & Compliance Overlay ◐
-An optional designer overlay that annotates the canvas with policy and IAM guardrail recommendations based on a selected compliance framework (CIS OCI Foundations Benchmark, DISA-STIG, internal enterprise baselines). Compliance rules are declared as JSON rule sets in `ocd/library/compliance/`; the overlay adds visual badges to non-compliant resources and generates a remediation checklist. Complements the existing DB-Observability and OKE-native overlays.
+### D3. Governance & Compliance Overlay ✅
+The Governance page evaluates posture risks across network exposure, public resources, tags, budgets, compartment segmentation, and database/LB placement. Findings include severity, summaries, copyable Terraform guidance, and safe one-click fixes where deterministic.
+
+### D4. Network Reachability Analysis ✅
+`analysis/OcdReachability.ts` walks subnets, route tables, gateways, databases, and security lists to identify missing egress, dangling route targets, public DB placement, and internet-reachable databases. Findings are merged into the Governance page.
+
+### D5. Landing Zone Plan / Diff ✅
+`landingzone/plan/OcdLzPlan.ts` compares a live design to imported LZNG output and renders create/update/delete/no-op groups with field-level semantic diffs.
+
+### D6. Enterprise IAM + Policy Blueprint ✅
+`landingzone/OcdLzIamBlueprint.ts` applies enterprise groups, compartment-scoped policy bundles, and an `lz-governance` tag namespace with cost-tracking tags. The add-on is idempotent and leaves all generated resources editable in the model.
+
+## Phase E — Discovery Workbench and LZNG integration ✅
+
+### E1. Application-Centric Discovery Views ✅
+`discovery/` adds typed snapshots, deterministic sample data, inventory summaries,
+service dependency topology, utilization and cost rollups, risk counters, and a
+console page with Inventory, Topology, Analytics, Landing Zone Mapping, and
+Resource Analytics tabs.
+
+### E2. Resource Analytics Integration ✅
+`OciApiFacade`, `@ocd/web-server`, and Electron IPC expose read-only discovery
+snapshot and Resource Analytics query paths. SQL validation lives in `@ocd/core`
+and accepts SELECT-only queries while rejecting semicolons and mutation/admin
+keywords outside quoted strings.
+
+### E3. Discovery-to-Landing-Zone Recommendations ✅
+`OcdDiscoveryLzRecommendations.ts` turns the discovered estate into Landing Zone
+seed recommendations: workload compartments, observability/OKE/IAM overlays, and
+migration phases based on applications, runtimes, owners, environments, and
+dispositions.
+
+## Phase F — Architecture Agent ✅
+
+### F1. Chat-to-Design Architecture Agent ✅
+`architecture-agent/` adds a structured planning layer for chat-driven OCI
+design creation. It can use deterministic local plans for offline operation or a
+user-provided OpenAI-compatible chat-completions endpoint. Generated plans are
+normalized, converted to real `OcdDesign` resources through model factories, and
+applied directly to the Designer canvas.
 
 ## Notes
-- Discovery, canvas drag/connect, and OCI SDK calls are Electron-runtime (fs + SDK + no CORS). The web preview covers the wizard, palette, and Terraform import.
+- Discovery, canvas drag/connect, and OCI SDK calls are Electron-runtime (fs + SDK + no CORS) unless routed through the localhost `@ocd/web-server`. The web preview covers the wizard, palette, Terraform import, and deterministic Discovery Workbench sample data.
 - No OCIDs/secrets committed; vendored OCID-bearing data is fetched via `npm run setup-lz` (see no-ocids rule).

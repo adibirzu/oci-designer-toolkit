@@ -1,9 +1,9 @@
 {
-  "name": "ocd",
-  "productName": "ocd",
+  "name": "oci-designer-toolkit-next-gen",
+  "productName": "oci-designer-toolkit-next-gen",
   "version": "0.4.5",
-  "description": "Oracle Designer Toolkit - OCTO",
-  "title": "Oracle Designer Toolkit - OCTO",
+  "description": "OCI Designer Toolkit Next Gen",
+  "title": "oci-designer-toolkit-next-gen",
   "author": {
     "name": "Andrew Hopkinson",
     "email": "andrew.hopkinson@oracle.com",

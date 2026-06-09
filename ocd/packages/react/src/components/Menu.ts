@@ -522,6 +522,27 @@ export const menuItems: MenuItem[] = [
                 }
             },
             {
+                label: 'Discovery',
+                click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                    ocdConsoleConfig.config.displayPage = 'discovery'
+                    setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+                }
+            },
+            {
+                label: 'OKIT Classic 0.70 Parity',
+                click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                    ocdConsoleConfig.config.displayPage = 'classic'
+                    setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+                }
+            },
+            {
+                label: 'Architecture Agent',
+                click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                    ocdConsoleConfig.config.displayPage = 'agent'
+                    setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+                }
+            },
+            {
                 label: 'Markdown',
                 click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
                     ocdConsoleConfig.config.displayPage = 'markdown'

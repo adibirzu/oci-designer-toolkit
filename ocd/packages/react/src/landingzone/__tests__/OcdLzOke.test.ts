@@ -65,6 +65,7 @@ describe('OcdLzOke', () => {
         const result = applyOkeNativeOverlay(makeDesign(true))
         const podSubnet = findOkeResource(result, 'pod_subnet')
         const nodeSubnet = findOkeResource(result, 'node_subnet')
+        expect(podSubnet?.displayName).toBe('OKE Pod Subnet (VCN-native CNI)')
         expect(podSubnet?.cidrBlock).toBe('10.0.16.0/20') // >=4096 IPs
         expect(nodeSubnet?.cidrBlock).toBe('10.0.1.0/24')
         // Pod subnet is distinct from the node subnet — the key VCN-native rule.
@@ -75,6 +76,7 @@ describe('OcdLzOke', () => {
         const result = applyOkeNativeOverlay(makeDesign(true))
         const cluster = findOkeResource(result, 'cluster')
         const nodePool = findOkeResource(result, 'node_pool')
+        expect(cluster?.displayName).toBe('OKE Cluster (enhanced)')
         expect(cluster?.type).toBe('ENHANCED')
         expect(nodePool?.clusterId).toBe(cluster?.id)
     })

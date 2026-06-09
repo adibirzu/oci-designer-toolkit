@@ -9,7 +9,7 @@ import path from 'path'
 import url from 'url'
 import fs from 'fs'
 import common from 'oci-common'
-import { OcdUtils } from '@ocd/core' 
+import { OcdUtils, validateResourceAnalyticsSql } from '@ocd/core'
 import { OciQuery, OciReferenceDataQuery, OciResourceManagerQuery } from '@ocd/query'
 import { OcdDesign, OcdResource, OciModelResources } from '@ocd/model'
 import { OcdCache, OcdConsoleConfiguration } from '@ocd/react'
@@ -24,8 +24,10 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // Temporary work around for not 
 const isDev = process.env.OCD_DEV === 'true';
 const isPreview = process.env.OCD_PREVIEW === 'true';
 const isMac = process.platform === 'darwin'
+const APP_DISPLAY_NAME = 'oci-designer-toolkit-next-gen'
 
 if (Squirrel) app.quit()
+app.setName(APP_DISPLAY_NAME)
 const ocdConfigDirectory = path.join(app.getPath('home'), '.ocd')
 const ocdConsoleConfigFilename = path.join(ocdConfigDirectory, 'console_config.json')
 const ocdCacheFilename = path.join(ocdConfigDirectory, 'cache.json')
@@ -44,7 +46,7 @@ const loadDesktopState = () => {
   }
   if (!fs.existsSync(ocdWindowStateFilename)) fs.writeFileSync(ocdWindowStateFilename, JSON.stringify(initialState, null, 4))
   const config = fs.readFileSync(ocdWindowStateFilename, 'utf-8')
-  return {...initialState, ...JSON.parse(config)} 
+  return {...initialState, ...JSON.parse(config)}
 }
 
 const saveDesktopState = (config: Record<string, any>) => {
@@ -195,6 +197,7 @@ const createWindow = () => {
 		y: desktopState.y,
 		width: desktopState.width,
 		height: desktopState.height,
+		title: APP_DISPLAY_NAME,
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: true,
@@ -232,7 +235,7 @@ const createWindow = () => {
 			slashes: true,
 		})
   	mainWindow.loadURL(startUrl)
-  
+
     if (desktopState.isMaximised) mainWindow.maximize()
     mainWindow.setFullScreen(desktopState.isFullScreen)
 
@@ -243,7 +246,7 @@ const createWindow = () => {
 app.whenReady().then(() => {
 	// Build Information
 	ipcMain.handle('ocdBuild:getVersion', handleGetVersion)
-	// OCI API Calls 
+	// OCI API Calls
 	// Query
 	ipcMain.handle('ociConfig:loadProfileNames', handleLoadOciConfigProfileNames)
 	ipcMain.handle('ociConfig:loadProfile', handleLoadOciConfigProfile)
@@ -251,6 +254,8 @@ app.whenReady().then(() => {
 	ipcMain.handle('ociQuery:listTenancyCompartments', handleListTenancyCompartments)
 	ipcMain.handle('ociQuery:queryTenancy', handleQueryTenancy)
 	ipcMain.handle('ociQuery:queryDropdown', handleQueryDropdown)
+	ipcMain.handle('ociQuery:discoverySnapshot', handleQueryDiscoverySnapshot)
+	ipcMain.handle('ociResourceAnalytics:query', handleQueryResourceAnalytics)
 	ipcMain.handle('ociQuery:listStacks', handleListStacks)
 	ipcMain.handle('OciResourceManager:createStack', handleCreateStack)
 	ipcMain.handle('OciResourceManager:updateStack', handleUpdateStack)
@@ -298,10 +303,10 @@ app.whenReady().then(() => {
 		  selectionMenu.popup({window: mainWindow});
 		}
 	  })
-	
+
 	ready = true
 })
-  
+
 app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") {
 		app.quit()
@@ -337,15 +342,30 @@ async function handleGetVersion() {
 }
 
 
-// OCI API Calls 
+// OCI API Calls
 // Query
+const SENSITIVE_PROFILE_KEYS: ReadonlyArray<string> = [
+	'key_file',
+	'security_token_file',
+	'pass_phrase',
+	'passphrase',
+	'fingerprint',
+	'cert-bundle'
+]
+
+function sanitizeOciConfigProfile(profileData: Map<string, string> | undefined): Record<string, string> {
+	const sanitized: Record<string, string> = {}
+	if (profileData === undefined) return sanitized
+	for (const [key, value] of profileData.entries()) {
+		if (!SENSITIVE_PROFILE_KEYS.includes(key)) sanitized[key] = value
+	}
+	return sanitized
+}
+
 async function handleLoadOciConfigProfileNames() {
 	console.debug('Electron Main: handleLoadOciConfigProfileNames')
 	return new Promise((resolve, reject) => {
 		const parsed = common.ConfigFileReader.parseDefault(null)
-		console.debug('Electron Main: handleLoadOciConfigProfileNames:', parsed)
-		console.debug('Electron Main: handleLoadOciConfigProfileNames:', parsed.accumulator.configurationsByProfile)
-		console.debug('Electron Main: handleLoadOciConfigProfileNames:', Array.from(parsed.accumulator.configurationsByProfile.keys()))
         const profiles = Array.from(parsed.accumulator.configurationsByProfile.keys())
 		resolve(profiles)
 	})
@@ -355,14 +375,8 @@ async function handleLoadOciConfigProfile(event: any, profile: string) {
 	console.debug('Electron Main: handleLoadOciConfigProfile')
 	return new Promise((resolve, reject) => {
 		const parsed = common.ConfigFileReader.parseDefault(null)
-		console.debug('Electron Main: handleLoadOciConfigProfile: Parsed:', parsed)
-		console.debug('Electron Main: handleLoadOciConfigProfile: Config By Profile:', parsed.accumulator.configurationsByProfile)
-		console.debug('Electron Main: handleLoadOciConfigProfile: Keys:', Array.from(parsed.accumulator.configurationsByProfile.keys()))
-		console.debug('Electron Main: handleLoadOciConfigProfile: Profile:', parsed.accumulator.configurationsByProfile.get(profile))
         const profileData = parsed.accumulator.configurationsByProfile.get(profile)
-        // const profileData = Array.from(parsed.accumulator.configurationsByProfile[profile])
-		console.debug('Electron Main: handleLoadOciConfigProfile: Profile Data:', profileData)
-		resolve(profileData)
+		resolve(sanitizeOciConfigProfile(profileData))
 	})
 }
 
@@ -392,6 +406,18 @@ async function handleQueryDropdown(event: any, profile: string, region: string) 
 	console.debug('Electron Main: handleQueryDropdown')
 	const ociQuery = new OciReferenceDataQuery(profile, region)
 	return ociQuery.query()
+}
+
+async function handleQueryDiscoverySnapshot(event: any, profile: string, region: string) {
+	console.debug('Electron Main: handleQueryDiscoverySnapshot')
+	const ociQuery = new OciQuery(profile, region)
+	const compartments = await ociQuery.withTimeout(ociQuery.listTenancyCompartments(), 'discoverySnapshot')
+	return { source: 'oci-query', compartments }
+}
+
+async function handleQueryResourceAnalytics(event: any, profile: string, region: string, sql: string) {
+	const validatedSql = validateResourceAnalyticsSql(sql)
+	return { rows: [], sql: validatedSql }
 }
 
 async function handleListStacks(event: any, profile: string, region: string, compartmentId: string) {

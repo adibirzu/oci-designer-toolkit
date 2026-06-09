@@ -4,6 +4,7 @@
 */
 
 import { OutputDataStringArray } from "@ocd/export"
+import { validateResourceAnalyticsSql } from "@ocd/core"
 import { getOciPriceList as fetchOciPriceList, PriceMap } from "@ocd/query/pricing"
 
 /*
@@ -23,6 +24,17 @@ interface OcdWebServerResponse<T> {
     success: boolean
     data?: T
     error?: string
+}
+
+export interface ResourceAnalyticsQueryRequest {
+    profile: string
+    region: string
+    sql: string
+}
+
+export interface ResourceAnalyticsQueryResult {
+    rows: Record<string, unknown>[]
+    sql: string
 }
 
 const unwrap = async <T>(response: Response): Promise<T> => {
@@ -78,6 +90,15 @@ export namespace OciApiFacade {
     export const queryDropdown = (profile: string = 'DEFAULT', region: string = 'uk-london-1'): Promise<any> => {
         if (window.ocdAPI) return window.ocdAPI.queryDropdown(profile, region)
         return webPost<any>('/dropdown', { profile, region })
+    }
+    export const queryDiscoverySnapshot = (profile: string = 'DEFAULT', region: string = 'uk-london-1'): Promise<any> => {
+        if (window.ocdAPI) return window.ocdAPI.queryDiscoverySnapshot(profile, region)
+        return webPost<any>('/discovery/snapshot', { profile, region })
+    }
+    export const queryResourceAnalytics = (profile: string = 'DEFAULT', region: string = 'uk-london-1', sql: string = ''): Promise<ResourceAnalyticsQueryResult> => {
+        const validatedSql = validateResourceAnalyticsSql(sql)
+        if (window.ocdAPI) return window.ocdAPI.queryResourceAnalytics(profile, region, validatedSql)
+        return webPost<ResourceAnalyticsQueryResult>('/resource-analytics/query', { profile, region, sql: validatedSql })
     }
     export const listStacks = (profile: string = 'DEFAULT', region: string = 'uk-london-1', compartmentId: string = ''): Promise<any> => {
         return window.ocdAPI ? window.ocdAPI.listStacks(profile, region, compartmentId) : Promise.reject(new Error('Currently Not Implemented'))

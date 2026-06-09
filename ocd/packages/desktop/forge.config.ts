@@ -46,7 +46,7 @@ const config: ForgeConfig = {
     // miss it because minimatch `**` does not traverse dot-directories. The
     // WASM must be asar-unpacked so the renderer can fetch it under file://.
     asar: { unpack: '*.wasm' },
-    executableName: 'ocd',
+    executableName: 'oci-designer-toolkit-next-gen',
     icon: './public/assets/icon',
     // osxSign: {}, // Appears to break the MacOS App I assume because it's empty
     appCategoryType: 'public.app-category.developer-tools'
@@ -54,8 +54,8 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
-      name: 'ocd',
-      setupExe: `ocd-${Package.version}-Setup.exe`
+      name: 'oci-designer-toolkit-next-gen',
+      setupExe: `oci-designer-toolkit-next-gen-${Package.version}-Setup.exe`
     }), 
     // Always ship a darwin ZIP (no native deps) so the build gate is green even
     // when appdmg cannot compile. The DMG maker below is added only when available.
@@ -63,7 +63,9 @@ const config: ForgeConfig = {
     ...(dmgMakerAvailable ? [new MakerDMG({
       background: './public/assets/background.png',
       icon: './public/assets/icon.icns',
-      title: 'OKIT - Open Cloud Designer',
+      // appdmg/macos-alias requires the mounted volume name to be <= 27 chars.
+      // Keep the app/package identity long, but use a short installer volume.
+      title: 'ODT Next Gen',
       format: 'ULFO',
       overwrite: true,
       additionalDMGOptions: {
@@ -85,20 +87,20 @@ const config: ForgeConfig = {
           x: 150,
           y: 200,
           type: 'file',
-          path: `${process.cwd()}/../../dist/ocd-darwin-${arch}/ocd.app`
+          path: `${process.cwd()}/../../dist/oci-designer-toolkit-next-gen-darwin-${arch}/oci-designer-toolkit-next-gen.app`
         }
       ]
     }, ['darwin'])] : []),
     new MakerRpm({
       options: {
-        name: 'ocd',
-        productName: 'ocd'
+        name: 'oci-designer-toolkit-next-gen',
+        productName: 'oci-designer-toolkit-next-gen'
       }
     }), 
     new MakerDeb({
       options: {
-        name: 'ocd',
-        productName: 'ocd'
+        name: 'oci-designer-toolkit-next-gen',
+        productName: 'oci-designer-toolkit-next-gen'
       }
     })
   ],

@@ -19,6 +19,8 @@ contextBridge.exposeInMainWorld('ocdAPI', {
   listTenancyCompartments: (profile: string) => ipcRenderer.invoke('ociQuery:listTenancyCompartments', profile),
   queryTenancy: (profile: string, compartmentIds: string[], region: string) => ipcRenderer.invoke('ociQuery:queryTenancy', profile, compartmentIds, region),
   queryDropdown: (profile: string, region: string) => ipcRenderer.invoke('ociQuery:queryDropdown', profile, region),
+  queryDiscoverySnapshot: (profile: string, region: string) => ipcRenderer.invoke('ociQuery:discoverySnapshot', profile, region),
+  queryResourceAnalytics: (profile: string, region: string, sql: string) => ipcRenderer.invoke('ociResourceAnalytics:query', profile, region, sql),
   listStacks: (profile: string, region: string, compartmentId: string) => ipcRenderer.invoke('ociQuery:listStacks', profile, region, compartmentId),
   // Resource Manager
   createStack: (profile: string, region: string, compartmentId: string, stackName: string, data: OutputDataStringArray, apply: boolean) => ipcRenderer.invoke('OciResourceManager:createStack', profile, region, compartmentId, stackName, data, apply),

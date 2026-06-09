@@ -1,8 +1,8 @@
 {
-  "name": "ocd",
+  "name": "oci-designer-toolkit-next-gen",
   "version": "0.4.5",
-  "description": "OKIT Open Cloud Designer Desktop",
-  "title": "OKIT-Desktop April 2025 (Beta)",
+  "description": "OCI Designer Toolkit Next Gen Desktop",
+  "title": "oci-designer-toolkit-next-gen",
   "author": {
     "name": "Andrew Hopkinson",
     "email": "andrew.hopkinson@oracle.com",
