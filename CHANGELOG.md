@@ -12,12 +12,15 @@
 #### Architecture Agent
 - **BYO-LLM architecture generation.** Added a first-class **Architecture Agent** page that turns a user chat request into a structured OCI architecture plan. The agent can call any OpenAI-compatible chat-completions endpoint supplied by the user at runtime; API keys are kept in renderer memory only.
 - **Offline deterministic planner.** When no LLM endpoint/model is configured, the agent uses local planning heuristics for common OCI patterns including three-tier applications, secure OKE platforms, and hub-spoke networks.
+- **Agentic Zero Trust planner.** Added a deterministic Agentic Zero Trust architecture template that maps reasoning isolation, policy-gated execution, scoped identity, and evidence-by-design controls into editable OCI resources where model support exists.
+- **Concrete OCI security-resource output.** The Architecture Agent can now generate API Gateway, Functions application/function, Web Application Firewall, Data Safe target/assessment, Cloud Guard target, Logging Analytics log group, and Service Connector resources in addition to the existing network, compute, OKE, IAM, Vault, logging, monitoring, and budget resources.
+- **Redwood Zero Trust UX.** Refreshed the agent page with a Redwood-style flow strip, prompt templates, plan metrics, control-model cards, and evidence outputs. Discovery analytics now includes Zero Trust readiness and control-matrix views.
 - **Chat-to-Designer handoff.** Generated plans are converted into editable `OcdDesign` resources using the existing OCI model factories, then auto-arranged and opened on the Designer canvas.
 - **Console integration.** Added the **AI Architect** toolbar entry and **View -> Architecture Agent** menu item.
 
 #### Testing
-- **Architecture Agent unit coverage.** Added Vitest coverage for local planning, fenced JSON LLM response parsing, OpenAI-compatible request formation, and design construction.
-- **Architecture Agent E2E coverage.** Added Playwright coverage for the full browser flow: open agent, generate an OKE plan, apply it to the Designer, and verify rendered resources.
+- **Architecture Agent unit coverage.** Added Vitest coverage for local planning, Agentic Zero Trust resource mapping, fenced JSON LLM response parsing, OpenAI-compatible request formation, and design construction.
+- **Architecture Agent E2E coverage.** Added Playwright coverage for the full browser flow: open agent, verify the Zero Trust UX, generate an OKE plan, apply it to the Designer, and verify rendered resources.
 - **DMG packaging guard.** Shortened the macOS DMG mounted volume label so `electron-forge make` succeeds while preserving the `oci-designer-toolkit-next-gen` app/package identity.
 
 

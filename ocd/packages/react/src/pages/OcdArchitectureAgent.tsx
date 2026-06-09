@@ -9,8 +9,28 @@ import {
     createArchitecturePlanFromPrompt,
 } from '../architecture-agent/OcdArchitectureAgent'
 import { OcdConsoleConfig } from '../components/OcdConsoleConfiguration'
+import { agentPromptTemplates, zeroTrustControls, zeroTrustFlowSteps } from '../security/OcdZeroTrustReference'
 
-const defaultPrompt = 'Create a secure three tier OCI web application with public load balancing, private app servers, private database, logging, monitoring, and budget controls.'
+const defaultPrompt = agentPromptTemplates[0].prompt
+
+const evidenceResourceKinds = new Set([
+    'cloud_guard_target',
+    'data_safe_security_assessment',
+    'data_safe_target_database',
+    'log_analytics_log_group',
+    'log_group',
+    'monitoring_alarm',
+    'service_connector',
+])
+
+const executionResourceKinds = new Set([
+    'api_gateway',
+    'functions_application',
+    'functions_function',
+    'dynamic_group',
+    'policy',
+    'vault',
+])
 
 const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, setOcdDocument }: ConsolePageProps): JSX.Element => {
     const [prompt, setPrompt] = useState(defaultPrompt)
@@ -21,6 +41,11 @@ const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocume
     const [status, setStatus] = useState('Local planner ready')
     const [busy, setBusy] = useState(false)
     const providerLabel = useMemo(() => endpoint.trim() && model.trim() ? 'LLM' : 'Local', [endpoint, model])
+    const planMetrics = useMemo(() => ({
+        resources: plan.resources.length,
+        evidence: plan.resources.filter((resource) => evidenceResourceKinds.has(resource.kind)).length,
+        execution: plan.resources.filter((resource) => executionResourceKinds.has(resource.kind)).length,
+    }), [plan])
 
     const onGenerate = async () => {
         setBusy(true)
@@ -43,24 +68,52 @@ const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocume
         clone.design = buildDesignFromArchitecturePlan(plan)
         clone.autoLayout(clone.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle ?? 'dynamic-columns')
         setOcdDocument(clone)
-        ocdConsoleConfig.config.displayPage = 'designer'
-        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+        const nextConfig = OcdConsoleConfig.clone(ocdConsoleConfig)
+        nextConfig.config.displayPage = 'designer'
+        setOcdConsoleConfig(nextConfig)
     }
 
     return (
         <div className='ocd-architecture-agent-page'>
             <header className='ocd-architecture-agent-header'>
-                <div>
+                <div className='ocd-agent-title-block'>
+                    <span className='ocd-agent-kicker'>Oracle Cloud Infrastructure</span>
                     <h1>Architecture Agent</h1>
-                    <p>{status}</p>
+                    <p>{status}. Generate editable OCI designs from a chat prompt, with zero-trust controls ready for review.</p>
                 </div>
                 <button className='ocd-agent-primary' disabled={busy} onClick={onGenerate} type='button'>
-                    Generate Plan
+                    Generate plan
                 </button>
             </header>
+            <section className='ocd-agent-flow' aria-label='Agentic zero trust flow'>
+                {zeroTrustFlowSteps.map((step, index) => (
+                    <article className='ocd-agent-flow-step' key={step.title}>
+                        <span>{String(index + 1).padStart(2, '0')}</span>
+                        <h2>{step.title}</h2>
+                        <p>{step.summary}</p>
+                        <div>
+                            {step.controls.map((control) => <b key={control}>{control}</b>)}
+                        </div>
+                    </article>
+                ))}
+            </section>
             <div className='ocd-architecture-agent-grid'>
                 <section className='ocd-architecture-agent-panel'>
-                    <h2>Chat</h2>
+                    <div className='ocd-agent-section-heading'>
+                        <h2>Chat</h2>
+                        <span>{providerLabel} planner</span>
+                    </div>
+                    <div className='ocd-agent-template-row' aria-label='Architecture prompt templates'>
+                        {agentPromptTemplates.map((template) => (
+                            <button
+                                key={template.label}
+                                onClick={() => setPrompt(template.prompt)}
+                                type='button'
+                            >
+                                {template.label}
+                            </button>
+                        ))}
+                    </div>
                     <textarea
                         aria-label='Architecture request'
                         className='ocd-agent-prompt'
@@ -99,6 +152,16 @@ const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocume
                             />
                         </label>
                     </div>
+                    <div className='ocd-agent-control-panel' aria-label='Zero trust controls'>
+                        <h2>Control model</h2>
+                        {zeroTrustControls.slice(0, 3).map((control) => (
+                            <article key={control.principle}>
+                                <h3>{control.principle}</h3>
+                                <p>{control.agenticExtension}</p>
+                                <div>{control.ociControls.map((item) => <span key={item}>{item}</span>)}</div>
+                            </article>
+                        ))}
+                    </div>
                 </section>
                 <section className='ocd-architecture-agent-panel'>
                     <div className='ocd-agent-plan-header'>
@@ -106,7 +169,21 @@ const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocume
                             <h2>{plan.title}</h2>
                             <p>{plan.summary}</p>
                         </div>
-                        <button className='ocd-agent-apply' onClick={onApply} type='button'>Apply to Designer</button>
+                        <button className='ocd-agent-apply' onClick={onApply} type='button'>Apply to designer</button>
+                    </div>
+                    <div className='ocd-agent-plan-metrics' aria-label='Generated plan metrics'>
+                        <article>
+                            <span>Resources</span>
+                            <strong>{planMetrics.resources}</strong>
+                        </article>
+                        <article>
+                            <span>Execution controls</span>
+                            <strong>{planMetrics.execution}</strong>
+                        </article>
+                        <article>
+                            <span>Evidence controls</span>
+                            <strong>{planMetrics.evidence}</strong>
+                        </article>
                     </div>
                     <div className='ocd-agent-assumptions'>
                         {plan.assumptions.map((assumption) => <span key={assumption}>{assumption}</span>)}
@@ -131,6 +208,16 @@ const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocume
                             ))}
                         </tbody>
                     </table>
+                    <div className='ocd-agent-evidence-panel' aria-label='Evidence outputs'>
+                        {zeroTrustControls.slice(3).map((control) => (
+                            <article key={control.principle}>
+                                <h3>{control.principle}</h3>
+                                <ul>
+                                    {control.evidence.map((item) => <li key={item}>{item}</li>)}
+                                </ul>
+                            </article>
+                        ))}
+                    </div>
                 </section>
             </div>
         </div>

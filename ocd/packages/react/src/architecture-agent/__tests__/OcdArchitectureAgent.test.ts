@@ -17,6 +17,30 @@ describe('OcdArchitectureAgent', () => {
         expect(plan.assumptions.length).toBeGreaterThan(0)
     })
 
+    it('creates an agentic zero trust plan with execution and evidence controls', () => {
+        const plan = createArchitecturePlanFromPrompt('Create an agentic Zero Trust OCI architecture with a policy gate and scoped identity.')
+        const design = buildDesignFromArchitecturePlan(plan)
+
+        expect(plan.title).toContain('Zero Trust')
+        expect(plan.resources.map((resource) => resource.kind)).toEqual(expect.arrayContaining([
+            'api_gateway',
+            'functions_application',
+            'functions_function',
+            'dynamic_group',
+            'policy',
+            'vault',
+            'cloud_guard_target',
+            'data_safe_target_database',
+            'log_analytics_log_group',
+            'service_connector',
+        ]))
+        expect(design.model.oci.resources.api_gateway).toHaveLength(1)
+        expect(design.model.oci.resources.functions_application).toHaveLength(1)
+        expect(design.model.oci.resources.functions_function).toHaveLength(1)
+        expect(design.model.oci.resources.cloud_guard_target).toHaveLength(1)
+        expect(design.model.oci.resources.service_connector).toHaveLength(1)
+    })
+
     it('parses JSON returned by an LLM even when wrapped in markdown fences', () => {
         const response = [
             '```json',

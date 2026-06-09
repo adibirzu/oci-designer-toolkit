@@ -175,10 +175,17 @@ canvas:
 - `parseArchitecturePlanResponse` accepts strict JSON and fenced JSON responses,
   then normalizes unsupported or missing fields.
 - `createArchitecturePlanFromPrompt` provides an offline deterministic fallback
-  for three-tier, OKE, and hub-spoke requests.
+  for three-tier, OKE, hub-spoke, and Agentic Zero Trust requests.
 - `buildDesignFromArchitecturePlan` converts the plan into real model resources
   using `OciModelResources` factories and stores provenance in
   `design.userDefined.architectureAgent`.
+
+Agentic Zero Trust plans map the reasoning -> policy -> scoped-execution pattern
+to editable OCI resources where the designer model supports them: API Gateway,
+Functions, Web Application Firewall, Dynamic Groups, IAM policies, Vault, Data
+Safe, Cloud Guard, Logging Analytics, Service Connector, logging, monitoring,
+and budgets. ZPR and Security Zones remain documented assumptions until editable
+model resources are available for those services.
 
 The console exposes the feature as **AI Architect** in the toolbar and as
 **View -> Architecture Agent**. Applying a plan replaces the active document with

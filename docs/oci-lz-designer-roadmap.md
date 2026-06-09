@@ -94,6 +94,13 @@ user-provided OpenAI-compatible chat-completions endpoint. Generated plans are
 normalized, converted to real `OcdDesign` resources through model factories, and
 applied directly to the Designer canvas.
 
+### F2. Agentic Zero Trust UX and Controls ✅
+The agent now includes a Redwood-style Zero Trust flow, reusable prompt
+templates, plan metrics, control/evidence panels, and a deterministic Agentic
+Zero Trust architecture that maps policy-gated execution to editable OCI
+resources such as API Gateway, Functions, Dynamic Groups, IAM policies, Vault,
+Data Safe, Cloud Guard, Logging Analytics, and Service Connector.
+
 ## Notes
 - Discovery, canvas drag/connect, and OCI SDK calls are Electron-runtime (fs + SDK + no CORS) unless routed through the localhost `@ocd/web-server`. The web preview covers the wizard, palette, Terraform import, and deterministic Discovery Workbench sample data.
 - No OCIDs/secrets committed; vendored OCID-bearing data is fetched via `npm run setup-lz` (see no-ocids rule).

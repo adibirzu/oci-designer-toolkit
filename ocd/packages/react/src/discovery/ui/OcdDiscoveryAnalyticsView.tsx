@@ -1,5 +1,6 @@
 import { summarizeUtilization } from '../OcdDiscoveryAnalytics'
 import { DiscoverySnapshot } from '../OcdDiscoveryTypes'
+import { zeroTrustControls } from '../../security/OcdZeroTrustReference'
 
 export interface OcdDiscoveryAnalyticsViewProps {
     snapshot: DiscoverySnapshot
@@ -10,6 +11,9 @@ const formatUsd = (value: number): string => `USD ${value.toLocaleString(undefin
 const OcdDiscoveryAnalyticsView = ({ snapshot }: OcdDiscoveryAnalyticsViewProps): JSX.Element => {
     const utilization = summarizeUtilization(snapshot)
     const assets = new Map(snapshot.assets.map((asset) => [asset.id, asset]))
+    const sensitiveDatabases = snapshot.services.filter((service) => service.runtime.includes('database')).length
+    const privateControlCandidates = snapshot.dependencies.filter((dependency) => dependency.protocol === 'tcp').length
+    const agenticEvidenceControls = zeroTrustControls.reduce((total, control) => total + control.evidence.length, 0)
 
     return (
         <div className='ocd-discovery-section'>
@@ -26,6 +30,33 @@ const OcdDiscoveryAnalyticsView = ({ snapshot }: OcdDiscoveryAnalyticsViewProps)
                     <h2>Memory Hot Assets</h2>
                     <strong>{utilization.p95MemoryHotAssets.length}</strong>
                 </article>
+            </div>
+            <h2>Zero Trust Readiness</h2>
+            <div className='ocd-discovery-grid ocd-zero-trust-readiness'>
+                <article className='ocd-discovery-card'>
+                    <h2>Sensitive Data Targets</h2>
+                    <p>Map to Data Safe targets, Vault keys, and data-class policy checks.</p>
+                    <strong>{sensitiveDatabases}</strong>
+                </article>
+                <article className='ocd-discovery-card'>
+                    <h2>Policy Gate Candidates</h2>
+                    <p>TCP service paths that should be mediated by private endpoints, NSGs, ZPR, or brokered execution.</p>
+                    <strong>{privateControlCandidates}</strong>
+                </article>
+                <article className='ocd-discovery-card'>
+                    <h2>Evidence Outputs</h2>
+                    <p>Reference evidence artifacts for audit, SOC, and operational proof.</p>
+                    <strong>{agenticEvidenceControls}</strong>
+                </article>
+            </div>
+            <div className='ocd-zero-trust-matrix'>
+                {zeroTrustControls.map((control) => (
+                    <article key={control.principle}>
+                        <h3>{control.principle}</h3>
+                        <p>{control.agenticExtension}</p>
+                        <div>{control.ociControls.map((item) => <span key={item}>{item}</span>)}</div>
+                    </article>
+                ))}
             </div>
             <h2>Utilization Metrics</h2>
             <table className='ocd-discovery-table'>

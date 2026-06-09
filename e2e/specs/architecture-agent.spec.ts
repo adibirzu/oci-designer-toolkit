@@ -10,11 +10,14 @@ test.describe('Architecture Agent smoke', () => {
     await agentButton.click()
 
     await expect(page.getByRole('heading', { name: 'Architecture Agent' })).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByRole('heading', { name: 'Reasoning proposes' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Policy decides' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Agentic Zero Trust' })).toBeVisible()
 
     await page.getByLabel('Architecture request').fill(
       'Create a secure OKE platform with a private worker subnet, pod subnet, vault, logging, monitoring, and budget controls.',
     )
-    await page.getByRole('button', { name: 'Generate Plan' }).click()
+    await page.getByRole('button', { name: 'Generate plan' }).click()
 
     await expect(page.getByRole('heading', { name: 'Agent OKE Platform Architecture' })).toBeVisible()
     await expect(page.getByRole('cell', { name: 'OKE Enhanced Cluster' })).toBeVisible()
@@ -22,7 +25,7 @@ test.describe('Architecture Agent smoke', () => {
     await expect(page.getByRole('cell', { name: 'OKE Private Node Pool' })).toBeVisible()
     await expect(page.getByRole('cell', { name: 'oke_node_pool' })).toBeVisible()
 
-    await page.getByRole('button', { name: 'Apply to Designer' }).click()
+    await page.getByRole('button', { name: 'Apply to designer' }).click()
 
     await expect(page.locator('#ocd_document_title')).toHaveValue('Agent OKE Platform Architecture')
     await expect(page.locator('.ocd-designer')).toBeVisible({ timeout: 20_000 })
