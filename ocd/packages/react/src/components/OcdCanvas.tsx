@@ -13,6 +13,8 @@ import { newDragData } from '../types/DragData'
 import { ActiveFileContext, SelectedResourceContext } from '../pages/OcdConsole'
 import { OcdUtils } from '@ocd/core'
 import { OcdDragResource, OcdSelectedResource } from '../types/Console'
+import { isLzOriginDesign, resolveLzPlacement } from '../landingzone/OcdLzPlacement'
+import { connectResources } from './OcdConnect'
 
 export interface OcdContextMenu {
     show: boolean
@@ -88,7 +90,19 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
             // Get Page
             const page: OcdViewPage = ocdDocument.getActivePage()
             const layer: OcdViewLayer = ocdDocument.getActiveLayer(page.id)
-            const compartmentId: string = layer.id
+            // A5 LZ-origin placement: when the active design was produced by the
+            // LZNG wizard, route the dropped stencil into the appropriate LZ
+            // compartment (network / security / fallback-root) instead of always
+            // inheriting the currently-selected canvas layer.  For non-LZ designs
+            // the behaviour is identical to before (layer.id).
+            const lzCompartments = ocdDocument.design.model.oci.resources.compartment ?? []
+            const compartmentId: string = isLzOriginDesign(ocdDocument.design) && dragData.dragObject
+                ? (resolveLzPlacement(
+                      // Derive the OCD model type from the palette class (e.g. 'oci-vcn' -> 'vcn').
+                      dragData.dragObject.class.replace(/^oci-/, '').replaceAll('-', '_'),
+                      lzCompartments,
+                  ) || layer.id)
+                : layer.id
             const pocid = dropTarget.dataset.ocid ? dropTarget.dataset.ocid : ''
             const pgid = dropTarget.dataset.gid ? dropTarget.dataset.gid : ''
             console.info('OcdCanvas: Dataset', dropTarget.dataset)
@@ -222,6 +236,25 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
             console.info('OcdCanvas: SVG Drag End', ocdDocument.dragResource)
             const hasMoved = coordinates.x !== 0 || coordinates.y !== 0
             setDragging(false)
+            // Drag-to-connect: when a connection target was recorded (connect mode),
+            // wire the FK association instead of moving/re-parenting the resource.
+            const connectTarget = ocdDocument.dragResource.connectTarget
+            if (connectTarget) {
+                const sourceId = ocdDocument.dragResource.resource.ocid
+                const result = connectResources(ocdDocument.design, sourceId, connectTarget.ocid)
+                ocdDocument.dragResource = OcdDocument.newDragResource()
+                setCoordinates({ x: 0, y: 0 })
+                setGhostTranslate({ x: 0, y: 0 })
+                if (result.connected) {
+                    ocdDocument.design = result.design
+                    setOcdDocument(OcdDocument.clone(ocdDocument))
+                    if (!activeFile.modified) setActiveFile({ name: activeFile.name, modified: true })
+                } else {
+                    // Nothing to wire (incompatible types / self) — just redraw to clear the drag.
+                    setOcdDocument(OcdDocument.clone(ocdDocument))
+                }
+                return
+            }
             // Test if container dropped on self
             if (ocdDocument.dragResource.parent && ocdDocument.dragResource.resource.id === ocdDocument.dragResource.parent.id) {
                 delete ocdDocument.dragResource.parent
@@ -457,6 +490,15 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
                                 />
                         })}
                         </g>
+                        {ocdConsoleConfig.config.connectMode && dragging && (() => {
+                            const src = ocdDocument.getRelativeXY(ocdDocument.dragResource.resource)
+                            const r = ocdDocument.dragResource.resource
+                            const hw = (r.w || 32) / 2
+                            const hh = (r.h || 32) / 2
+                            return <line className='ocd-connect-rubber-band'
+                                x1={src.x + hw} y1={src.y + hh}
+                                x2={ghostTranslate.x + hw} y2={ghostTranslate.y + hh} />
+                        })()}
                         <g className='ocd-ghost-group'
                             transform={`translate(${ghostTranslate.x}, ${ghostTranslate.y})`}
                             >

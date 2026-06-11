@@ -1,9 +1,9 @@
 {
-  "name": "ocd",
-  "productName": "ocd",
-  "version": "0.3.0",
-  "description": "OKIT Open Cloud Designer Desktop",
-  "title": "OKIT Open Cloud Designer Desktop",
+  "name": "oci-designer-toolkit-next-gen",
+  "productName": "oci-designer-toolkit-next-gen",
+  "version": "0.4.5",
+  "description": "OCI Designer Toolkit Next Gen",
+  "title": "oci-designer-toolkit-next-gen",
   "author": {
     "name": "Andrew Hopkinson",
     "email": "andrew.hopkinson@oracle.com",
@@ -23,14 +23,17 @@
   "main": ".vite/build/main.js",
   "scripts": {
     "dev": "vite",
+    "web": "vite --host 0.0.0.0",
     "vite-build": "tsc -b ./tsconfig.json && vite build",
-    "clean": "rm -rf lib dist .vite out",
+    "build:web": "npm run prebuild && vite build --config vite.web.config.mts",
+    "build:pages": "npm run build:web && node scripts/prepare-pages-build.mjs web-dist",
+    "clean": "rm -rf lib dist .vite out web-dist",
     "purge": "npm run clean && rm -rf node_modules",
-    "prebuild": "cp -v ../react/src/css/*.css ./src/css || copy /y ../react/src/css/*.css ./src/css",
+    "prebuild": "cp -v ../react/src/css/*.css ./src/css && cp -v ../react/src/landingzone/wasm/libjsonnet.wasm ./public/libjsonnet.wasm || (copy /y ..\\react\\src\\css\\*.css .\\src\\css && copy /y ..\\react\\src\\landingzone\\wasm\\libjsonnet.wasm .\\public\\libjsonnet.wasm)",
     "build": "npm run make",
     "start": "NODE_OPTIONS=--max-old-space-size=8192 electron-forge start",
     "package": "NODE_OPTIONS=--max-old-space-size=8192 electron-forge package",
-    "make": "electron-forge make ",
+    "make": "NODE_OPTIONS=--max-old-space-size=8192 electron-forge make ",
     "make-macos-universal": "NODE_OPTIONS=--max-old-space-size=8192 DEBUG=electron-installer-dmg* electron-forge make --arch='universal'",
     "make-macos-arm64": "NODE_OPTIONS=--max-old-space-size=8192 DEBUG=electron-installer-dmg* electron-forge make --arch='arm64'",
     "make-macos-x64": "NODE_OPTIONS=--max-old-space-size=8192 DEBUG=electron-installer-dmg* electron-forge make --arch='x64'",
@@ -64,11 +67,14 @@
     "@ocd/export": ">=0.3.0",
     "@ocd/import": ">=0.3.0",
     "@ocd/model": ">=0.3.0",
-    "@ocd/query": ">=0.3.0",
     "@ocd/parser": ">=0.3.0",
+    "@ocd/query": ">=0.3.0",
     "@ocd/react": ">=0.3.0",
     "electron-squirrel-startup": "^1.0.1",
     "exceljs": "^4.4.0",
     "oci-sdk": "^2.69.0"
+  },
+  "optionalDependencies": {
+    "appdmg": "^0.6.6"
   }
 }

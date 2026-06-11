@@ -4,11 +4,43 @@
 */
 
 import { OcdDesign } from "@ocd/model"
+import { OcdTerraformImporter } from "@ocd/import"
 import { OcdDesignerBrowserActions } from "../actions/OcdDesignBrowserActions"
 
 /*
 ** Facade exists so we can switch between Electron based and Web based which will require a web server
 */
+
+/*
+** Browser file picker + reader. Lets web-build features (e.g. Terraform import)
+** work without Electron: the parser is dependency-free, only the native file
+** dialog / fs read is Electron-specific.
+*/
+const pickAndReadTextFiles = (accept: string, multiple = true): Promise<{ canceled: boolean; filename: string; text: string }> =>
+    new Promise((resolve, reject) => {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.accept = accept
+        input.multiple = multiple
+        input.style.display = 'none'
+        input.addEventListener('change', () => {
+            const files = Array.from(input.files || [])
+            if (files.length === 0) {
+                resolve({ canceled: true, filename: '', text: '' })
+            } else {
+                // Concatenating multiple HCL .tf files is valid (Terraform treats all
+                // .tf in a directory as one config). A read failure is surfaced as a
+                // rejection — never silently swallowed as a "cancel".
+                Promise.all(files.map((f) => f.text()))
+                    .then((texts) => resolve({ canceled: false, filename: files[0].name, text: texts.join('\n') }))
+                    .catch((err) => reject(err instanceof Error ? err : new Error('Failed to read selected file(s)')))
+            }
+            input.remove()
+        })
+        input.addEventListener('cancel', () => { resolve({ canceled: true, filename: '', text: '' }); input.remove() })
+        document.body.appendChild(input)
+        input.click()
+    })
 
 export namespace OcdDesignFacade {
     export const loadDesign = (filename: string): Promise<any> => {
@@ -46,6 +78,13 @@ export namespace OcdDesignFacade {
         return window.ocdAPI ? window.ocdAPI.exportToTerraform(design, directory) : Promise.reject(new Error('Currently Not Implemented'))
     }
     export const importFromTerraform = (): Promise<any> => {
-        return window.ocdAPI ? window.ocdAPI.importFromTerraform() : Promise.reject(new Error('Currently Not Implemented'))
+        if (window.ocdAPI) return window.ocdAPI.importFromTerraform()
+        // Web path: pick .tf/.tf.json files in the browser and parse them with the
+        // dependency-free importer (same one the Electron main process uses).
+        return pickAndReadTextFiles('.tf').then(({ canceled, filename, text }) => {
+            if (canceled || !text.trim()) return { canceled: true, filename: '', design: undefined }
+            const importer = new OcdTerraformImporter()
+            return { canceled: false, filename, design: importer.import(text) }
+        })
     }
 }

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Repo pre-push hook. Setting repo core.hooksPath to .githooks (to enable the
+# pre-commit redaction gate) would otherwise bypass any GLOBAL hooks dir. So we
+# chain to the previously-configured global pre-push (e.g. an ECC/codex
+# build+pytest gate) when present. Portable: a no-op if no global hook exists.
+set -euo pipefail
+GLOBAL_HOOKS="$(git config --global core.hooksPath 2>/dev/null || true)"
+GLOBAL_HOOKS="${GLOBAL_HOOKS/#\~/$HOME}"
+if [ -n "$GLOBAL_HOOKS" ] && [ -x "$GLOBAL_HOOKS/pre-push" ]; then
+    exec "$GLOBAL_HOOKS/pre-push" "$@"
+fi
+exit 0

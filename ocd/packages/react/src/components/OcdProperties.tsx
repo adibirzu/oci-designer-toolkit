@@ -13,8 +13,10 @@ import * as ociResources from './properties/provider/oci/resources'
 import * as azureResources from './properties/provider/azure/resources'
 import * as googleResources from './properties/provider/google/resources'
 import { RgbaStringColorPicker } from 'react-colorful'
+import { getResourceTerraformHcl } from '@ocd/export'
 import Markdown from 'react-markdown'
 import { SelectedResourceContext } from '../pages/OcdConsole'
+import { getOciResourceRelationships } from '../landingzone/OcdResourceRelationships'
 // import { CacheContext, SelectedResourceContext } from '../pages/OcdConsole'
 import { OciDefinedTagRow, OciFreeformTagRow } from '../pages/OcdCommonTags'
 import { OcdCacheData } from './OcdCache'
@@ -27,7 +29,7 @@ const getResourceTabs = (modelId: string, coordsId: string): string[] => {
         'Documentation',
         ...modelId && modelId !== '' ? ['Style'] : [],
         ...coordsId && coordsId !== '' ? ['Arrange'] : [],
-        ...modelId && modelId !== '' ? ['Validation'] : [],
+        ...modelId && modelId !== '' ? ['Terraform', 'Relationships', 'Validation'] : [],
     ]
     console.debug('OcdPropertiesTabbar: getResourceTabs:', tabs)
     return tabs
@@ -711,6 +713,121 @@ const OcdColourPicker = ({colour, setColour}: DesignerColourPicker): JSX.Element
     )
 }
 
+// ---------------------------------------------------------------------------
+// Terraform HCL preview tab (A4 — per-resource Terraform preview)
+// ---------------------------------------------------------------------------
+
+/**
+ * Read-only panel that shows the Terraform HCL the selected resource would
+ * generate.  It delegates entirely to the existing OciExporter/AzureExporter
+ * generators via the `getResourceTerraformHcl` helper from @ocd/export.
+ */
+const OcdResourceTerraformPreview = ({ocdDocument, setOcdDocument}: DesignerResourceProperties): JSX.Element => {
+    const {selectedResource} = useContext(SelectedResourceContext)
+    const theme = useTheme()
+    const selectedModelResource: OcdResource = ocdDocument.getResource(selectedResource.modelId)
+
+    const hcl = useMemo((): string => {
+        if (!selectedModelResource) return ''
+        try {
+            return getResourceTerraformHcl(ocdDocument.design, selectedModelResource.id)
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err)
+            return `# Terraform HCL preview unavailable\n# ${msg}`
+        }
+        // Depend on ocdDocument (recreated immutably on every design edit) so the
+        // preview refreshes when the selected resource's properties change, not
+        // only when a different resource is selected.
+    }, [selectedResource, ocdDocument])
+
+    const divClassNames = `ocd-properties-panel ocd-properties-terraform-preview-panel ocd-properties-panel-default-theme ocd-properties-panel-${theme}-theme`
+    return (
+        <div className={divClassNames}>
+            {selectedModelResource
+                ? <pre className='ocd-terraform-preview-hcl'>{hcl}</pre>
+                : <span className='ocd-terraform-preview-placeholder'>Select a resource to view its Terraform HCL.</span>
+            }
+        </div>
+    )
+}
+
+// ---------------------------------------------------------------------------
+// Relationships panel (A4 part 2 — resource relationship tab)
+// ---------------------------------------------------------------------------
+
+/**
+ * Read-only panel that shows the informational parent/child/connection
+ * relationship types valid for the currently-selected OCI resource.
+ * Data is derived entirely from the model's `allowedParentTypes()` functions —
+ * no live OCI API calls are made.
+ */
+const OcdResourceRelationshipsPanel = ({ocdDocument, setOcdDocument}: DesignerResourceProperties): JSX.Element => {
+    const {selectedResource} = useContext(SelectedResourceContext)
+    const theme = useTheme()
+    const selectedModelResource: OcdResource = ocdDocument.getResource(selectedResource.modelId)
+
+    const relationships = useMemo(() => {
+        if (!selectedModelResource || selectedModelResource.provider !== 'oci') return undefined
+        return getOciResourceRelationships(selectedModelResource.resourceType)
+    }, [selectedResource, ocdDocument])
+
+    const divClassNames = `ocd-properties-panel ocd-properties-relationships-panel ocd-properties-panel-default-theme ocd-properties-panel-${theme}-theme`
+    const summaryClassNames = `summary-background summary-background-default-theme summary-background-${theme}-theme`
+
+    if (!selectedModelResource) {
+        return (
+            <div className={divClassNames}>
+                <span className='ocd-relationships-placeholder'>Select a resource to view its relationships.</span>
+            </div>
+        )
+    }
+
+    if (!relationships) {
+        return (
+            <div className={divClassNames}>
+                <span className='ocd-relationships-placeholder'>No relationship data available for this resource type ({selectedModelResource.resourceType}).</span>
+            </div>
+        )
+    }
+
+    return (
+        <div className={divClassNames}>
+            <details className='ocd-details' open={true}>
+                <summary className={summaryClassNames}><label>Parent Types ({relationships.parents.length})</label></summary>
+                <div className='ocd-details-body'>
+                    {relationships.parents.length === 0
+                        ? <span className='ocd-relationships-empty'>None — this resource can be placed directly in a Compartment.</span>
+                        : <ul className='ocd-relationships-list'>
+                            {relationships.parents.map((p) => <li key={p} className='ocd-relationships-item ocd-relationships-parent'>{p}</li>)}
+                          </ul>
+                    }
+                </div>
+            </details>
+            <details className='ocd-details' open={true}>
+                <summary className={summaryClassNames}><label>Child Types ({relationships.children.length})</label></summary>
+                <div className='ocd-details-body'>
+                    {relationships.children.length === 0
+                        ? <span className='ocd-relationships-empty'>No resources are contained by this type.</span>
+                        : <ul className='ocd-relationships-list'>
+                            {relationships.children.map((c) => <li key={c} className='ocd-relationships-item ocd-relationships-child'>{c}</li>)}
+                          </ul>
+                    }
+                </div>
+            </details>
+            {relationships.connectionLabels.length > 0 && (
+                <details className='ocd-details' open={true}>
+                    <summary className={summaryClassNames}><label>Connections ({relationships.connectionLabels.length})</label></summary>
+                    <div className='ocd-details-body'>
+                        <ul className='ocd-relationships-list'>
+                            {relationships.connectionLabels.map((l) => <li key={l} className='ocd-relationships-item ocd-relationships-connection'>{l}</li>)}
+                        </ul>
+                    </div>
+                </details>
+            )}
+        </div>
+    )
+}
+
 const getResourceValidationResults = (ocdDocument: OcdDocument, selectedModelResource: OcdResource): OcdValidationResult[] => {
     const provider = selectedModelResource ? selectedModelResource.provider : ''
     switch (provider) {
@@ -840,6 +957,12 @@ const getActiveTabJMX = (availableTabs: string[], activeTab: string, ocdDocument
         case 'style': {
             if (isLayer) return <OcdLayerStyle ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} key={`ResourceActiveTab`}/>
             else return <OcdResourceStyle ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} key={`ResourceActiveTab`}/>
+        }
+        case 'terraform': {
+            return <OcdResourceTerraformPreview ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} key={`ResourceActiveTab`}/>
+        }
+        case 'relationships': {
+            return <OcdResourceRelationshipsPanel ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} key={`ResourceActiveTab`}/>
         }
         case 'validation': {
             return <OcdResourceValidation ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} key={`ResourceActiveTab`}/>
