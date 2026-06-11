@@ -28,6 +28,24 @@ export class OciCommonQuery {
         if (this.isSessionTokenSpecified(profile)) this.provider = new common.SessionAuthDetailProvider(undefined, profile)
         if (region) this.provider.setRegion(region)
         else console.debug('OciCommonQuery: Using Region', this.provider.getRegion().regionId)
+        // Defensive region/realm resolution diagnostic (issue #782). For dedicated regions and
+        // alternate realms the OCI SDK resolves endpoints from a region it can recognise; it reads
+        // unknown regions from ~/.oci/regions-config.json or the OCI_REGION_METADATA env var. If the
+        // configured region cannot be resolved the SDK silently falls back to the public realm
+        // (oraclecloud.com), so requests target the wrong endpoint. We do not hardcode realm domains
+        // here (cannot be verified without a dedicated tenancy); instead we warn so the operator knows
+        // to provide region metadata. We never throw, to avoid breaking standard public regions.
+        try {
+            const configuredRegionId = this.provider.getRegion()?.regionId
+            if (configuredRegionId && common.Region.fromRegionId(configuredRegionId) === undefined) {
+                console.warn(
+                    `OciCommonQuery: Region '${configuredRegionId}' is not recognised by the OCI SDK and will fall back to the public realm (oraclecloud.com). ` +
+                    `For dedicated regions / alternate realms, register the region via ~/.oci/regions-config.json or the OCI_REGION_METADATA environment variable.`
+                )
+            }
+        } catch (reason: unknown) {
+            console.warn('OciCommonQuery: Unable to verify region resolution', reason)
+        }
         const certBundle: string | undefined = this.getCertBundle(profile)
         // Define Retry Configuration
         const retryConfiguration: common.RetryConfiguration = {
@@ -45,6 +63,32 @@ export class OciCommonQuery {
         this.authenticationConfiguration = { authenticationDetailsProvider: this.provider }
         console.debug('OciCommonQuery Client Configuration:', this.clientConfiguration)
         this.identityClient = new identity.IdentityClient(this.authenticationConfiguration, this.clientConfiguration)
+    }
+
+    // Default upper bound (milliseconds) for a single top level tenancy query before we
+    // surface a timeout error to the renderer. Without this an unresponsive / unreachable
+    // endpoint (e.g. an unresolved dedicated region falling back to a non routable host)
+    // leaves the UI spinner running indefinitely (see issue #741).
+    static readonly DEFAULT_QUERY_TIMEOUT_MS: number = 120000
+
+    /*
+    ** Wrap a Promise so that it rejects if it has not settled within timeoutMs. This guarantees
+    ** the renderer always receives either a result or an error and never hangs forever. The
+    ** wrapped promise's own resolution/rejection is still honoured if it settles first.
+    */
+    withTimeout<T>(promise: Promise<T>, label: string, timeoutMs: number = OciCommonQuery.DEFAULT_QUERY_TIMEOUT_MS): Promise<T> {
+        return new Promise<T>((resolve, reject) => {
+            const timer = setTimeout(() => {
+                reject(new Error(`${label} timed out after ${timeoutMs}ms`))
+            }, timeoutMs)
+            promise.then((value) => {
+                clearTimeout(timer)
+                resolve(value)
+            }).catch((reason) => {
+                clearTimeout(timer)
+                reject(reason)
+            })
+        })
     }
 
     isSessionTokenSpecified = (profile: string): boolean => this.provider.getProfileCredentials()?.configurationsByProfile.get(profile)?.get('security_token_file') !== undefined

@@ -22,9 +22,24 @@
 
         "desktop": "cd ocd && npm run desktop",
         "web": "cd ocd && npm run web",
+        "build:pages": "cd ocd && npm run build:pages",
         "install": "cd ocd && npm install",
         "compile": "cd ocd && npm run compile-for-codegen",
         "generate": "cd ocd && npm run import-and-generate",
-        "build": "cd ocd && npm run build"
+        "generate-observability-lz": "cd ocd && npm run generate-observability-lz",
+        "validate-observability-lz": "cd ocd && npm run validate-observability-lz",
+        "validate-observability-lz-terraform": "python scripts/validate_observability_lz_terraform.py",
+        "sync-oci-lz-baselines": "cd ocd && npm run sync-oci-lz-baselines",
+        "package-observability-lz": "python scripts/package_observability_lz_addon.py",
+        "estimate-observability-lz-costs": "python scripts/estimate_observability_lz_costs.py",
+        "audit-observability-lz": "python scripts/audit_observability_lz_addon.py",
+        "build": "cd ocd && npm run build",
+        "generate-lz-jsonnet": "node scripts/generate_lz_jsonnet_sources.mjs",
+        "setup-lz": "node scripts/setup_landing_zone.mjs",
+        "setup-lz:latest": "node scripts/setup_landing_zone.mjs --latest",
+        "hooks:install": "git config core.hooksPath .githooks && echo 'Git hooks enabled (.githooks): pre-commit redaction gate + pre-push chain.'",
+        "test:e2e": "cd e2e && npm install --no-save && npx playwright test",
+        "test:e2e:headed": "cd e2e && npm install --no-save && npx playwright test --headed",
+        "test:e2e:build-first": "cd ocd/packages/react && npm run build && cd ../.. && OCD_PAGES_BASE=/ npm run build:pages && npm run test:e2e"
     }
 }

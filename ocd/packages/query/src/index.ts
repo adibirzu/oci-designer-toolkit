@@ -6,3 +6,5 @@
 export { OciQuery } from './OciQuery.js'
 export { OciReferenceDataQuery } from './OciReferenceDataQuery.js'
 export { OciResourceManagerQuery } from './OciResourceManagerQuery.js'
+export { OciPriceListQuery, getOciPriceList, CETOOLS_PRICING_BASE_URL } from './OciPriceListQuery.js'
+export type { PriceMap, PriceMapEntry, CetoolsResponse, CetoolsProductItem, CetoolsCurrencyPrices, CetoolsPriceTier, PriceListOptions } from './OciPriceListQuery.js'

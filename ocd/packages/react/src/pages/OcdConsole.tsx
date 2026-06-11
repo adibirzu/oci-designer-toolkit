@@ -10,6 +10,13 @@ import OcdConsoleMenuBar from '../components/OcdConsoleMenuBar'
 import { OcdConsoleConfig } from '../components/OcdConsoleConfiguration'
 import { ConsoleHeaderProps, ConsolePageProps, ConsoleToolbarProps, OcdSelectedResource } from '../types/Console'
 import OcdBom from './OcdBom'
+// Lazy-loaded: the Landing Zone wizard pulls in React Flow + the jsonnet-WASM
+// generator and is a distinct, mutually-exclusive page. Code-splitting it keeps
+// it out of the initial entry chunk (it loads only when the wizard is opened).
+const OcdLandingZone = React.lazy(() => import('./OcdLandingZone'))
+const OcdDiscovery = React.lazy(() => import('./OcdDiscovery'))
+const OcdClassicParity = React.lazy(() => import('./OcdClassicParity'))
+const OcdArchitectureAgent = React.lazy(() => import('./OcdArchitectureAgent'))
 import OcdMarkdown, { OcdMarkdownLeftToolbar } from './OcdMarkdown'
 import OcdTabular, { OcdTabularLeftToolbar } from './OcdTabular'
 import OcdTerraform, { OcdTerraformLeftToolbar } from './OcdTerraform'
@@ -21,6 +28,12 @@ import OcdDocumentation from './OcdDocumentation'
 import { loadDesign } from '../components/Menu'
 import { OcdValidationResult, OcdValidator } from '@ocd/model'
 import OcdValidation from './OcdValidation'
+import OcdGovernancePanel from '../governance/OcdGovernancePanel'
+import { evaluateGovernance, applyRemediation, type GovernanceFinding } from '../governance/OcdGovernanceChecks'
+import { evaluateReachability } from '../analysis/OcdReachability'
+import OcdLzPlanPage from './OcdLzPlanPage'
+import OcdTemplateGallery from '../landingzone/templates/OcdTemplateGallery'
+import { findTemplate } from '../landingzone/templates/OcdArchitectureTemplates'
 import { buildDetails } from '../data/OcdBuildDetails'
 import OcdHelp from './OcdHelp'
 import OcdCommonTags from './OcdCommonTags'
@@ -29,6 +42,12 @@ import { OcdActiveFileContext, OcdConsoleConfigContext, OcdDialogContext, OcdDoc
 // import { OcdActiveFileContext, OcdCacheContext, OcdConsoleConfigContext, OcdDialogContext, OcdDocumentContext, OcdDragResourceContext, OcdSelectedResourceContext } from './OcdConsoleContext'
 import { OcdExportToResourceManagerDialog } from '../components/dialogs/OcdExportToResourceManagerDialog'
 import { ocdThemes } from '../data/OcdThemes'
+import { canReconcile, isReconcileEnabled, reconcileOnEdit, LZ_RECONCILE_ENABLED_KEY } from '../landingzone/OcdLzReconcile'
+import { reconcileLzScaffold, addRealmAdFdFrames } from '../landingzone/OcdLzScaffold'
+import { applyObservabilityOverlay, LZ_OBSERVABILITY_ENABLED_KEY } from '../landingzone/OcdLzObservability'
+import { applyOkeNativeOverlay, LZ_OKE_NATIVE_ENABLED_KEY } from '../landingzone/OcdLzOke'
+import { applyIamBlueprintOverlay, LZ_IAM_BLUEPRINT_ENABLED_KEY } from '../landingzone/OcdLzIamBlueprint'
+import { isLzOriginDesign } from '../landingzone/OcdLzPlacement'
 // Context Providers
 import { CacheProvider, useCache, useCacheDispatch } from '../contexts/OcdCacheContext'
 import { defaultTheme, ThemeProvider, useThemeDispatch } from '../contexts/OcdThemeContext'
@@ -44,11 +63,21 @@ export const DialogContext = createContext<OcdDialogContext>({displayDialog: '',
 
 export const OcdConsole = (): JSX.Element => {
     // State Variables
-    const [ocdDocument, setOcdDocument] = useState(OcdDocument.new())
+    const [ocdDocument, setOcdDocumentState] = useState(OcdDocument.new())
     const [ocdConsoleConfig, setOcdConsoleConfig] = useState(OcdConsoleConfig.new())
     // const [ocdCache, setOcdCache] = useState(OcdCacheData.new())
     const [activeFile, setActiveFile] = useState({name: '', modified: false})
     const [selectedResource, setSelectedResource] = useState({} as OcdSelectedResource)
+    // Reconcile-on-edit funnel: every edit flows through setOcdDocument. When both
+    // the wizard 'Realm/AD/FD scaffold' tick and the designer 'LZ live reconcile'
+    // tick are on, re-apply the idempotent scaffold. reconcileOnEdit returns the
+    // SAME design reference when not applicable (non-LZ, ticks off) or when nothing
+    // changed, so this never loops and is a no-op for ordinary designs.
+    const setOcdDocument = (document: OcdDocument): void => {
+        const reconciled = reconcileOnEdit(document.design)
+        if (reconciled !== document.design) document.design = reconciled
+        setOcdDocumentState(document)
+    }
     // Context
     // Memo Hooks
     const activeFileContext = useMemo(() => ({activeFile, setActiveFile}), [activeFile])
@@ -95,7 +124,7 @@ export const OcdConsole = (): JSX.Element => {
                         <ConsoleConfigProvider>
                             <CacheProvider>
                                 <ThemeProvider>
-                                    <div className='ocd-console'>
+                                    <div className={`ocd-console ocd-console-${ocdConsoleConfig.config.theme}-theme`}>
                                         <OcdConsoleHeader ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} />
                                         <OcdConsoleToolbar ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} />
                                         <OcdConsoleBody ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} />
@@ -193,9 +222,91 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         ocdConsoleConfig.config.displayPage = 'validation'
         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
     }
-    const onEstimateClick = () => {
-        console.info('Estimate Clicked')
+    const onGovernanceClick = () => {
+        ocdConsoleConfig.config.displayPage = 'governance'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
     }
+    const onPlanClick = () => {
+        ocdConsoleConfig.config.displayPage = 'plan'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onEstimateClick = () => {
+        ocdConsoleConfig.config.displayPage = 'bom'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onLandingZoneClick = () => {
+        ocdConsoleConfig.config.displayPage = 'landingzone'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onDiscoveryClick = () => {
+        ocdConsoleConfig.config.displayPage = 'discovery'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onClassicClick = () => {
+        ocdConsoleConfig.config.displayPage = 'classic'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onAgentClick = () => {
+        ocdConsoleConfig.config.displayPage = 'agent'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    // Designer 'LZ live reconcile' tick: records that edits should re-apply the
+    // Realm/AD/FD scaffold. Only meaningful together with the wizard scaffold tick.
+    const onReconcileToggle = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design.userDefined[LZ_RECONCILE_ENABLED_KEY] = !isReconcileEnabled(ocdDocument.design)
+        setOcdDocument(document)
+    }
+    // One-shot: re-apply the scaffold now without enabling live mode (idempotent).
+    const onReapplyScaffold = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design = reconcileLzScaffold(document.design)
+        setOcdDocument(document)
+    }
+    // Add Realm > Region > AD > FD frames to ANY design (idempotent). Available
+    // on the Designer page regardless of LZ origin.
+    const onAddFramesClick = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design = addRealmAdFdFrames(document.design)
+        setOcdDocument(document)
+    }
+    // Add the DB Observability add-on (DBM/OPSI private endpoints, Database
+    // Insight, Management Agent) to an LZ-origin design from the Designer
+    // (idempotent — re-applying is a no-op). Editable in the properties panel.
+    const onApplyObservability = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design = applyObservabilityOverlay(document.design)
+        document.design.userDefined[LZ_OBSERVABILITY_ENABLED_KEY] = true
+        setOcdDocument(document)
+    }
+    // Add the OKE-native add-on (VCN-native subnets, enhanced cluster, node
+    // pool, workload-identity dynamic group + policy, NSG, Vault + Key).
+    const onApplyOke = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design = applyOkeNativeOverlay(document.design)
+        document.design.userDefined[LZ_OKE_NATIVE_ENABLED_KEY] = true
+        setOcdDocument(document)
+    }
+    // Add the Enterprise IAM blueprint (admin/network/security/dev/auditor groups,
+    // least-privilege policy bundles scoped to the LZ compartments, and an
+    // lz-governance tag namespace + cost-tracking tags) to an LZ-origin design.
+    const onApplyIamBlueprint = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design = applyIamBlueprintOverlay(document.design)
+        document.design.userDefined[LZ_IAM_BLUEPRINT_ENABLED_KEY] = true
+        setOcdDocument(document)
+    }
+    const onDesignerPage = ocdConsoleConfig.config.displayPage === 'designer'
+    const isLzOrigin = isLzOriginDesign(ocdDocument.design)
+    // Drag-to-connect mode toggle. When on, dropping a resource on another wires
+    // their FK association instead of re-parenting.
+    const connectMode = Boolean(ocdConsoleConfig.config.connectMode)
+    const onConnectModeToggle = () => {
+        ocdConsoleConfig.config.connectMode = !connectMode
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const showReconcile = canReconcile(ocdDocument.design)
+    const reconcileOn = isReconcileEnabled(ocdDocument.design)
     let PageLeftToolbar = OcdEmptyLeftRightToolbar
     let PageRightToolbar = OcdEmptyLeftRightToolbar
     switch (ocdConsoleConfig.config.displayPage) {
@@ -248,8 +359,36 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                         ocdDocument={ocdDocument} 
                         setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} 
                         />
+                    <button className='ocd-lz-hero-cta' title='Open the Landing Zone Next-Gen Wizard' onClick={onLandingZoneClick}>
+                        <span className='ocd-lz-hero-cta-icon' aria-hidden></span>
+                        <span className='ocd-lz-hero-cta-label'>Landing Zone Next-Gen</span>
+                    </button>
+                    <button className='ocd-discovery-cta' title='Open OCI Discovery Workbench' onClick={onDiscoveryClick}>
+                        <span className='ocd-discovery-cta-icon' aria-hidden></span>
+                        <span className='ocd-discovery-cta-label'>Discovery</span>
+                    </button>
+                    <button className='ocd-classic-cta' title='Open OKIT Classic 0.70 parity map' onClick={onClassicClick}>
+                        <span className='ocd-classic-cta-icon' aria-hidden></span>
+                        <span className='ocd-classic-cta-label'>Classic 0.70</span>
+                    </button>
+                    <button className='ocd-agent-cta' title='Open Architecture Agent' onClick={onAgentClick}>
+                        <span className='ocd-agent-cta-icon' aria-hidden></span>
+                        <span className='ocd-agent-cta-label'>AI Architect</span>
+                    </button>
                     <div className={validateClassName} title={validateTitle} onClick={onValidateClick} aria-hidden></div>
-                    {/* <div className='cost-estimate ocd-console-toolbar-icon' onClick={onEstimateClick}></div> */}
+                    <div className='governance ocd-console-toolbar-icon' title='Governance &amp; Compliance posture' onClick={onGovernanceClick} aria-hidden></div>
+                    <div className='ocd-lz-plan ocd-console-toolbar-icon' title='Landing Zone Plan / Diff (compare current design with imported LZ)' onClick={onPlanClick} aria-hidden></div>
+                    {showReconcile && <label className={`ocd-lz-reconcile-toggle ${reconcileOn ? 'on' : ''}`} title='LZ live reconcile: when on (with the wizard scaffold tick), edits re-apply the Realm/AD/FD scaffold idempotently.'>
+                        <input type='checkbox' checked={reconcileOn} onChange={onReconcileToggle} />
+                        <span>LZ sync</span>
+                    </label>}
+                    {showReconcile && <div className='ocd-lz-reapply ocd-console-toolbar-icon' title='Re-apply the Realm/AD/FD scaffold now (idempotent)' onClick={onReapplyScaffold} aria-hidden></div>}
+                    {onDesignerPage && <div className='ocd-add-frames ocd-console-toolbar-icon' title='Add Realm / Region / AD / FD frames to the canvas' onClick={onAddFramesClick} aria-hidden></div>}
+                    {onDesignerPage && isLzOrigin && <div className='ocd-lz-observability ocd-console-toolbar-icon' title='Add DB Observability add-on (DBM/OPSI endpoints, Database Insight, Management Agent)' onClick={onApplyObservability} aria-hidden></div>}
+                    {onDesignerPage && isLzOrigin && <div className='ocd-lz-oke ocd-console-toolbar-icon' title='Add OKE-native add-on (native subnets, enhanced cluster, node pool, workload identity, Vault)' onClick={onApplyOke} aria-hidden></div>}
+                    {onDesignerPage && isLzOrigin && <div className='ocd-lz-iam ocd-console-toolbar-icon' title='Add Enterprise IAM blueprint (groups, least-privilege policies, governance tag namespace)' onClick={onApplyIamBlueprint} aria-hidden></div>}
+                    {onDesignerPage && <div className={`ocd-connect-mode ocd-console-toolbar-icon ${connectMode ? 'on' : ''}`} title='Connect mode: drag one resource onto another to wire their association' onClick={onConnectModeToggle} aria-hidden></div>}
+                    <div className='cost-estimate ocd-console-toolbar-icon' title='BoM and Cost Estimate' onClick={onEstimateClick} aria-hidden></div>
                 </div>
             </div>
         </div>
@@ -258,12 +397,53 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
 
 const OcdEmptyLeftRightToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, setOcdDocument}: ConsolePageProps): JSX.Element => {return (<></>)}
 
+// Governance & compliance posture page: runs the pure governance rule set over
+// the current design model and renders the findings (mirrors OcdValidation).
+const OcdGovernance = ({ ocdDocument, setOcdDocument }: ConsolePageProps): JSX.Element => {
+    // Governance posture + graph-based connectivity/reachability findings share
+    // the same finding shape and panel; merge both into one list.
+    const findings = [...evaluateGovernance(ocdDocument.design), ...evaluateReachability(ocdDocument.design)]
+    // Apply a safe one-field remediation to the model and persist; the panel
+    // re-renders and evaluateGovernance recomputes so the finding clears.
+    const handleApplyFix = (finding: GovernanceFinding) => {
+        const fixedDesign = applyRemediation(ocdDocument.design, finding)
+        if (fixedDesign === ocdDocument.design) return // no-op for guidance-only findings
+        const clone = OcdDocument.clone(ocdDocument)
+        clone.design = fixedDesign
+        setOcdDocument(clone)
+    }
+    return <OcdGovernancePanel findings={findings} design={ocdDocument.design} onApplyFix={handleApplyFix} />
+}
+
 const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, setOcdDocument }: ConsolePageProps): JSX.Element => {
+    const { setActiveFile } = useContext(ActiveFileContext)
     const showQueryDialog = ocdDocument.query
     const showReferenceDataQueryDialog = ocdConsoleConfig.queryReferenceData
     const showExportToResourceManagerDialog = ocdDocument.dialog.resourceManager
+    const showTemplateGallery = ocdDocument.dialog.templateGallery
+    // Seed the chosen architecture template into a fresh design, lay it out, and
+    // drop the user on the Designer page (mirrors the LZ Open-in-Designer flow).
+    const onTemplateSelect = (templateId: string) => {
+        const template = findTemplate(templateId)
+        if (!template) return
+        const clone = OcdDocument.clone(ocdDocument)
+        clone.design = template.build()
+        clone.dialog.templateGallery = false
+        clone.autoLayout(clone.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle ?? 'dynamic-columns')
+        setOcdDocument(clone)
+        setActiveFile({ name: `${template.title}.okit`, modified: true })
+        ocdConsoleConfig.config.displayPage = 'designer'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onTemplateGalleryClose = () => {
+        const clone = OcdDocument.clone(ocdDocument)
+        clone.dialog.templateGallery = false
+        setOcdDocument(clone)
+    }
     console.debug('OcdConsoleBody: Dialogs: Query', showQueryDialog, 'ReferenceData', showReferenceDataQueryDialog, 'Resource Manager', showExportToResourceManagerDialog)
-    let DisplayPage = OcdDesigner
+    // Widened so an eager page component and the lazy-loaded OcdLandingZone
+    // (a LazyExoticComponent) are both assignable.
+    let DisplayPage: React.ComponentType<ConsolePageProps> = OcdDesigner
     switch (ocdConsoleConfig.config.displayPage) {
         case 'bom':
             DisplayPage = OcdBom
@@ -271,8 +451,20 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
         case 'designer':
             DisplayPage = OcdDesigner
             break;
+        case 'classic':
+            DisplayPage = OcdClassicParity
+            break;
+        case 'agent':
+            DisplayPage = OcdArchitectureAgent
+            break;
         case 'documentation':
             DisplayPage = OcdDocumentation
+            break;
+        case 'discovery':
+            DisplayPage = OcdDiscovery
+            break;
+        case 'landingzone':
+            DisplayPage = OcdLandingZone
             break;
         case 'markdown':
             DisplayPage = OcdMarkdown
@@ -292,6 +484,12 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
         case 'validation':
             DisplayPage = OcdValidation
             break;
+        case 'governance':
+            DisplayPage = OcdGovernance
+            break;
+        case 'plan':
+            DisplayPage = OcdLzPlanPage
+            break;
         case 'help':
             DisplayPage = OcdHelp
             break;
@@ -303,13 +501,15 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
     return (
         <div className='ocd-console-body ocd-console-body-theme'>
             {/* <OcdDesigner ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig:any) => setOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} /> */}
-            <DisplayPage 
-                ocdConsoleConfig={ocdConsoleConfig} 
-                setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)} 
-                ocdDocument={ocdDocument} 
-                setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} 
-                key={`${ocdConsoleConfig.config.displayPage}-page`}
-                />
+            <React.Suspense fallback={<div className='ocd-console-loading' aria-busy='true'>Loading…</div>}>
+                <DisplayPage
+                    ocdConsoleConfig={ocdConsoleConfig}
+                    setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)}
+                    ocdDocument={ocdDocument}
+                    setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)}
+                    key={`${ocdConsoleConfig.config.displayPage}-page`}
+                    />
+            </React.Suspense>
             {/* <OcdPropertiesPanel ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument) => setOcdDocument(ocdDocument)} ocdResource={resource} /> */}
             {showQueryDialog && <OcdQueryDialog 
                 ocdDocument={ocdDocument} 
@@ -319,9 +519,13 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
                 ocdDocument={ocdDocument} 
                 setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} 
             />}
-            {showExportToResourceManagerDialog && <OcdExportToResourceManagerDialog 
-                ocdDocument={ocdDocument} 
-                setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} 
+            {showExportToResourceManagerDialog && <OcdExportToResourceManagerDialog
+                ocdDocument={ocdDocument}
+                setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)}
+            />}
+            {showTemplateGallery && <OcdTemplateGallery
+                onSelect={onTemplateSelect}
+                onClose={onTemplateGalleryClose}
             />}
         </div>
     )

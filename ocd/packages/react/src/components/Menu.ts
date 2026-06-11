@@ -13,6 +13,8 @@ import { OcdViewLayer, OcdViewPage, OciModelResources } from '@ocd/model'
 import { autoLayoutOptions } from '../data/OcdAutoLayoutOptions'
 import { getSvgCssData } from '../data/OcdSvgCssData'
 import { OcdExternalFacade } from '../facade/OcdExternalFacade'
+import { buildDesignFromLzUpload } from '../landingzone/OcdLzFileImport'
+import { buildDesignFromDrawio } from '../import/OcdDrawioImport'
 // import { OcdDesign } from '../../../model/lib/cjs'
 
 // const ociSvgThemeCss = svgCssData['oci-theme.css']
@@ -64,6 +66,23 @@ export const menuItems: MenuItem[] = [
                         ocdConsoleConfig.config.displayPage = 'designer'
                         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
                         }
+                }
+            },
+            {
+                label: 'New from Template…',
+                click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function, activeFile: Record<string, any>, setActiveFile: Function) => {
+                    const openGallery = () => {
+                        const document: OcdDocument = OcdDocument.clone(ocdDocument)
+                        document.dialog.templateGallery = true
+                        setOcdDocument(document)
+                    }
+                    if (activeFile.modified) {
+                        OcdDesignFacade.discardConfirmation().then((discard) => {
+                            if (discard) openGallery()
+                        }).catch((resp) => {console.warn('Discard Failed with', resp)})
+                    } else {
+                        openGallery()
+                    }
                 }
             },
             {
@@ -270,6 +289,18 @@ export const menuItems: MenuItem[] = [
                                 ocdDocument.autoLayout(ocdDocument.getActivePage().id)
                                 setOcdDocument(ocdDocument)
                             }).catch((reason) => {console.debug(reason)})
+                        }
+                    },
+                    {
+                        label: 'OCI Landing Zone (LZNG)',
+                        click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                            importFromLandingZoneFiles(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig)
+                        }
+                    },
+                    {
+                        label: 'draw.io Diagram',
+                        click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                            importFromDrawio(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig)
                         }
                     },
                     // {
@@ -487,6 +518,27 @@ export const menuItems: MenuItem[] = [
                 label: 'BoM',
                 click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
                     ocdConsoleConfig.config.displayPage = 'bom'
+                    setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+                }
+            },
+            {
+                label: 'Discovery',
+                click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                    ocdConsoleConfig.config.displayPage = 'discovery'
+                    setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+                }
+            },
+            {
+                label: 'OKIT Classic 0.70 Parity',
+                click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                    ocdConsoleConfig.config.displayPage = 'classic'
+                    setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+                }
+            },
+            {
+                label: 'Architecture Agent',
+                click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                    ocdConsoleConfig.config.displayPage = 'agent'
                     setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
                 }
             },
@@ -729,8 +781,101 @@ export const importFromTerraform = (setOcdDocument: Function, ocdConsoleConfig: 
     }).catch((resp) => {console.warn('Load Design Failed with', resp)})
 }
 
+/**
+ * Import pre-generated OCI Landing Zone Next Gen (LZNG) JSON files (iam.json,
+ * network.json, …) from a multi-file picker and open them in the Designer.
+ *
+ * Mirrors importFromTerraform: build an OcdDocument, add one layer per top-level
+ * compartment, auto-arrange, then switch to the Designer page. The resulting
+ * design is flagged lzOrigin=true (by buildOcdDesignFromLz), so further non-LZ
+ * stencils dropped onto it route through the LZ placement resolver.
+ */
+export const importFromLandingZoneFiles = (setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function): Promise<any> => {
+    const pickFiles = async (): Promise<{ name: string; content: string }[]> => {
+        const options = {
+            multiple: true,
+            types: [
+                {
+                    description: 'Landing Zone JSON (iam.json, network.json, …)',
+                    accept: { 'application/json': ['.json'] },
+                },
+            ],
+        }
+        // @ts-ignore - File System Access API
+        const handles = await window.showOpenFilePicker(options)
+        return Promise.all(
+            handles.map(async (handle: any) => {
+                const file = await handle.getFile()
+                return { name: file.name, content: await file.text() }
+            }),
+        )
+    }
+    return pickFiles().then((uploads) => {
+        const { design, topCompartmentIds } = buildDesignFromLzUpload(uploads)
+        const ocdDocument = OcdDocument.new()
+        ocdDocument.design = design
+        const layerIds: string[] = topCompartmentIds.length > 0
+            ? topCompartmentIds
+            : [design.model.oci.resources.compartment?.[0]?.id].filter(Boolean)
+        layerIds.forEach((id: string, i: number) => ocdDocument.addLayer(id, i === 0))
+        ocdDocument.autoLayout(ocdDocument.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle)
+        setOcdDocument(ocdDocument)
+        ocdConsoleConfig.config.displayPage = 'designer'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }).catch((reason: any) => {
+        // AbortError = user dismissed the picker; only surface real failures.
+        if (reason?.name === 'AbortError') return
+        console.warn('LZ import failed:', reason?.message ?? reason)
+        if (reason?.message) alert(reason.message)
+    })
+}
+
+/**
+ * Import a draw.io (diagrams.net) diagram and recreate it in the Designer.
+ *
+ * Reads a single uncompressed .drawio / .xml file, maps each shape to an OCI
+ * resource, wires edges + container nesting into FK associations, then
+ * auto-arranges and switches to the Designer. Compressed .drawio files raise a
+ * clear "re-export uncompressed" error.
+ */
+export const importFromDrawio = (setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function): Promise<any> => {
+    const pickFile = async (): Promise<{ name: string; content: string }> => {
+        const options = {
+            multiple: false,
+            types: [
+                {
+                    description: 'draw.io diagram (uncompressed XML)',
+                    accept: { 'application/xml': ['.drawio', '.xml'] },
+                },
+            ],
+        }
+        // @ts-ignore - File System Access API
+        const [handle] = await window.showOpenFilePicker(options)
+        const file = await handle.getFile()
+        return { name: file.name, content: await file.text() }
+    }
+    return pickFile().then(({ name, content }) => {
+        const title = name.replace(/\.(drawio|xml)$/i, '')
+        const { design, topCompartmentIds } = buildDesignFromDrawio(content, `Imported ${title}`)
+        const ocdDocument = OcdDocument.new()
+        ocdDocument.design = design
+        const layerIds: string[] = topCompartmentIds.length > 0
+            ? topCompartmentIds
+            : [design.model.oci.resources.compartment?.[0]?.id].filter(Boolean)
+        layerIds.forEach((id: string, i: number) => ocdDocument.addLayer(id, i === 0))
+        ocdDocument.autoLayout(ocdDocument.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle)
+        setOcdDocument(ocdDocument)
+        ocdConsoleConfig.config.displayPage = 'designer'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }).catch((reason: any) => {
+        if (reason?.name === 'AbortError') return
+        console.warn('draw.io import failed:', reason?.message ?? reason)
+        if (reason?.message) alert(reason.message)
+    })
+}
+
 
 
 export const saveDesign = () => {
-    
+
 }

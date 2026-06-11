@@ -27,6 +27,7 @@ export const OcdQueryDialog = ({ocdDocument, setOcdDocument}: QueryDialogProps):
     const [selectedCompartmentIds, setSelectedCompartmentIds] = useState([])
     const [collapsedCompartmentIds, setCollapsedCompartmentIds] = useState([])
     const [hierarchy, setHierarchy] = useState('')
+    const [queryError, setQueryError] = useState('')
     const refs: Record<string, React.RefObject<any>> = compartments.reduce((acc, value: OciModelResources.OciCompartment) => {
         acc[value.hierarchy] = React.createRef();
         return acc;
@@ -86,6 +87,7 @@ export const OcdQueryDialog = ({ocdDocument, setOcdDocument}: QueryDialogProps):
     }
     const onClickQuery = (e: React.MouseEvent<HTMLButtonElement>) => {
         setWorkingClassName('ocd-query-wrapper')
+        setQueryError('')
         console.debug('OcdQueryDialog: Selected Compartments', selectedCompartmentIds)
         OciApiFacade.queryTenancy(selectedProfile, selectedCompartmentIds, selectedRegion).then((results) => {
             // @ts-ignore
@@ -113,6 +115,13 @@ export const OcdQueryDialog = ({ocdDocument, setOcdDocument}: QueryDialogProps):
             clone.autoLayout(clone.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle)
             setOcdDocument(clone)
             setActiveFile({name: '', modified: false})
+        }).catch((reason) => {
+            // Without this catch a rejected query (auth failure, missing permissions,
+            // unreachable / unresolved region, timeout) would leave the spinner running
+            // forever (issue #741). Hide the spinner and surface the error to the user.
+            console.warn('OcdQueryDialog: Query Tenancy failed', reason)
+            setWorkingClassName('ocd-query-wrapper hidden')
+            setQueryError(`${reason}`)
         })
     }
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,6 +166,7 @@ export const OcdQueryDialog = ({ocdDocument, setOcdDocument}: QueryDialogProps):
                             </div>
                         </div>
                         <div></div><div className="ocd-compartment-hierarchy">{hierarchy}</div>
+                        {queryError && <><div>Status</div><div className="ocd-resource-manager-status"><span className="ocd-resource-manager-error">{queryError}</span></div></>}
                     </div>
                 </div>
                 <div className='ocd-dialog-footer'>

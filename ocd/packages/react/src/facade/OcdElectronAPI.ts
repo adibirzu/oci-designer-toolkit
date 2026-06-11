@@ -7,6 +7,7 @@ import { OcdDesign } from "@ocd/model"
 import { OcdConsoleConfiguration } from "../components/OcdConsoleConfiguration"
 import { OcdCache } from "../components/OcdCache"
 import { OutputDataStringArray } from "@ocd/export"
+import { PriceMap } from "@ocd/query/pricing"
 
 export interface OcdElectronAPI {
     // Build Information
@@ -18,11 +19,15 @@ export interface OcdElectronAPI {
     listTenancyCompartments: (profile: string) => Promise<void>
     queryTenancy: (profile: string, compartmentIds: string[], region: string) => Promise<void>
     queryDropdown: (profile: string, region: string) => Promise<void>
+    queryDiscoverySnapshot: (profile: string, region: string) => Promise<any>
+    queryResourceAnalytics: (profile: string, region: string, sql: string) => Promise<{ rows: Record<string, unknown>[]; sql: string }>
     listStacks: (profile: string, region: string, compartmentId: string) => Promise<void>
-    createStack: (profile: string, region: string, compartmentId: string, data: OutputDataStringArray, apply: boolean) => Promise<void>
+    createStack: (profile: string, region: string, compartmentId: string, stackName: string, data: OutputDataStringArray, apply: boolean) => Promise<void>
     updateStack: (profile: string, region: string, stackId: string, data: OutputDataStringArray, apply: boolean) => Promise<void>
     createJob: (profile: string, region: string, stackId: string, apply: boolean) => Promise<void>
-	// OCD Design 
+    // OCI Pricing
+    getOciPriceList: (partNumbers: string[], currencyCode: string) => Promise<PriceMap>
+	// OCD Design
     loadDesign: (filename: string) => Promise<void>
     saveDesign: (design: OcdDesign | string, filename: string, suggestedFilename: string | undefined) => Promise<void>
     discardConfirmation: () => Promise<void>

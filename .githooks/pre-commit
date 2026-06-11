@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Repo pre-commit hook: redaction gate (blocks OCIDs/IPs/secrets in the staged diff).
+# Enable with:  git config core.hooksPath .githooks   (or: npm run hooks:install)
+set -euo pipefail
+ROOT="$(git rev-parse --show-toplevel)"
+if [ -x "$ROOT/scripts/check-redaction.sh" ]; then
+    "$ROOT/scripts/check-redaction.sh"
+else
+    bash "$ROOT/scripts/check-redaction.sh"
+fi
