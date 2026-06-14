@@ -28,7 +28,64 @@ permissions:
   contents: read
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
+      CI: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "26"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Python tests (pytest)
+        run: pytest -q
+
+      - name: Install JS dependencies
+        run: npm run github-action-install
+
+      - name: Codegen
+        run: |
+          npm run github-action-compile-for-codegen
+          npm run github-action-generate
+
+      - name: Setup Landing Zone (fetch OE jsonnet sources — required by vitest)
+        run: npm run setup-lz
+
+      # Build only the workspace libs that @ocd/react imports at test time.
+      # @ocd/react itself is NOT built here — vitest runs directly on its src/.
+      - name: Build workspace libraries (required for vitest module resolution)
+        run: |
+          cd ocd && npm run build \
+            --workspace=packages/core \
+            --workspace=packages/model \
+            --workspace=packages/query \
+            --workspace=packages/import \
+            --workspace=packages/export \
+            --workspace=packages/parser \
+            --if-present
+
+      - name: Run JS tests (vitest — @ocd/react)
+        run: cd ocd && npm test
+
+      # TODO: src/main.ts has ~93 pre-existing noImplicitAny errors (the electron-forge
+      # vite plugin uses esbuild and bypasses tsc on the make path, so they have never
+      # been caught). Non-blocking until those type errors are resolved.
+      - name: Desktop type-check (non-blocking — pre-existing errors in src/main.ts)
+        continue-on-error: true
+        run: cd ocd && npm run typecheck --workspace=packages/desktop
+
   build-dmg:
+    needs: test
     runs-on: macos-latest
     env:
       NODE_OPTIONS: "--max-old-space-size=8192"

@@ -72,14 +72,33 @@ export function isCompressedDrawio(content: string): boolean {
  * Extract every <mxCell> from an mxGraphModel XML string. Tolerant of attribute
  * order and self-closing or geometry-wrapped cells.
  */
+// Reject pathologically large inputs before regex scanning. Real draw.io
+// diagrams are well under this; the cap bounds worst-case parse time and memory.
+export const MAX_DRAWIO_INPUT_BYTES = 10 * 1024 * 1024 // 10 MiB
+
+// Secondary cap on the number of cells extracted. A crafted payload can stay
+// under the byte cap yet carry an enormous count of tiny <mxCell> tags; bailing
+// here bounds the downstream per-cell work (resource creation, FK wiring).
+export const MAX_DRAWIO_CELLS = 10000
+
 export function parseMxCells(xml: string): MxCell[] {
+    if (xml.length > MAX_DRAWIO_INPUT_BYTES) {
+        throw new Error(`draw.io input exceeds the ${MAX_DRAWIO_INPUT_BYTES}-byte limit`)
+    }
     const cells: MxCell[] = []
-    const cellRe = /<mxCell\b([^>]*?)(?:\/>|>[\s\S]*?<\/mxCell>)/g
+    // We only ever read the cell's TAG ATTRIBUTES (match[1]); the element body is
+    // never used. Match the opening tag alone (`[^>]` bounded, no lazy dot-all),
+    // which removes the catastrophic-backtracking risk of scanning for a possibly
+    // missing `</mxCell>` on adversarial input.
+    const cellRe = /<mxCell\b([^>]*?)\/?>/g
     let match: RegExpExecArray | null
     while ((match = cellRe.exec(xml)) !== null) {
         const tag = match[1]
         const id = attr(tag, 'id')
         if (!id) continue
+        if (cells.length >= MAX_DRAWIO_CELLS) {
+            throw new Error(`draw.io input exceeds the ${MAX_DRAWIO_CELLS}-cell limit`)
+        }
         cells.push({
             id,
             value: attr(tag, 'value'),

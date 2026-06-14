@@ -33,7 +33,7 @@
 ** setup-lz notice if the OE sources are absent.
 */
 
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ConsolePageProps } from '../types/Console'
 import { OcdConsoleConfig } from '../components/OcdConsoleConfiguration'
 import { OcdDocument } from '../components/OcdDocument'
@@ -70,9 +70,12 @@ import { LzngDebugDrawer } from '../landingzone/ui/LzngDebugDrawer'
 import { buildDiagramModel } from '../landingzone/ui/LzngDiagramModel'
 import { buildDrawioXml } from '../landingzone/ui/LzngDrawioExport'
 import { LzngUpdateBanner } from '../landingzone/ui/LzngUpdateBanner'
+import { LzngEngineBanner } from '../landingzone/ui/LzngEngineBanner'
+import { probeJsonnetEngine } from '../landingzone/OcdJsonnetWasm'
 import { LzngSourcesPanel } from '../landingzone/ui/LzngSourcesPanel'
 import { useLzUpdateCheck } from '../landingzone/useLzUpdateCheck'
 import { useUpstreamFeatureCheck } from '../upstream/useUpstreamFeatureCheck'
+import { OciApiFacade } from '../facade/OciApiFacade'
 
 const SETUP_NOTICE = 'Run `npm run setup-lz` to enable Landing Zone generation.'
 const DEFAULT_TITLE = 'Untitled Landing Zone'
@@ -102,11 +105,50 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
     const [activeStep, setActiveStep] = useState(0)
     const [notice, setNotice] = useState<{ kind: 'info' | 'error'; text: string } | null>(null)
     const [busy, setBusy] = useState(false)
-    const { statuses, loading: updatesLoading, anyUpdate, refresh: refreshUpdates } = useLzUpdateCheck()
+    const [githubToken, setGithubToken] = useState('')
+    const [sourcePinnedRefs, setSourcePinnedRefs] = useState<Record<string, string>>({})
+    const { statuses, loading: updatesLoading, anyUpdate, refresh: refreshUpdates } = useLzUpdateCheck(undefined, {
+        githubToken,
+        pinnedRefs: sourcePinnedRefs,
+    })
     const { status: upstreamStatus, hasNewFeatures: hasNewUpstreamFeatures } = useUpstreamFeatureCheck()
     const [bannerDismissed, setBannerDismissed] = useState(false)
     const [showSources, setShowSources] = useState(false)
     const [showDebug, setShowDebug] = useState(false)
+    const [engineError, setEngineError] = useState<string | null>(null)
+    const [engineBannerDismissed, setEngineBannerDismissed] = useState(false)
+    const refreshBackendSourcePins = useCallback(async () => {
+        try {
+            const health = await OciApiFacade.listLandingZoneAddonHealth()
+            setSourcePinnedRefs(Object.fromEntries(health
+                .filter((source) => source.pinnedRef)
+                .map((source) => [source.sourceKey, source.pinnedRef])))
+        } catch {
+            setSourcePinnedRefs({})
+        }
+    }, [])
+
+    // Mount-time jsonnet engine health probe: if libjsonnet.wasm cannot be
+    // loaded/instantiated, surface a dismissible banner instead of letting the
+    // page fail silently on first generate/preview.
+    useEffect(() => {
+        let cancelled = false
+        probeJsonnetEngine()
+            .then((probe) => {
+                if (!cancelled && !probe.available) setEngineError(probe.error ?? 'Unknown WASM load failure.')
+            })
+            .catch((err: unknown) => {
+                // probeJsonnetEngine never rejects by contract; belt-and-braces.
+                if (!cancelled) setEngineError(err instanceof Error ? err.message : String(err))
+            })
+        return () => {
+            cancelled = true
+        }
+    }, [])
+
+    useEffect(() => {
+        void refreshBackendSourcePins()
+    }, [refreshBackendSourcePins])
 
     const validation = useMemo(() => validateConfig(config), [config])
     const serializedConfig = useMemo(
@@ -243,6 +285,10 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         <div className='ocd-lzng' data-testid='lzng-wizard'>
             <LzngHeader layout={layout} onLayoutChange={setLayout} onExit={onExit} />
 
+            {engineError !== null && !engineBannerDismissed && (
+                <LzngEngineBanner error={engineError} onDismiss={() => setEngineBannerDismissed(true)} />
+            )}
+
             {(anyUpdate || hasNewUpstreamFeatures) && !bannerDismissed && (
                 <LzngUpdateBanner
                     statuses={statuses}
@@ -339,6 +385,17 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                         statuses={statuses}
                         loading={updatesLoading}
                         onRefresh={() => refreshUpdates(true)}
+                        githubTokenConfigured={githubToken.trim() !== ''}
+                        githubToken={githubToken}
+                        onGithubTokenChange={(token) => {
+                            setGithubToken(token)
+                        }}
+                        onSourceUpdated={(sourceKey, pinnedRef) => {
+                            if (pinnedRef) {
+                                setSourcePinnedRefs((current) => ({ ...current, [sourceKey]: pinnedRef }))
+                            }
+                            void refreshBackendSourcePins()
+                        }}
                         onClose={() => setShowSources(false)}
                     />
                 )}

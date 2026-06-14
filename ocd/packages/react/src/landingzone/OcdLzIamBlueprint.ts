@@ -31,6 +31,13 @@
 
 import { OcdDesign, OciModelResources } from '@ocd/model'
 import { isLzOriginDesign } from './OcdLzPlacement'
+import {
+    cloneDesign,
+    createOverlayContext,
+    isOverlayEnabled,
+    OverlayRoleSpec,
+    rootCompartmentId,
+} from './OcdLzOverlay'
 
 /** `design.userDefined` key: the wizard / designer 'Enterprise IAM Blueprint' tick. */
 export const LZ_IAM_BLUEPRINT_ENABLED_KEY = 'lzIamBlueprintEnabled'
@@ -64,12 +71,7 @@ export type IamRole = IamGroupRole | IamPolicyRole | IamTagRole
 // RoleSpec — unified across groups, policies, and tags
 // ---------------------------------------------------------------------------
 
-interface RoleSpec {
-    role: IamRole
-    listKey: string
-    displayName: string
-    create: () => Record<string, unknown>
-}
+type RoleSpec = OverlayRoleSpec<IamRole>
 
 const NEW = OciModelResources
 
@@ -172,51 +174,30 @@ const ALL_SPECS: readonly RoleSpec[] = [...GROUP_SPECS, ...POLICY_SPECS, ...TAG_
 // Public API
 // ---------------------------------------------------------------------------
 
+/** Shared find/upsert machinery bound to this overlay's role key + specs. */
+const overlay = createOverlayContext(IAM_ROLE_KEY, ALL_SPECS, 'always')
+
 /** Read the Enterprise IAM Blueprint tick off a design (defaults to false). */
 export function isIamBlueprintEnabled(design: { userDefined?: Record<string, unknown> } | null | undefined): boolean {
-    return Boolean(design?.userDefined?.[LZ_IAM_BLUEPRINT_ENABLED_KEY])
-}
-
-function readRole(resource: Record<string, unknown>): IamRole | undefined {
-    const role = (resource.userDefined as Record<string, unknown> | undefined)?.[IAM_ROLE_KEY]
-    return typeof role === 'string' ? (role as IamRole) : undefined
+    return isOverlayEnabled(design, LZ_IAM_BLUEPRINT_ENABLED_KEY)
 }
 
 /** Find an overlay-emitted resource by its role marker (idempotent key). */
 export function findIamBlueprintResource(design: OcdDesign, role: IamRole): Record<string, unknown> | undefined {
-    const spec = ALL_SPECS.find((s) => s.role === role)
-    if (!spec) return undefined
-    const list = (design.model.oci.resources?.[spec.listKey] ?? []) as Record<string, unknown>[]
-    return list.find((r) => readRole(r) === role)
+    return overlay.find(design, role)
 }
 
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-function cloneDesign(design: OcdDesign): OcdDesign {
-    return JSON.parse(JSON.stringify(design)) as OcdDesign
-}
-
-/** Find-or-create the resource for a role; idempotent by role marker. */
-function upsertRole(design: OcdDesign, spec: RoleSpec, compartmentId: string): Record<string, unknown> {
-    if (!Array.isArray(design.model.oci.resources[spec.listKey])) {
-        design.model.oci.resources[spec.listKey] = []
-    }
-    const list = design.model.oci.resources[spec.listKey] as Record<string, unknown>[]
-    let resource = list.find((r) => readRole(r) === spec.role)
-    if (!resource) {
-        resource = spec.create()
-        list.push(resource)
-    }
-    const userDefined = (resource.userDefined as Record<string, unknown>) ?? {}
-    resource.userDefined = { ...userDefined, [IAM_ROLE_KEY]: spec.role }
-    resource.compartmentId = compartmentId
-    // Always set the canonical displayName so the overlay controls naming, not
-    // the UUID-suffix factory default (e.g. "Tag f560").
-    resource.displayName = spec.displayName
-    return resource
-}
+/**
+ * Find-or-create the resource for a role; idempotent by role marker. Always sets
+ * the canonical displayName so the overlay controls naming, not the UUID-suffix
+ * factory default (e.g. "Tag f560").
+ */
+const upsertRole = (design: OcdDesign, spec: RoleSpec, compartmentId: string): Record<string, unknown> =>
+    overlay.upsert(design, spec, compartmentId)
 
 /**
  * Return the display name of the first compartment whose name includes the hint
@@ -300,7 +281,7 @@ export function applyIamBlueprintOverlay(design: OcdDesign): OcdDesign {
 
     // Root compartment (id) — used as the resource parent.
     const compartments = (next.model.oci.resources?.compartment ?? []) as Record<string, unknown>[]
-    const compartmentId = compartments.length > 0 ? (compartments[0].id as string) : ''
+    const compartmentId = rootCompartmentId(next)
 
     // Resolve compartment display names for policy statements. Fall back to the
     // root compartment display name when a specific one is not found.

@@ -83,7 +83,8 @@ export function LzngUpdateBanner({
     const [showUpstreamHow, setShowUpstreamHow] = useState(false)
     const [upstreamCopyState, setUpstreamCopyState] = useState<'idle' | 'copied' | 'failed'>('idle')
 
-    const available = statuses.filter((status) => status.updateAvailable)
+    // Unavailable (private/unreachable) sources can never surface in the banner.
+    const available = statuses.filter((status) => status.updateAvailable && !status.unavailable)
     const showUpstreamRow = !!hasNewUpstreamFeatures && !!upstreamStatus && !upstreamStatus.error
 
     // Render nothing when there are no LZ updates AND no upstream features to surface.

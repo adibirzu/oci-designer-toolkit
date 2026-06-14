@@ -27,6 +27,14 @@
 
 import { OcdDesign, OciModelResources } from '@ocd/model'
 import { isLzOriginDesign } from './OcdLzPlacement'
+import {
+    cloneDesign,
+    createOverlayContext,
+    firstId,
+    isOverlayEnabled,
+    OverlayRoleSpec,
+    rootCompartmentId,
+} from './OcdLzOverlay'
 
 /** `design.userDefined` key: the wizard / designer 'Database Observability' tick. */
 export const LZ_OBSERVABILITY_ENABLED_KEY = 'lzObservabilityEnabled'
@@ -37,14 +45,7 @@ const OBSERVABILITY_ROLE_KEY = 'lzObservability'
 /** The roles the overlay emits, in dependency order (PEs before the insight). */
 export type ObservabilityRole = 'dbm_pe' | 'opsi_pe' | 'db_insight' | 'mgmt_agent'
 
-interface RoleSpec {
-    role: ObservabilityRole
-    /** schema key = key under design.model.oci.resources */
-    listKey: string
-    displayName: string
-    /** Factory for a fresh model resource of this type. */
-    create: () => Record<string, unknown>
-}
+type RoleSpec = OverlayRoleSpec<ObservabilityRole>
 
 const ROLE_SPECS: readonly RoleSpec[] = [
     {
@@ -73,58 +74,21 @@ const ROLE_SPECS: readonly RoleSpec[] = [
     },
 ]
 
+/** Shared find/upsert machinery bound to this overlay's role key + specs. */
+const overlay = createOverlayContext(OBSERVABILITY_ROLE_KEY, ROLE_SPECS, 'whenEmpty')
+
 /** Read the Database Observability tick off a design (defaults to false). */
 export function isObservabilityEnabled(design: { userDefined?: Record<string, unknown> } | null | undefined): boolean {
-    return Boolean(design?.userDefined?.[LZ_OBSERVABILITY_ENABLED_KEY])
-}
-
-function readRole(resource: Record<string, unknown>): ObservabilityRole | undefined {
-    const userDefined = resource.userDefined as Record<string, unknown> | undefined
-    const role = userDefined?.[OBSERVABILITY_ROLE_KEY]
-    return typeof role === 'string' ? (role as ObservabilityRole) : undefined
+    return isOverlayEnabled(design, LZ_OBSERVABILITY_ENABLED_KEY)
 }
 
 /** Find an overlay-emitted resource by its role marker (idempotent key). */
 export function findObservabilityResource(design: OcdDesign, role: ObservabilityRole): Record<string, unknown> | undefined {
-    for (const spec of ROLE_SPECS) {
-        const list = (design.model.oci.resources?.[spec.listKey] ?? []) as Record<string, unknown>[]
-        const hit = list.find((r) => readRole(r) === role)
-        if (hit) return hit
-    }
-    return undefined
+    return overlay.find(design, role)
 }
 
-function cloneDesign(design: OcdDesign): OcdDesign {
-    return JSON.parse(JSON.stringify(design)) as OcdDesign
-}
-
-/** First id from a resource list (used to resolve FK targets), or ''. */
-function firstId(design: OcdDesign, listKey: string): string {
-    const list = (design.model.oci.resources?.[listKey] ?? []) as Record<string, unknown>[]
-    return list.length > 0 ? (list[0].id as string) : ''
-}
-
-/**
- * Find-or-create the overlay resource for a role, set its compartment + display
- * name + role marker, and return it. Idempotent: an existing resource with the
- * same role marker is reused (never duplicated).
- */
-function upsertRole(design: OcdDesign, spec: RoleSpec, compartmentId: string): Record<string, unknown> {
-    if (!Array.isArray(design.model.oci.resources[spec.listKey])) {
-        design.model.oci.resources[spec.listKey] = []
-    }
-    const list = design.model.oci.resources[spec.listKey] as Record<string, unknown>[]
-    let resource = list.find((r) => readRole(r) === spec.role)
-    if (!resource) {
-        resource = spec.create()
-        list.push(resource)
-    }
-    const userDefined = (resource.userDefined as Record<string, unknown>) ?? {}
-    resource.userDefined = { ...userDefined, [OBSERVABILITY_ROLE_KEY]: spec.role }
-    resource.compartmentId = compartmentId
-    if (!resource.displayName || resource.displayName === '') resource.displayName = spec.displayName
-    return resource
-}
+const upsertRole = (design: OcdDesign, spec: RoleSpec, compartmentId: string): Record<string, unknown> =>
+    overlay.upsert(design, spec, compartmentId)
 
 /**
  * Apply the Database Observability overlay to a design. Pure + idempotent.
@@ -139,8 +103,7 @@ export function applyObservabilityOverlay(design: OcdDesign): OcdDesign {
     const next = cloneDesign(design)
     // Target compartment: the first compartment in the design (root) — the user
     // can re-parent into a workload compartment afterwards.
-    const compartments = (next.model.oci.resources?.compartment ?? []) as Record<string, unknown>[]
-    const compartmentId = compartments.length > 0 ? (compartments[0].id as string) : ''
+    const compartmentId = rootCompartmentId(next)
 
     // FK targets resolved from existing network/db resources (empty string when
     // absent — the user fills them in; the resource still models correctly).

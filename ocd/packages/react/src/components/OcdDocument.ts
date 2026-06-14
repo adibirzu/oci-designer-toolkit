@@ -18,6 +18,17 @@ export interface OcdAddResourceResponse {
     additionalResources: OcdResource[]
 }
 
+export interface OcdCoordsBounds {
+    x: number
+    y: number
+    w: number
+    h: number
+}
+
+const MINIMUM_CONTAINER_WIDTH = 140
+const MINIMUM_CONTAINER_HEIGHT = 120
+const CONTAINER_CHILD_PADDING = 32
+
 export class OcdDocument {
     query: boolean
     design: OcdDesign
@@ -26,10 +37,10 @@ export class OcdDocument {
     dialog: Record<string, boolean>
     constructor(design?: string | OcdDesign, resource?: OcdSelectedResource, dragResource?: OcdDragResource) {
         if (typeof design === 'string' && design.length > 0) this.design = JSON.parse(design)
-        else if (design instanceof Object) this.design = design
+        else if (design instanceof Object) this.design = OcdDocument.clonePlainData(design)
         else this.design = OcdDesign.newDesign()
-        this.selectedResource = resource || OcdDocument.newSelectedResource()
-        this.dragResource = dragResource || OcdDocument.newDragResource()
+        this.selectedResource = resource ? OcdDocument.clonePlainData(resource) : OcdDocument.newSelectedResource()
+        this.dragResource = dragResource ? OcdDocument.clonePlainData(dragResource) : OcdDocument.newDragResource()
         this.query = false
         this.dialog = {
             resourceManager: false,
@@ -41,6 +52,11 @@ export class OcdDocument {
     static readonly new = () => new OcdDocument()
 
     static readonly clone = (ocdDocument:OcdDocument) => new OcdDocument(ocdDocument.design, ocdDocument.selectedResource, ocdDocument.dragResource)
+
+    private static readonly clonePlainData = <T,>(data: T): T => {
+        if (typeof structuredClone === 'function') return structuredClone(data)
+        return JSON.parse(JSON.stringify(data)) as T
+    }
 
     static readonly newDesign = (): OcdDesign => OcdDesign.newDesign()
 
@@ -274,7 +290,6 @@ export class OcdDocument {
             const client = OciModelResources[resourceNamespace]
             if (client) {
                 cloneResource = client.cloneResource(resource)
-                console.debug(cloneResource)
                 this.design.model.oci.resources[resourceList] ? this.design.model.oci.resources[resourceList].push(cloneResource) : this.design.model.oci.resources[resourceList] = [cloneResource]
             }
         } else {
@@ -296,7 +311,6 @@ export class OcdDocument {
     setResourceParent(id: string, parentId: string) {
         const resource = this.getResource(id)
         const parentResource = this.getResource(parentId)
-        console.debug('OcdDocument: Setting Parent Resource', resource, parentResource)
         if (resource && parentResource) {
             if (resource.provider === 'oci') OciResource.assignParentId(resource, parentResource)
         }
@@ -433,6 +447,8 @@ export class OcdDocument {
     getCoords = (id: string) => {return this.design.view.pages.map(p => [...p.coords, ...this.getChildCoords(p.coords)]).reduce((a, c) => [...a, ...c], []).find(c => c.id === id)}
     // getChildCoords = (coords?: OcdViewCoords[]): OcdViewCoords[] => coords ? coords.reduce((a, c) => [...a, ...this.getChildCoords(c.coords)], [] as OcdViewCoords[]) : []
     getChildCoords = (coords?: OcdViewCoords[]): OcdViewCoords[] => coords ? coords.reduce((a, c) => [...a, ...this.getChildCoords(c.coords)], coords) : []
+    getVisibleCoordsWidth = (coords: OcdViewCoords): number => Math.max(coords.w || 0, coords.container ? MINIMUM_CONTAINER_WIDTH : 32)
+    getVisibleCoordsHeight = (coords: OcdViewCoords): number => Math.max(coords.h || 0, coords.container ? MINIMUM_CONTAINER_HEIGHT : 32)
     getRelativeXY = (coords: OcdViewCoords): OcdViewPoint => {
         // console.debug('OcdDocument: Get Relative XY for', coords.id, 'Parent', coords.pgid)
         const parentCoords: OcdViewCoords | undefined = this.getCoords(coords.pgid)
@@ -445,6 +461,78 @@ export class OcdDocument {
         }
         // console.debug('OcdDocument: Relative XY', relativeXY)
         return relativeXY
+    }
+    getCoordsBounds = (coords: OcdViewCoords): OcdCoordsBounds => {
+        const point = this.getRelativeXY(coords)
+        return {
+            x: point.x,
+            y: point.y,
+            w: this.getVisibleCoordsWidth(coords),
+            h: this.getVisibleCoordsHeight(coords)
+        }
+    }
+    isBoundsInsideBounds = (candidate: OcdCoordsBounds, container: OcdCoordsBounds): boolean => {
+        return candidate.x >= container.x
+            && candidate.y >= container.y
+            && candidate.x + candidate.w <= container.x + container.w
+            && candidate.y + candidate.h <= container.y + container.h
+    }
+    getContainerMinimumDimensions = (coords: OcdViewCoords, padding: number = CONTAINER_CHILD_PADDING): Pick<OcdCoordsBounds, 'w' | 'h'> => {
+        const childCoords = coords.coords ?? []
+        if (childCoords.length === 0) return {w: MINIMUM_CONTAINER_WIDTH, h: MINIMUM_CONTAINER_HEIGHT}
+        const childBounds = childCoords.map((child) => ({
+            x: child.x,
+            y: child.y,
+            w: this.getVisibleCoordsWidth(child),
+            h: this.getVisibleCoordsHeight(child)
+        }))
+        const minChildX = Math.min(...childBounds.map((child) => child.x))
+        const minChildY = Math.min(...childBounds.map((child) => child.y))
+        const maxChildX = Math.max(...childBounds.map((child) => child.x + child.w))
+        const maxChildY = Math.max(...childBounds.map((child) => child.y + child.h))
+        return {
+            w: Math.max(MINIMUM_CONTAINER_WIDTH, maxChildX + padding, Math.abs(Math.min(0, minChildX)) + maxChildX + padding),
+            h: Math.max(MINIMUM_CONTAINER_HEIGHT, maxChildY + padding, Math.abs(Math.min(0, minChildY)) + maxChildY + padding)
+        }
+    }
+    constrainContainerResize = (source: OcdViewCoords, candidate: OcdViewCoords): OcdViewCoords => {
+        const minimum = this.getContainerMinimumDimensions(source)
+        const constrained = OcdDocument.clonePlainData(candidate)
+        const eastEdge = source.x + source.w
+        const southEdge = source.y + source.h
+        constrained.w = Math.max(constrained.w, minimum.w)
+        constrained.h = Math.max(constrained.h, minimum.h)
+        if (candidate.x !== source.x && constrained.w !== candidate.w) constrained.x = eastEdge - constrained.w
+        if (candidate.y !== source.y && constrained.h !== candidate.h) constrained.y = southEdge - constrained.h
+        return constrained
+    }
+    getSiblingCoords = (coords: OcdViewCoords, page: OcdViewPage): OcdViewCoords[] => {
+        const parent = this.getCoords(coords.pgid)
+        if (parent?.coords) return parent.coords
+        return page.coords
+    }
+    attachContainedCoordsToFrame = (frame: OcdViewCoords, viewId: string): number => {
+        if (!frame.container) return 0
+        const page = this.getPage(viewId)
+        if (!page) return 0
+        const frameBounds = this.getCoordsBounds(frame)
+        const frameDescendantIds = new Set(this.getChildCoords(frame.coords ?? []).map((coords) => coords.id))
+        const siblings = this.getSiblingCoords(frame, page)
+        const containedSiblings = siblings.filter((candidate) => {
+            if (candidate.id === frame.id || frameDescendantIds.has(candidate.id)) return false
+            return this.isBoundsInsideBounds(this.getCoordsBounds(candidate), frameBounds)
+        })
+        containedSiblings.forEach((candidate) => {
+            const candidateBounds = this.getCoordsBounds(candidate)
+            this.removeCoords(candidate, viewId, candidate.pgid)
+            candidate.pgid = frame.id
+            candidate.pocid = frame.ocid
+            candidate.x = candidateBounds.x - frameBounds.x
+            candidate.y = candidateBounds.y - frameBounds.y
+            this.setResourceParent(candidate.ocid, frame.ocid)
+            frame.coords = [...(frame.coords ?? []), candidate]
+        })
+        return containedSiblings.length
     }
     addCoords(coords: OcdViewCoords, viewId: string, pgid: string = '') {
         const view: OcdViewPage = this.getPage(viewId)

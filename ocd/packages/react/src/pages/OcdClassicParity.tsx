@@ -66,7 +66,7 @@ const OcdClassicParity = (_props: ConsolePageProps): JSX.Element => {
                 <p>
                     Desktop parity tracks the final OKIT Classic capability surface and keeps each item mapped to the
                     current Next Gen implementation path. The target is feature continuity plus Landing Zone, discovery,
-                    governance, Resource Analytics, and expanded OCI catalog workflows.
+                    governance, and expanded OCI catalog workflows.
                 </p>
             </div>
             <div className='ocd-discovery-grid ocd-classic-enhancements' aria-label='Next Gen enhancement lanes'>

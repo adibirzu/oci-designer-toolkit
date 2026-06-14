@@ -9,6 +9,9 @@
         "url": "https://github.com/oracle/oci-designer-toolkit"
     },
     "bugs": "https://github.com/oracle/oci-designer-toolkit/issues",
+    "engines": {
+        "node": ">=26"
+    },
     "scripts": {
         "github-action-install": "cd ocd && npm run github-action-install",
         "github-action-compile-for-codegen": "cd ocd && npm run github-action-compile-for-codegen",
@@ -36,7 +39,10 @@
         "build": "cd ocd && npm run build",
         "generate-lz-jsonnet": "node scripts/generate_lz_jsonnet_sources.mjs",
         "setup-lz": "node scripts/setup_landing_zone.mjs",
+        "setup-lz:check": "node scripts/setup_landing_zone.mjs --check",
         "setup-lz:latest": "node scripts/setup_landing_zone.mjs --latest",
+        "setup-lz:addon": "node scripts/setup_landing_zone.mjs --latest --install",
+        "import-oci-stencils": "node scripts/import_oci_stencils.mjs",
         "hooks:install": "git config core.hooksPath .githooks && echo 'Git hooks enabled (.githooks): pre-commit redaction gate + pre-push chain.'",
         "test:e2e": "cd e2e && npm install --no-save && npx playwright test",
         "test:e2e:headed": "cd e2e && npm install --no-save && npx playwright test --headed",

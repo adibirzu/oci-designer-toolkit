@@ -81,13 +81,21 @@ export interface DiscoveryMetricSample {
     monthlyCostUsd: number
 }
 
+export interface DiscoveryOciResourceSummary {
+    resourceType: string
+    displayName: string
+    compartmentId?: string
+    compartmentName?: string
+}
+
 export interface DiscoverySnapshot {
     id: string
     generatedAt: string
-    source: 'sample' | 'oci-query' | 'resource-analytics' | 'imported'
+    source: 'sample' | 'oci-query' | 'imported'
     applications: DiscoveryApplication[]
     assets: DiscoveryComputeAsset[]
     services: DiscoveryService[]
     dependencies: DiscoveryDependency[]
     metrics: DiscoveryMetricSample[]
+    ociResources?: DiscoveryOciResourceSummary[]
 }

@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
+import react from '@vitejs/plugin-react'
 
 // Standalone STATIC web build of the Electron renderer for GitHub Pages.
 //
@@ -55,24 +56,39 @@ const base = normalizeBase(process.env.OCD_PAGES_BASE)
 //      own copy of @xyflow/react's react dep into index-Cdi2_*.js).
 const ocdReactSrc = resolve(__dirname, '../../packages/react/src/index.ts')
 
+function normalizeId(id: string): string {
+  return id.split('\\').join('/')
+}
+
+function generatedWorkspaceChunk(id: string): string | undefined {
+  const normalized = normalizeId(id)
+
+  if (normalized.includes('/packages/react/src/data/OcdDefaultCache.ts')) return 'data-default-cache'
+  if (normalized.includes('/packages/react/src/data/OcdPalette.ts')) return 'data-palette'
+
+  return undefined
+}
+
 // https://vitejs.dev/config
 export default defineConfig({
   base,
+  plugins: [react()],
   assetsInclude: ['**/*.wasm'],
   // Route @ocd/react to its TypeScript source so Vite can split the bundle
-  // properly (see comment above). The esbuild JSX settings are required because
-  // the source contains .tsx files that need the React automatic runtime.
+  // properly (see comment above). The React plugin handles the source .tsx files.
   resolve: {
     alias: {
       '@ocd/react': ocdReactSrc,
     },
   },
-  esbuild: {
-    jsx: 'automatic',
-    jsxImportSource: 'react',
-  },
   build: {
     target: 'esnext',
+    // ExcelJS publishes one browser bundle around 0.9 MB minified, and the
+    // initial designer still carries the shared model/document core. The
+    // expensive per-resource OCI property panels are lazy-loaded, so keep the
+    // warning budget explicit at 3 MB rather than letting Vite's generic 500 kB
+    // web-site default flag this app's expected tool-surface payload.
+    chunkSizeWarningLimit: 3000,
     // Dedicated output dir so the static build never collides with electron-forge's
     // `.vite/` / `out/` directories or the desktop `dist`.
     outDir: 'web-dist',
@@ -81,8 +97,19 @@ export default defineConfig({
     // initial payload and browsers can cache vendor code across app deploys. Without
     // this the whole renderer collapses into one ~5MB chunk (Vite warns >500kB).
     rollupOptions: {
+      onwarn(warning, warn) {
+        if (
+          warning.code === 'MODULE_LEVEL_DIRECTIVE'
+          && warning.message.includes('"use client"')
+          && warning.message.includes('@xyflow/react')
+        ) return
+        warn(warning)
+      },
       output: {
         manualChunks(id: string) {
+          const workspaceChunk = generatedWorkspaceChunk(id)
+          if (workspaceChunk) return workspaceChunk
+
           if (!id.includes('node_modules')) return undefined
           // Normalise to the top-level package name (handles scoped packages).
           const pkgPath = id.split('node_modules/').pop() as string
@@ -113,7 +140,7 @@ export default defineConfig({
         target: 'https://apexapps.oracle.com',
         changeOrigin: true,
         secure: true,
-        rewrite: (p) => p.replace(/^\/api\/pricing/, '/pls/apex/cetools/api/v1/products'),
+        rewrite: (p: string) => p.replace(/^\/api\/pricing/, '/pls/apex/cetools/api/v1/products'),
       },
       '/api/oci': {
         target: process.env.OCD_WEB_SERVER_URL || 'http://127.0.0.1:5050',

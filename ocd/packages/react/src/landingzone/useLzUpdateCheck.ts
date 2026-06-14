@@ -10,8 +10,8 @@
 ** flag, and an aggregate `anyUpdate` derived from the per-source statuses.
 */
 
-import { useCallback, useEffect, useState } from 'react'
-import { LzSource } from './OcdLzSources'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { LzSource, OCI_LZ_SOURCES } from './OcdLzSources'
 import { LzUpdateStatus, checkLzUpdates } from './OcdLzUpdateCheck'
 
 export interface UseLzUpdateCheck {
@@ -24,17 +24,54 @@ export interface UseLzUpdateCheck {
     refresh: (force?: boolean) => void
 }
 
-export function useLzUpdateCheck(sources?: LzSource[]): UseLzUpdateCheck {
+export interface UseLzUpdateCheckOptions {
+    githubToken?: string
+    pinnedRefs?: Record<string, string>
+}
+
+const EMPTY_PINNED_REFS: Record<string, string> = {}
+
+export const buildEffectiveLzUpdateSources = (
+    sources: readonly LzSource[],
+    pinnedRefs: Record<string, string>,
+): LzSource[] => sources.map((source) => ({
+    ...source,
+    pinnedRef: pinnedRefs[source.key] ?? source.pinnedRef,
+}))
+
+export interface ShouldForceLzUpdateCheckInput {
+    explicitForce: boolean
+    pinnedRefsChanged: boolean
+    githubTokenChanged: boolean
+}
+
+export const shouldForceLzUpdateCheck = ({
+    explicitForce,
+    pinnedRefsChanged,
+    githubTokenChanged,
+}: ShouldForceLzUpdateCheckInput): boolean =>
+    explicitForce || pinnedRefsChanged || githubTokenChanged
+
+export function useLzUpdateCheck(sources?: LzSource[], options: UseLzUpdateCheckOptions = {}): UseLzUpdateCheck {
     const [statuses, setStatuses] = useState<LzUpdateStatus[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const pinnedRefs = options.pinnedRefs ?? EMPTY_PINNED_REFS
+    const githubToken = options.githubToken ?? ''
+    const pinnedRefsFingerprint = useMemo(() => JSON.stringify(Object.entries(pinnedRefs).sort(([left], [right]) => left.localeCompare(right))), [pinnedRefs])
+    const previousPinnedRefsFingerprint = useRef(pinnedRefsFingerprint)
+    const previousGithubToken = useRef(githubToken)
+    const effectiveSources = useMemo(
+        () => buildEffectiveLzUpdateSources(sources ?? OCI_LZ_SOURCES, pinnedRefs),
+        [sources, pinnedRefs],
+    )
 
     const load = useCallback(
         async (force: boolean, cancelledRef?: { current: boolean }) => {
             setLoading(true)
             setError(null)
             try {
-                const result = await checkLzUpdates(sources, { force })
+                const result = await checkLzUpdates(effectiveSources, { force, githubToken })
                 if (cancelledRef?.current) return
                 setStatuses(result)
             } catch (err: unknown) {
@@ -45,16 +82,20 @@ export function useLzUpdateCheck(sources?: LzSource[]): UseLzUpdateCheck {
                 if (!cancelledRef?.current) setLoading(false)
             }
         },
-        [sources],
+        [effectiveSources, githubToken],
     )
 
     useEffect(() => {
         const cancelledRef = { current: false }
-        void load(false, cancelledRef)
+        const pinnedRefsChanged = previousPinnedRefsFingerprint.current !== pinnedRefsFingerprint
+        const githubTokenChanged = previousGithubToken.current !== githubToken
+        previousPinnedRefsFingerprint.current = pinnedRefsFingerprint
+        previousGithubToken.current = githubToken
+        void load(shouldForceLzUpdateCheck({ explicitForce: false, pinnedRefsChanged, githubTokenChanged }), cancelledRef)
         return () => {
             cancelledRef.current = true
         }
-    }, [load])
+    }, [githubToken, load, pinnedRefsFingerprint])
 
     const refresh = useCallback(
         (force = true) => {
@@ -63,7 +104,9 @@ export function useLzUpdateCheck(sources?: LzSource[]): UseLzUpdateCheck {
         [load],
     )
 
-    const anyUpdate = statuses.some((status) => status.updateAvailable)
+    // Private/unreachable sources (status.unavailable) never count as updates —
+    // a 404 on a project-addon source must not trigger the update banner.
+    const anyUpdate = statuses.some((status) => status.updateAvailable && !status.unavailable)
 
     return { statuses, loading, error, anyUpdate, refresh }
 }

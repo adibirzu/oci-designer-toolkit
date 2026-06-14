@@ -52,7 +52,7 @@ function tarHeader(name: string, size: number): Uint8Array {
     return header
 }
 
-export function buildTarBytes(files: DownloadFile[]): Uint8Array {
+export function buildTarBytes(files: DownloadFile[]): Uint8Array<ArrayBuffer> {
     const chunks: Uint8Array[] = []
     for (const file of files) {
         const body = encoder.encode(file.content)
