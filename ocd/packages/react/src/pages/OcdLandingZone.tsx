@@ -37,7 +37,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ConsolePageProps } from '../types/Console'
 import { OcdConsoleConfig } from '../components/OcdConsoleConfiguration'
 import { OcdDocument } from '../components/OcdDocument'
-import { WizardProvider, useWizard } from '../landingzone/OcdLzWizardContext'
+import { WizardProvider, useWizard, consumeWizardSeed } from '../landingzone/OcdLzWizardContext'
 import { downloadTar, downloadTextFile } from '../landingzone/OcdLzDownloads'
 import { GeneratedFile, generateLandingZone } from '../landingzone/OcdLzGenerator'
 import { buildOcdDesignFromLz } from '../landingzone/OcdLzToModel'
@@ -490,8 +490,13 @@ const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdC
         switchToDesigner()
     }
 
+    // Consume any one-shot seed staged by "Edit Landing Zone in Wizard" exactly
+    // once per page mount. When present it rehydrates the wizard from a saved
+    // LZ-origin design's config; when absent the wizard opens as today (draft).
+    const seed = useMemo(() => consumeWizardSeed(), [])
+
     return (
-        <WizardProvider>
+        <WizardProvider seed={seed}>
             <WizardBody onExit={onExit} onOpenInDesigner={onOpenInDesigner} />
         </WizardProvider>
     )
