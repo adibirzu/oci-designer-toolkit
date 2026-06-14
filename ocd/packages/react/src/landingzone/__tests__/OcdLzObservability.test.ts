@@ -94,4 +94,12 @@ describe('OcdLzObservability', () => {
         applyObservabilityOverlay(design)
         expect(JSON.stringify(design)).toBe(before)
     })
+
+    // Reconcile contract (shared OcdLzOverlay upsert): applying the overlay any
+    // number of times must converge to the same design as applying it once.
+    it('converges on re-apply (apply once == re-apply twice more)', () => {
+        const once = applyObservabilityOverlay(makeDesign(true))
+        const thrice = applyObservabilityOverlay(applyObservabilityOverlay(once))
+        expect(JSON.stringify(thrice)).toBe(JSON.stringify(once))
+    })
 })

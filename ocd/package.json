@@ -31,7 +31,7 @@
     "github-action-build-macos-x86": "npm run make-macos-x64 --workspace=packages/desktop --if-present",
     "github-action-build-react": "npm run build-react-scripts --workspace=packages/desktop",
     "github-action-build-electron": "npm run electron-pack --workspace=packages/desktop",
-    "test": "npm run test --workspace=packages/react",
+    "test": "npm run test --workspace=packages/react && npm run test --workspace=packages/query && npm run test --workspace=packages/core",
     "install-and-codegen": "npm install --legacy-peer-deps && npm run compile-for-codegen && npm run import-and-generate && npm run build",
     "fresh-install": "npm run install-and-codegen",
     "new-install": "npm run github-action-install && npm run github-action-compile-for-codegen && npm run github-action-generate && npm run github-action-build",
@@ -57,7 +57,12 @@
     "web-server": "npm run start --workspace=packages/web-server",
     "web-server-dev": "npm run dev --workspace=packages/web-server",
     "dev-desktop": "npm run build && npm run desktop",
-    "test:e2e": "cd ../e2e && npm install --no-save && npx playwright test"
+    "test:e2e": "cd ../e2e && npm install --no-save && npx playwright test",
+    "setup-lz": "node ../scripts/setup_landing_zone.mjs",
+    "setup-lz:check": "node ../scripts/setup_landing_zone.mjs --check",
+    "setup-lz:latest": "node ../scripts/setup_landing_zone.mjs --latest",
+    "setup-lz:addon": "node ../scripts/setup_landing_zone.mjs --latest --install",
+    "import-oci-stencils": "node ../scripts/import_oci_stencils.mjs"
   },
   "workspaces": [
     "packages/core",
@@ -82,6 +87,12 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "uuid": "^9.0.0"
+    "uuid": "^11.1.1"
+  },
+  "overrides": {
+    "tar": "^7.5.16",
+    "tmp": "^0.2.7",
+    "uuid": "^11.1.1",
+    "vite": "^8.0.16"
   }
 }

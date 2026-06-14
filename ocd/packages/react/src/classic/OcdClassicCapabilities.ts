@@ -46,7 +46,7 @@ export const okitClassicDesktopViews: OcdClassicCapability[] = [
         classicSurface: 'Common freeform and defined tags for resources',
         nextGenSurface: 'Common Tags page plus Enterprise IAM blueprint tag namespace and cost-tracking tags',
         status: 'enhanced',
-        nextStep: 'Surface tag compliance deltas from Governance and Resource Analytics.'
+        nextStep: 'Surface tag compliance deltas from Governance.'
     },
     {
         id: 'markdown-view',
@@ -113,7 +113,7 @@ export const okitClassicImportExportCapabilities: OcdClassicCapability[] = [
         classicSurface: 'Desktop export option for detailed tabular data',
         nextGenSurface: 'Generated Excel exporter for curated OCI resource surfaces',
         status: 'available',
-        nextStep: 'Add Resource Analytics inventory sheets for discovery snapshots.'
+        nextStep: 'Add discovery snapshot inventory sheets to the Excel export.'
     },
     {
         id: 'portable-json',
@@ -127,7 +127,7 @@ export const okitClassicImportExportCapabilities: OcdClassicCapability[] = [
         id: 'oci-query-import',
         capability: 'OCI query and introspection',
         classicSurface: 'Embedded OCI query functionality for existing environments',
-        nextGenSurface: 'Desktop OCI query IPC, web-server discovery endpoints, Discovery Workbench, Resource Analytics',
+        nextGenSurface: 'Desktop OCI query IPC, web-server discovery endpoints, Discovery Workbench',
         status: 'enhanced',
         nextStep: 'Expand discovery adapters and OCI mapping rules for remaining workload and platform services.'
     },
@@ -155,7 +155,7 @@ export const okitNextGenEnhancements: OcdNextGenEnhancement[] = [
     {
         id: 'discovery',
         title: 'Discovery Workbench',
-        summary: 'Inventory, topology, analytics, OCI target mapping, migration waves, LZ recommendations, and Resource Analytics.'
+        summary: 'Inventory, topology, analytics, OCI target mapping, migration waves, and LZ recommendations.'
     },
     {
         id: 'catalog',

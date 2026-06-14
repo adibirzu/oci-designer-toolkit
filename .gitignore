@@ -86,6 +86,9 @@ containers/ssh/*
 # Copied wasm (Landing Zone Wizard) — prebuild copies from react/src/landingzone/wasm
 **/desktop/public/libjsonnet.wasm
 
+# Copied reference architecture library — prebuild copies from ocd/library
+**/desktop/public/library/
+
 # Landing Zone Wizard — vendored OCI Operating Entities sources are fetched
 # locally via `npm run setup-lz` and NOT committed (they embed upstream OCI
 # reference OCIDs). Keep this repo free of any OCIDs / environment identifiers.
@@ -102,6 +105,7 @@ log/
 okitclassic/instance/
 baselines/oci-landing-zones/
 addons/oci-observability-end-to-end/dist/
+external/lz-addons/
 
 # Testing
 test

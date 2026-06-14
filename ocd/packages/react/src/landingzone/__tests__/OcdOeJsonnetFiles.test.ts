@@ -28,9 +28,9 @@ describe('OcdOeJsonnetFiles', () => {
         expect(files['/gen/constants.libsonnet']).toContain("std.strReplace(ocid, '.oc1..', '.oc19..')")
     })
 
-    it('bundles 146 logical sources under both /gen and gen-relative keys', () => {
+    it('bundles 152 logical sources under both /gen and gen-relative keys', () => {
         const files = getOperatingEntitiesJsonnetFiles()
-        expect(OE_JSONNET_SOURCE_COUNT).toBe(146)
+        expect(OE_JSONNET_SOURCE_COUNT).toBe(152)
         // Each logical source is registered under two keys.
         expect(Object.keys(files).length).toBe(OE_JSONNET_SOURCE_COUNT * 2)
     })

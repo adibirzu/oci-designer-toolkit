@@ -8,6 +8,7 @@ import '../src/css/oci-theme.css'
 import '../src/css/azure-theme.css'
 import '../src/css/google-theme.css'
 import '../src/css/general-theme.css'
+import '../src/css/oci-stencils.css'
 import '../src/css/ocd.css'
 import '../src/css/ocd-svg.css'
 import OcdConsole from '../src/pages/OcdConsole'
@@ -17,4 +18,3 @@ const container = document.getElementById('root')
 const root = createRoot(container!); 
 // root.render(<StrictMode><OcdConsole /></StrictMode>)
 root.render(<OcdConsole />)
-

@@ -1391,6 +1391,21 @@
     color: var(--oracle-red-dark);
 }
 
+/* Engine-unavailable variant of the update banner (jsonnet WASM probe failed). */
+.ocd-lzng-engine-banner {
+    border-left: 3px solid var(--oracle-red);
+}
+
+.ocd-lzng-engine-banner-error {
+    margin-top: 6px;
+    color: var(--oracle-text-muted);
+    word-break: break-word;
+}
+
+.ocd-lzng-engine-banner-error code {
+    font-size: 12px;
+}
+
 /* ============================================================
    Sources & Updates panel
    ============================================================ */
@@ -1408,6 +1423,42 @@
     margin: 0 0 12px;
     color: var(--oracle-text-muted);
     font-size: 13px;
+}
+
+.ocd-lzng-github-login {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) minmax(220px, 320px) auto auto;
+    gap: 10px;
+    align-items: end;
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    background: var(--oracle-bg-soft);
+    margin: 0 0 14px;
+    padding: 12px;
+}
+
+.ocd-lzng-github-login strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.ocd-lzng-github-login span {
+    color: var(--oracle-text-muted);
+    font-size: 12px;
+}
+
+.ocd-lzng-github-login label {
+    display: grid;
+    gap: 4px;
+}
+
+.ocd-lzng-github-login input {
+    min-height: 34px;
+    border: 1px solid var(--oracle-border);
+    border-radius: 6px;
+    padding: 0 10px;
+    background: var(--oracle-white);
+    color: var(--oracle-text);
 }
 
 .ocd-lzng-sources-list {
@@ -1432,9 +1483,43 @@
     gap: 10px;
 }
 
+.ocd-lzng-source-title {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
 .ocd-lzng-source-label {
     font-weight: 700;
     font-size: 14px;
+}
+
+.ocd-lzng-source-row-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ocd-lzng-source-update-btn {
+    min-height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+.ocd-lzng-source-message {
+    color: var(--oracle-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ocd-lzng-source-message-error {
+    color: var(--oracle-red-dark);
+}
+
+.ocd-lzng-source-message-ok {
+    color: var(--oracle-success);
 }
 
 .ocd-lzng-source-repo {
@@ -1739,4 +1824,106 @@
 .ocd-designer-resource.ocd-connect-target-invalid {
     filter: drop-shadow(0 0 5px var(--oracle-red, #C74634));
     cursor: no-drop;
+}
+
+/* Sources & Updates — role grouping + private/unreachable state.
+   Role group headers split the source list into vendored jsonnet / project
+   add-ons / reference sections; the unavailable badge mutes private or
+   unreachable repos (informational skip, not a failure). */
+.ocd-lzng-source-role-group {
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--oracle-text-muted);
+}
+
+.ocd-lzng-source-role-group:first-child {
+    margin-top: 0;
+}
+
+.ocd-lzng-badge-unavailable {
+    background: var(--oracle-bg);
+    color: var(--oracle-text-muted);
+    border-color: var(--oracle-border);
+    font-style: italic;
+}
+
+.ocd-lzng-addon-manager {
+    border: 1px solid var(--oracle-border);
+    border-radius: 8px;
+    background: var(--oracle-bg-soft);
+    margin: 12px 0 16px;
+    padding: 12px;
+}
+
+.ocd-lzng-addon-manager-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+    margin-bottom: 10px;
+}
+
+.ocd-lzng-addon-manager-head h3 {
+    font-size: 14px;
+    margin: 0;
+}
+
+.ocd-lzng-addon-manager-head span {
+    color: var(--oracle-text-muted);
+    font-size: 12px;
+}
+
+.ocd-lzng-addon-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    border-top: 1px solid var(--oracle-border);
+    padding-top: 10px;
+}
+
+.ocd-lzng-addon-row:first-of-type {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.ocd-lzng-addon-meta {
+    display: grid;
+    gap: 4px;
+    margin: 8px 0 0;
+}
+
+.ocd-lzng-addon-meta div {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 8px;
+}
+
+.ocd-lzng-addon-meta dt {
+    color: var(--oracle-text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.ocd-lzng-addon-meta dd {
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.ocd-lzng-addon-message {
+    margin: 8px 0 0;
+    font-size: 12px;
+}
+
+.ocd-lzng-addon-message-ok {
+    color: var(--oracle-success, #3A9B4E);
+}
+
+.ocd-lzng-addon-message-error {
+    color: var(--oracle-red, #C74634);
 }

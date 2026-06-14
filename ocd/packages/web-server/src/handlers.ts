@@ -13,18 +13,69 @@
 ** placed in the HTTP responses.
 */
 
-import { common } from "oci-sdk"
-import { validateResourceAnalyticsSql } from "@ocd/core"
-import { OciQuery, OciReferenceDataQuery } from "@ocd/query"
+import {
+    cancelLandingZoneAddonUpdateJob,
+    createJob,
+    createStack,
+    errorMessage,
+    generateArchitecturePlanWithGenAi,
+    getLandingZoneAddonUpdateJob,
+    getResourceManagerPlanReview,
+    listLandingZoneAddonHealth,
+    listRegions,
+    listStacks,
+    listTenancyCompartments,
+    loadOciConfigProfile,
+    loadOciConfigProfiles,
+    OciQuery,
+    queryDiscoverySnapshot,
+    queryDropdown,
+    queryTenancy as backendQueryTenancy,
+    startLandingZoneAddonUpdateJob,
+    updateLandingZoneAddon,
+    updateStack,
+} from "@ocd/query"
 
-export interface ProfilesResult {
-    profiles: string[]
+export {
+    cancelLandingZoneAddonUpdateJob,
+    createJob,
+    createStack,
+    errorMessage,
+    generateArchitecturePlanWithGenAi,
+    getLandingZoneAddonUpdateJob,
+    getResourceManagerPlanReview,
+    listLandingZoneAddonHealth,
+    listRegions,
+    listStacks,
+    listTenancyCompartments,
+    queryDiscoverySnapshot,
+    queryDropdown,
+    startLandingZoneAddonUpdateJob,
+    updateLandingZoneAddon,
+    updateStack,
 }
 
 export interface QueryTenancyRequest {
     profile: string
     region: string
     compartmentIds: string[]
+    // Optional correlation id threaded from the HTTP boundary (X-Request-Id). When present
+    // it is passed down to the query layer so its log lines correlate with the request.
+    requestId?: string
+}
+
+/*
+** Tenancy discovery for the web backend. Backward-compatible: when no requestId is supplied
+** the call delegates to the shared @ocd/query queryTenancy (unchanged behaviour). When the
+** HTTP layer threads the request id through, we drive the OciQuery instance directly so the
+** correlation id reaches OciQuery.queryTenancy and scopes its logger. requestId is an opaque
+** token, never an OCID/secret, and no design JSON is logged.
+*/
+export const queryTenancy = (request: QueryTenancyRequest): Promise<unknown> => {
+    const { profile, region, compartmentIds, requestId } = request
+    if (!requestId) return backendQueryTenancy({ profile, region, compartmentIds })
+    const query = new OciQuery(profile, region)
+    return query.withTimeout(query.queryTenancy(compartmentIds, { requestId }), 'queryTenancy')
 }
 
 export interface QueryDropdownRequest {
@@ -32,111 +83,21 @@ export interface QueryDropdownRequest {
     region: string
 }
 
-export interface ResourceAnalyticsQueryRequest {
+export interface QueryDiscoverySnapshotRequest {
     profile: string
     region: string
-    sql: string
+    compartmentIds?: string[]
 }
-
-/*
-** Field names that, if present on a parsed OCI config profile, would expose credential
-** material or local filesystem layout. These are stripped before a profile is returned.
-*/
-const SENSITIVE_PROFILE_KEYS: ReadonlyArray<string> = [
-    'key_file',
-    'security_token_file',
-    'pass_phrase',
-    'passphrase',
-    'fingerprint',
-    'cert-bundle'
-]
 
 /*
 ** Read the profile names defined in ~/.oci/config. Never returns credential values.
 ** Throws a descriptive error when no config / no profiles are found so the caller can
 ** surface a clear JSON error to the browser instead of a stack trace.
 */
-export const loadProfileNames = (): ProfilesResult => {
-    let parsed
-    try {
-        parsed = common.ConfigFileReader.parseDefault(null)
-    } catch (reason: unknown) {
-        throw new Error(`Unable to read OCI config (~/.oci/config): ${errorMessage(reason)}`)
-    }
-    const profiles = Array.from(parsed.accumulator.configurationsByProfile.keys())
-    if (profiles.length === 0) throw new Error('No OCI profiles found in ~/.oci/config')
-    return { profiles }
-}
+export const loadProfileNames = loadOciConfigProfiles
 
 /*
 ** Return the non-sensitive key/value pairs for a single profile. Credential-bearing
 ** keys (key file paths, fingerprints, passphrases, token files) are removed.
 */
-export const loadProfile = (profile: string): Record<string, string> => {
-    let parsed
-    try {
-        parsed = common.ConfigFileReader.parseDefault(null)
-    } catch (reason: unknown) {
-        throw new Error(`Unable to read OCI config (~/.oci/config): ${errorMessage(reason)}`)
-    }
-    const profileData = parsed.accumulator.configurationsByProfile.get(profile)
-    if (profileData === undefined) throw new Error(`OCI profile '${profile}' not found in ~/.oci/config`)
-    const sanitised: Record<string, string> = {}
-    for (const [key, value] of profileData.entries()) {
-        if (!SENSITIVE_PROFILE_KEYS.includes(key)) sanitised[key] = value
-    }
-    return sanitised
-}
-
-/*
-** List the regions the tenancy (for the given profile) is subscribed to. Bound with the
-** shared withTimeout so an unreachable endpoint rejects instead of hanging.
-*/
-export const listRegions = (profile: string): Promise<unknown> => {
-    const query = new OciQuery(profile)
-    return query.withTimeout(query.listRegions(), 'listRegions')
-}
-
-/*
-** List every compartment (and the tenancy root) for the given profile.
-*/
-export const listTenancyCompartments = (profile: string): Promise<unknown> => {
-    const query = new OciQuery(profile)
-    return query.withTimeout(query.listTenancyCompartments(), 'listTenancyCompartments')
-}
-
-/*
-** Discover resources across the supplied compartments for the given profile / region.
-*/
-export const queryTenancy = (request: QueryTenancyRequest): Promise<unknown> => {
-    const { profile, region, compartmentIds } = request
-    const query = new OciQuery(profile, region)
-    return query.withTimeout(query.queryTenancy(compartmentIds), 'queryTenancy')
-}
-
-/*
-** Reference / dropdown data (shapes, images, versions, etc.) for the given profile / region.
-*/
-export const queryDropdown = (request: QueryDropdownRequest): Promise<unknown> => {
-    const { profile, region } = request
-    const query = new OciReferenceDataQuery(profile, region)
-    return query.withTimeout(query.query(), 'queryDropdown')
-}
-
-export const queryDiscoverySnapshot = async (request: { profile: string; region: string }): Promise<unknown> => {
-    const { profile, region } = request
-    const query = new OciQuery(profile, region)
-    const compartments = await query.withTimeout(query.listTenancyCompartments(), 'discoverySnapshot')
-    return { source: 'oci-query', compartments }
-}
-
-export const queryResourceAnalytics = (request: ResourceAnalyticsQueryRequest): { rows: Record<string, unknown>[]; sql: string } => {
-    const validatedSql = validateResourceAnalyticsSql(request.sql)
-    return { rows: [], sql: validatedSql }
-}
-
-export const errorMessage = (reason: unknown): string => {
-    if (reason instanceof Error) return reason.message
-    if (typeof reason === 'string') return reason
-    return 'Unexpected error'
-}
+export const loadProfile = loadOciConfigProfile

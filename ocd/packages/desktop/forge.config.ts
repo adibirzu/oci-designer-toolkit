@@ -31,7 +31,7 @@ function appdmgAvailable(): boolean {
 const dmgMakerAvailable = appdmgAvailable()
 console.info('Forge Config: appdmg available =', dmgMakerAvailable)
 
-const archPos = process.argv.findIndex(arg => arg.startsWith('--arch'))
+const archPos = process.argv.findIndex((arg: string) => arg.startsWith('--arch'))
 let arch = archPos > 0 ? process.argv[archPos+1] : os.arch()
 if (arch === undefined) {
   arch = process.argv[archPos].replace('arch', '').replace(/[\W]+/g,"")

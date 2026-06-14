@@ -358,7 +358,22 @@ export const resourceMap: OcdResourceMap = {
     "oci_ai_language_model": "ai_language_model",
     "oci_ai_anomaly_detection_ai_private_endpoint": "ai_anomaly_detection_private_endpoint",
     "oci_ai_anomaly_detection_data_asset": "ai_anomaly_detection_data_asset",
-    "oci_ai_anomaly_detection_detect_anomaly_job": "ai_anomaly_detection_job"
+    "oci_ai_anomaly_detection_detect_anomaly_job": "ai_anomaly_detection_job",
+    // Batch 11 — Block volume backups, DNS records, FSS snapshots, MySQL backups/config/replicas
+    "oci_core_volume_backup": "volume_backup",
+    "oci_core_volume_backup_policy": "volume_backup_policy",
+    "oci_core_volume_backup_policy_assignment": "volume_backup_policy_assignment",
+    "oci_core_volume_group_backup": "volume_group_backup",
+    "oci_core_instance_console_connection": "instance_console_connection",
+    "oci_core_route_table_attachment": "route_table_attachment",
+    "oci_core_ipv6": "ipv6",
+    "oci_core_public_ip_pool": "public_ip_pool",
+    "oci_file_storage_snapshot": "file_storage_snapshot",
+    "oci_mysql_mysql_backup": "mysql_backup",
+    "oci_mysql_mysql_configuration": "mysql_configuration",
+    "oci_mysql_replica": "mysql_replica",
+    "oci_dns_record": "dns_record",
+    "oci_dns_steering_policy_attachment": "dns_steering_policy_attachment"
 }
 
 export const dataMap: OcdResourceMap = {
@@ -3280,5 +3295,137 @@ export const resourceAttributes: OcdIncludedElements = {
         "management_agent_id",
         "management_agent_compartment_id",
         "are_logs_collected"
+    ],
+    "oci_core_volume_backup": [
+        "display_name",
+        "expiration_time",
+        "kms_key_id",
+        "source_type",
+        "source_volume_backup_id",
+        "type",
+        "volume_id",
+        "source_details",
+        "source_details.kms_key_id",
+        "source_details.volume_backup_id"
+    ],
+    "oci_core_volume_backup_policy": [
+        "display_name",
+        "destination_region",
+        "schedules",
+        "schedules.backup_type",
+        "schedules.day_of_month",
+        "schedules.day_of_week",
+        "schedules.hour_of_day",
+        "schedules.month",
+        "schedules.offset_seconds",
+        "schedules.offset_type",
+        "schedules.period",
+        "schedules.retention_seconds",
+        "schedules.time_zone"
+    ],
+    "oci_core_volume_backup_policy_assignment": [
+        "asset_id",
+        "policy_id"
+    ],
+    "oci_core_volume_group_backup": [
+        "display_name",
+        "expiration_time",
+        "source_type",
+        "source_volume_group_backup_id",
+        "type",
+        "volume_backup_ids",
+        "volume_group_id",
+        "source_details",
+        "source_details.kms_key_id",
+        "source_details.volume_group_backup_id"
+    ],
+    "oci_core_instance_console_connection": [
+        "fingerprint",
+        "instance_id",
+        "public_key"
+    ],
+    "oci_core_route_table_attachment": [
+        "route_table_id",
+        "subnet_id"
+    ],
+    "oci_core_ipv6": [
+        "display_name",
+        "ip_address",
+        "ipv6subnet_cidr",
+        "subnet_id",
+        "vnic_id"
+    ],
+    "oci_core_public_ip_pool": [
+        "cidr_blocks",
+        "display_name"
+    ],
+    "oci_file_storage_snapshot": [
+        "expiration_time",
+        "file_system_id",
+        "filesystem_snapshot_policy_id",
+        "name",
+        "snapshot_time",
+        "snapshot_type"
+    ],
+    "oci_mysql_mysql_backup": [
+        "backup_type",
+        "creation_type",
+        "db_system_id",
+        "description",
+        "display_name",
+        "immediate_source_backup_id",
+        "retention_in_days",
+        "source_details",
+        "source_details.backup_id",
+        "source_details.compartment_id"
+    ],
+    "oci_mysql_mysql_configuration": [
+        "description",
+        "display_name",
+        "parent_configuration_id",
+        "shape_name",
+        "init_variables",
+        "init_variables.lower_case_table_names",
+        "variables",
+        "variables.autocommit",
+        "variables.binlog_expire_logs_seconds",
+        "variables.connect_timeout",
+        "variables.default_authentication_plugin",
+        "variables.foreign_key_checks",
+        "variables.innodb_buffer_pool_size",
+        "variables.innodb_lock_wait_timeout",
+        "variables.max_allowed_packet",
+        "variables.max_connections",
+        "variables.sql_mode",
+        "variables.sql_require_primary_key",
+        "variables.time_zone",
+        "variables.wait_timeout"
+    ],
+    "oci_mysql_replica": [
+        "availability_domain",
+        "configuration_id",
+        "db_system_id",
+        "description",
+        "display_name",
+        "fault_domain",
+        "is_delete_protected",
+        "replica_overrides",
+        "replica_overrides.configuration_id",
+        "replica_overrides.mysql_version",
+        "replica_overrides.shape_name"
+    ],
+    "oci_dns_record": [
+        "domain",
+        "rdata",
+        "rtype",
+        "ttl",
+        "zone_name_or_id"
+    ],
+    "oci_dns_steering_policy_attachment": [
+        "display_name",
+        "domain_name",
+        "rtypes",
+        "steering_policy_id",
+        "zone_id"
     ]
 }

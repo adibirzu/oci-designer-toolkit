@@ -36,7 +36,7 @@ const OcdBom = ({ ocdDocument }: ConsolePageProps): JSX.Element => {
         [resources]
     )
 
-    const { priceMap, loading, error, source } = useOciPriceList(requiredPartNumbers, currency)
+    const { priceMap, loading, error, source, snapshotDate } = useOciPriceList(requiredPartNumbers, currency)
     const estimate = useMemo(
         () => estimateMonthlyCost(resources, priceMap, { hoursPerMonth: HOURS_PER_MONTH, currency }),
         [resources, priceMap, currency]
@@ -57,6 +57,8 @@ const OcdBom = ({ ocdDocument }: ConsolePageProps): JSX.Element => {
                     <span>Estimated Monthly Cost</span>
                     <strong>{estimate.currency} {estimate.totalMonthly.toFixed(2)}</strong>
                     <span className='ocd-bom-source-badge'>{source === 'live' ? 'live pricing' : 'offline snapshot'}</span>
+                    {/* `.ocd-bom-summary-card span` already renders small + muted. */}
+                    {source === 'snapshot' && <span>Prices as of {snapshotDate}</span>}
                 </div>
                 <div className='ocd-bom-summary-card'>
                     <span>Currency</span>
