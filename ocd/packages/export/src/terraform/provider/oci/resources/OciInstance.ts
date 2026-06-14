@@ -29,7 +29,7 @@ data "oci_core_images" "${this.terraformResourceName}Images" {
 }
 
 locals {
-    ${this.terraformResourceName}_image_id = data.oci_core_images.${this.terraformResourceName}Images.images[0]["id"]
+    ${this.terraformResourceName}_image_id = length(data.oci_core_images.${this.terraformResourceName}Images.images) == 0 ? "" : data.oci_core_images.${this.terraformResourceName}Images.images[0]["id"]
 }
 `
     return content
