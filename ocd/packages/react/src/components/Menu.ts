@@ -17,6 +17,7 @@ import { autoLayoutOptions } from '../data/OcdAutoLayoutOptions'
 import { OcdExternalFacade } from '../facade/OcdExternalFacade'
 import { buildDesignFromLzUpload } from '../landingzone/OcdLzFileImport'
 import { buildDesignFromDrawio } from '../import/OcdDrawioImport'
+import { lzConfigToWizardSeed, stageWizardSeed } from '../landingzone/OcdLzWizardContext'
 import { OcdLogger } from '@ocd/core'
 // import { OcdDesign } from '../../../model/lib/cjs'
 
@@ -248,6 +249,12 @@ export const menuItems: MenuItem[] = [
                     //     }
                     // }
                 ]
+            },
+            {
+                label: 'Edit Landing Zone in Wizard',
+                click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                    editLandingZoneInWizard(ocdDocument, ocdConsoleConfig, setOcdConsoleConfig)
+                }
             },
             {
                 label: 'Export',
@@ -734,6 +741,26 @@ export const importFromLandingZoneFiles = (setOcdDocument: Function, ocdConsoleC
         logger.warn('LZ import failed', reason?.message ?? reason)
         if (reason?.message) alert(reason.message)
     })
+}
+
+/**
+ * Reopen a saved Landing Zone (LZNG) design back in the wizard so it can be
+ * edited and re-generated. Only meaningful when the active design originated
+ * from the wizard (carries a persisted `lzConfig`); otherwise this is a no-op
+ * with a friendly notice (the menu item is effectively disabled).
+ *
+ * Stages a one-shot wizard seed (config + title + add-on toggles) and switches
+ * the console to the Landing Zone page, which consumes the seed on mount.
+ */
+export const editLandingZoneInWizard = (ocdDocument: OcdDocument, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function): void => {
+    const seed = lzConfigToWizardSeed(ocdDocument?.design)
+    if (!seed) {
+        alert('This design was not created by the Landing Zone wizard, so there is no Landing Zone configuration to edit. Create or import a Landing Zone design first.')
+        return
+    }
+    stageWizardSeed(seed)
+    ocdConsoleConfig.config.displayPage = 'landingzone'
+    setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
 }
 
 /**

@@ -10,8 +10,17 @@
 */
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react'
+import { getLzConfig } from './OcdLzToModel'
+import { LZ_SCAFFOLD_ENABLED_KEY } from './OcdLzReconcile'
+import { LZ_OBSERVABILITY_ENABLED_KEY } from './OcdLzObservability'
+import { LZ_OKE_NATIVE_ENABLED_KEY } from './OcdLzOke'
 
 const STORAGE_KEY = 'ocd.lz.wizard.draft'
+// One-shot key: a staged wizard seed produced when the user chooses to edit an
+// existing saved LZ design. The provider consumes it for a single load (it wins
+// over the persisted draft for that load) and the page clears it so a later
+// reload falls back to the normal draft rehydrate — no double application.
+const SEED_KEY = 'ocd.lz.wizard.seed'
 
 export interface WizardState {
     data: Record<string, unknown>
@@ -67,23 +76,94 @@ function reducer(state: WizardState, action: WizardAction): WizardState {
 
 const WizardContext = createContext<WizardContextValue | null>(null)
 
-interface WizardProviderProps {
-    children: React.ReactNode
+/** Minimal shape of an OcdDesign needed to derive a wizard seed. */
+interface LzSeedDesignLike {
+    metadata?: { title?: string }
+    userDefined?: Record<string, unknown>
 }
 
-export function WizardProvider({ children }: WizardProviderProps): JSX.Element {
-    const [state, dispatch] = useReducer(reducer, undefined, defaultWizardState)
+/**
+ * Pure mapper: turn a saved, LZ-origin design into a wizard seed (a full
+ * `WizardState`) that reproduces the config, title and add-on toggles that
+ * created it. Returns `null` for any design that did not originate from the LZ
+ * wizard (no persisted `lzConfig`), which is also the menu-enablement signal —
+ * a `null` seed means "Edit Landing Zone in Wizard" should stay disabled.
+ */
+export function lzConfigToWizardSeed(design: LzSeedDesignLike | null | undefined): WizardState | null {
+    const config = getLzConfig(design)
+    if (!config) return null
+    const userDefined = design?.userDefined ?? {}
+    const data: Record<string, unknown> = {
+        config,
+        scaffoldEnabled: Boolean(userDefined[LZ_SCAFFOLD_ENABLED_KEY]),
+        observabilityEnabled: Boolean(userDefined[LZ_OBSERVABILITY_ENABLED_KEY]),
+        okeNativeEnabled: Boolean(userDefined[LZ_OKE_NATIVE_ENABLED_KEY]),
+    }
+    const title = design?.metadata?.title
+    if (typeof title === 'string' && title.trim()) data.title = title
+    return { data }
+}
+
+function getLocalStorage(): Storage | null {
+    try {
+        return typeof window !== 'undefined' ? window.localStorage : null
+    } catch {
+        return null
+    }
+}
+
+/** Stage a one-shot wizard seed (no-op when seed is null). */
+export function stageWizardSeed(seed: WizardState | null): void {
+    if (!seed) return
+    try {
+        getLocalStorage()?.setItem(SEED_KEY, JSON.stringify(seed))
+    } catch {
+        /* ignore quota / serialisation failure */
+    }
+}
+
+/** Read and clear the staged one-shot wizard seed. Returns null when none. */
+export function consumeWizardSeed(): WizardState | null {
+    const storage = getLocalStorage()
+    if (!storage) return null
+    try {
+        const raw = storage.getItem(SEED_KEY)
+        if (!raw) return null
+        storage.removeItem(SEED_KEY)
+        return JSON.parse(raw) as WizardState
+    } catch {
+        return null
+    }
+}
+
+interface WizardProviderProps {
+    children: React.ReactNode
+    /**
+     * Optional one-shot seed. When provided it initialises the wizard
+     * synchronously (so step content reflects it on first render) and wins over
+     * the persisted draft for this load. Omit for the normal create-new flow.
+     */
+    seed?: WizardState | null
+}
+
+export function WizardProvider({ children, seed = null }: WizardProviderProps): JSX.Element {
+    // Seed (when present) initialises synchronously so WizardBody's step state
+    // picks it up on first render; the persist effect below then writes it into
+    // the draft so a subsequent reload restores it via the normal path.
+    const [state, dispatch] = useReducer(reducer, undefined, () => seed ?? defaultWizardState())
     const [anchorRequest, internalSetAnchorRequest] = useState<AnchorRequest | null>(null)
 
-    // Hydrate from localStorage on mount.
+    // Hydrate from localStorage on mount — skipped when seeded so the explicit
+    // edit-this-design config is not clobbered by a stale persisted draft.
     useEffect(() => {
+        if (seed) return
         try {
             const raw = window.localStorage.getItem(STORAGE_KEY)
             if (raw) dispatch({ type: 'HYDRATE', payload: JSON.parse(raw) as WizardState })
         } catch {
             /* ignore parse failure */
         }
-    }, [])
+    }, [seed])
 
     // Persist every state change.
     useEffect(() => {
@@ -114,3 +194,4 @@ export function useWizard(): WizardContextValue {
 }
 
 export const WIZARD_STORAGE_KEY = STORAGE_KEY
+export const WIZARD_SEED_KEY = SEED_KEY
