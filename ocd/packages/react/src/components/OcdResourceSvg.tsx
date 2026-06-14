@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { OcdDocument } from './OcdDocument'
 import { OcdViewPage, OcdViewCoords, OcdViewLayer } from '@ocd/model'
 import { ResourceRectProps, ResourceForeignObjectProps, ResourceSvgProps, ResourceSvgContextMenuProps, ResourceSvgGhostProps, OcdMouseEvents, ConnectorSvgProps } from '../types/ReactComponentProperties'
-import { OcdContextMenu } from './OcdCanvas'
+import { OcdContextMenu, PortConnectContext } from './OcdCanvas'
 import { ActiveFileContext, SelectedResourceContext } from '../pages/OcdConsole'
 import { OcdDragResource, OcdSelectedResource } from '../types/Console'
 import { canConnectResources } from './OcdConnect'
@@ -469,6 +469,17 @@ export const OcdResourceSvg = memo(({ ocdConsoleConfig, ocdDocument, setOcdDocum
     const updateOcdDocument = useCallback((ocdDocument: OcdDocument) => setOcdDocument(ocdDocument), [setOcdDocument])
     // Draw.io-style drop-target hint while dragging a connection over this resource.
     const [connectHint, setConnectHint] = useState<'none' | 'valid' | 'invalid'>('none')
+    // Hover state drives the always-available connect "ports" on this resource.
+    const [hovered, setHovered] = useState(false)
+    // Port connect context: sourceModelId is non-empty while a hover-port drag is
+    // in progress; begin() starts one from this resource (see onPortMouseDown).
+    const portConnect = useContext(PortConnectContext)
+    // A connection drag (either the connect-mode body drag or a hover-port drag)
+    // is in progress. Source = the port source if set, else the body-drag source.
+    const connectSourceId = portConnect.sourceModelId !== ''
+        ? portConnect.sourceModelId
+        : (ocdConsoleConfig.config.connectMode ? ocdDocument.dragResource?.resource?.ocid : '')
+    const connectInProgress = !!connectSourceId
     const containerLayout = (resource.container && (!resource.detailsStyle || resource.detailsStyle === 'default'))
     const SvgRect = containerLayout ? OcdContainerRect : OcdSimpleRect
     const gX = resource.x
@@ -532,15 +543,26 @@ export const OcdResourceSvg = memo(({ ocdConsoleConfig, ocdDocument, setOcdDocum
         const contextPosition = {show: true, x: x, y: y, resource: resource}
         setContextMenu(contextPosition)
     }
+    // Press on a hover port: start an always-available connect drag from this
+    // resource. stopPropagation/preventDefault keep it off the canvas pan
+    // (onSVGDragStart) and the resource body move (onResourceDragStart) — the
+    // port is the only thing that initiates a connect without connect mode.
+    const onPortMouseDown = (e: React.MouseEvent<SVGElement>) => {
+        e.stopPropagation()
+        e.preventDefault()
+        setHovered(false)
+        portConnect.begin(resource, e.clientX, e.clientY)
+    }
     const onResourceMouseUp = (e: React.MouseEvent<SVGElement>) => {
         e.preventDefault()
         console.info('OcdResourceSvg: Resource Mouse Up', resource.ocid, e.clientX, e.clientY)
         if (!contextMenu.show) {
-            // Drag-to-connect: in connect mode, dropping the dragged resource onto
-            // any other resource records it as the connection target (wired on drag
-            // end). Default reparenting is unchanged when connect mode is off.
-            if (ocdConsoleConfig.config.connectMode) {
-                if (resource.id !== ocdDocument.dragResource.resource.id) {
+            // Drag-to-connect: while a connect drag is in progress (connect-mode body
+            // drag OR a hover-port drag), dropping onto another resource records it as
+            // the connection target (wired on drag end). Default reparenting is
+            // unchanged when no connect drag is active.
+            if (connectInProgress) {
+                if (resource.ocid !== connectSourceId) {
                     ocdDocument.dragResource.connectTarget = resource
                 }
                 setConnectHint('none')
@@ -560,12 +582,15 @@ export const OcdResourceSvg = memo(({ ocdConsoleConfig, ocdDocument, setOcdDocum
     // progress (connect mode + a drag source recorded), entering another resource
     // glows it green (the source has an FK for this type) or red (it does not).
     const onResourceMouseEnter = (e: React.MouseEvent<SVGElement>) => {
-        const dragSource = ocdDocument.dragResource?.resource
-        if (!ocdConsoleConfig.config.connectMode || !dragSource?.ocid || dragSource.ocid === resource.ocid) return
-        setConnectHint(canConnectResources(ocdDocument.design, dragSource.ocid, resource.ocid) ? 'valid' : 'invalid')
+        setHovered(true)
+        // Live drop-target highlight: green if the source has an FK for this type,
+        // red if not. Applies to both connect-mode and hover-port connect drags.
+        if (!connectInProgress || connectSourceId === resource.ocid) return
+        setConnectHint(canConnectResources(ocdDocument.design, connectSourceId, resource.ocid) ? 'valid' : 'invalid')
     }
     const onResourceMouseMove = (e: React.MouseEvent<SVGElement>) => {}
     const onResourceMouseLeave = (e: React.MouseEvent<SVGElement>) => {
+        setHovered(false)
         if (connectHint !== 'none') setConnectHint('none')
     }
     console.debug(`>> OcdResourceSvg: OcdResourceSvg: Render(${resource.id})`, resource.class, resource.ocid)
@@ -593,7 +618,20 @@ export const OcdResourceSvg = memo(({ ocdConsoleConfig, ocdDocument, setOcdDocum
                     source; this is the visual cue. */}
                 {ocdConsoleConfig.config.connectMode && !hidden && !resource.container &&
                     <circle className='ocd-connect-handle' cx={resource.w || 32} cy={(resource.h || 32) / 2} r={5} />}
-                <OcdForeignObject 
+                {/* Hover ports: always-available connect handles at the resource's
+                    edge anchors. Shown only on hover, when not already in a connect
+                    drag, not body-dragging, and not in connect mode (which has its
+                    own handle). Pressing one starts a connect drag (onPortMouseDown
+                    isolates it from pan/move via stop/preventDefault). */}
+                {!hidden && !ghost && !resource.container && hovered && !dragging && !connectInProgress && !ocdConsoleConfig.config.connectMode &&
+                    (['left', 'right', 'top', 'bottom'] as OcdConnectorSide[]).map((side) => {
+                        const anchor = getAnchor({ x: 0, y: 0, w: resource.w || 32, h: resource.h || 32 }, side)
+                        return <circle className='ocd-svg-connect-port'
+                            key={`${resource.id}-port-${side}`}
+                            cx={anchor.x} cy={anchor.y} r={4}
+                            onMouseDown={onPortMouseDown} />
+                    })}
+                <OcdForeignObject
                     ocdConsoleConfig={ocdConsoleConfig}
                     ocdDocument={ocdDocument}
                     setOcdDocument={updateOcdDocument}

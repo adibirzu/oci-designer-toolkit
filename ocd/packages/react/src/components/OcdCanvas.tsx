@@ -8,13 +8,13 @@ import { OcdAddResourceResponse, OcdDocument } from './OcdDocument'
 import { OcdResourceSvg, OcdConnector, OcdDragResourceGhostSvg, OcdSvgContextMenu } from './OcdResourceSvg'
 import { OcdResource, OcdViewConnector, OcdViewCoords, OcdViewLayer, OcdViewPage } from '@ocd/model'
 import { CanvasProps, OcdMouseEvents } from '../types/ReactComponentProperties'
-import { useCallback, useContext, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
 import { newDragData } from '../types/DragData'
 import { ActiveFileContext, SelectedResourceContext } from '../pages/OcdConsole'
 import { OcdUtils } from '@ocd/core'
 import { OcdDragResource, OcdSelectedResource } from '../types/Console'
 import { isLzOriginDesign, resolveLzPlacement } from '../landingzone/OcdLzPlacement'
-import { connectResources } from './OcdConnect'
+import { beginPortConnect, completePortConnect, connectResources, idlePortConnect, PortConnectState } from './OcdConnect'
 import { OcdDisplayConnector, useArchitectureRelation } from './OcdCanvasRelations'
 
 // Re-exported so existing consumers (and tests) can keep importing the relation
@@ -44,6 +44,24 @@ export interface Point {
     x: number
     y: number
 }
+
+/*
+** Always-available drag-to-connect ("hover ports"). A resource exposes small
+** edge handles on hover; pressing one starts a connect drag without toggling
+** connect mode. OcdResourceSvg (the source/target renderer) needs to know a port
+** connect is in progress (to show drop hints) and how to start one (the port's
+** onMouseDown) — both flow through this context so no shared component-prop types
+** have to change. `sourceModelId` is non-empty only while a port drag is active.
+*/
+export interface PortConnectApi {
+    sourceModelId: string
+    begin: (coords: OcdViewCoords, clientX: number, clientY: number) => void
+}
+
+export const PortConnectContext = createContext<PortConnectApi>({
+    sourceModelId: '',
+    begin: () => {},
+})
 
 export const calculateSvgWidth = (coords: OcdViewCoords[]): number => {
     const simpleWidth = 40
@@ -86,6 +104,12 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
     const [panOrigin, setPanOrigin] = useState<Point>({ x: 0, y: 0 });
     const transformMatrix = page.transform
     const [panning, setPanning] = useState(false)
+    // Hover-port drag-to-connect (always available, no connect-mode toggle).
+    // portConnect holds the logical state (active + source ids); portStart/portCursor
+    // are the rubber-band endpoints in matrix-group (model) space.
+    const [portConnect, setPortConnect] = useState<PortConnectState>(idlePortConnect())
+    const [portStart, setPortStart] = useState<Point>({ x: 0, y: 0 })
+    const [portCursor, setPortCursor] = useState<Point>({ x: 0, y: 0 })
     const [relationOverlayVisible, setRelationOverlayVisible] = useState(true)
     const [relationParentVisible, setRelationParentVisible] = useState(true)
     const [relationAssociationVisible, setRelationAssociationVisible] = useState(true)
@@ -244,6 +268,40 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
         return false
     }
 
+    // Convert a screen (client) point into matrix-group (model) coordinates so the
+    // port rubber-band lines up with resources regardless of pan/zoom. The
+    // matrix-group CTM already folds in both the svg position and the page transform.
+    const clientToModelPoint = (clientX: number, clientY: number): Point => {
+        const group = document.getElementById('matrix-group') as unknown as SVGGraphicsElement | null
+        const ctm = group ? group.getScreenCTM() : null
+        if (!ctm) return { x: 0, y: 0 }
+        // @ts-ignore DOMPoint is available in the browser runtime.
+        const point = new DOMPoint(clientX, clientY)
+        const { x, y } = point.matrixTransform(ctm.inverse())
+        return { x, y }
+    }
+    // Start a port connect from a resource's hover handle. Records the source on
+    // ocdDocument.dragResource (so target hover can stamp connectTarget and the
+    // self-guard works) and seeds the rubber-band endpoints. Pure logic lives in
+    // beginPortConnect (OcdConnect).
+    const beginPortConnectHandler = useCallback((coords: OcdViewCoords, clientX: number, clientY: number) => {
+        const rel = ocdDocument.getRelativeXY(coords)
+        const center = { x: rel.x + (coords.w || 32) / 2, y: rel.y + (coords.h || 32) / 2 }
+        const dragResource: OcdDragResource = OcdDocument.newDragResource(false)
+        dragResource.modelId = coords.ocid
+        dragResource.coordsId = coords.id
+        dragResource.class = coords.class
+        dragResource.resource = coords
+        ocdDocument.dragResource = dragResource
+        setPortConnect(beginPortConnect(coords))
+        setPortStart(center)
+        setPortCursor(clientToModelPoint(clientX, clientY))
+    }, [ocdDocument])
+    const portConnectApi: PortConnectApi = useMemo(() => ({
+        sourceModelId: portConnect.active ? portConnect.sourceModelId : '',
+        begin: beginPortConnectHandler,
+    }), [portConnect.active, portConnect.sourceModelId, beginPortConnectHandler])
+
     // SVG Drag & Drop / Pan Events
     const onSVGDragStart = (e: React.MouseEvent<SVGElement>) => {
         e.stopPropagation()
@@ -264,6 +322,11 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
     const onSVGDrag = (e: React.MouseEvent<SVGElement>) => {
         e.stopPropagation()
         e.preventDefault()
+        if (portConnect.active) {
+            // Port connect in progress: just track the cursor for the rubber-band.
+            setPortCursor(clientToModelPoint(e.clientX, e.clientY))
+            return
+        }
         if (dragging) {
             console.debug('OcdCanvas: SVG Drag')
             const ghostXY = ocdDocument.getRelativeXY(ocdDocument.dragResource.resource)
@@ -290,6 +353,26 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
     }
     const onSVGDragEnd = (e: React.MouseEvent<SVGElement>) => {
         e.stopPropagation()
+        if (portConnect.active) {
+            // Port connect release. The target resource (if any) stamped itself on
+            // dragResource.connectTarget on its mouse-up; wire it via the shared
+            // connect action. Release over empty space / invalid target cancels cleanly.
+            const connectTarget = ocdDocument.dragResource.connectTarget
+            const completion = completePortConnect(ocdDocument.design, portConnect, connectTarget?.ocid)
+            ocdDocument.dragResource = OcdDocument.newDragResource()
+            setPortConnect(idlePortConnect())
+            setPortStart({ x: 0, y: 0 })
+            setPortCursor({ x: 0, y: 0 })
+            if (completion.connected) {
+                ocdDocument.design = completion.design
+                setOcdDocument(OcdDocument.clone(ocdDocument))
+                if (!activeFile.modified) setActiveFile({ name: activeFile.name, modified: true })
+            } else {
+                // Nothing wired (no/invalid target) — redraw to clear the rubber-band.
+                setOcdDocument(OcdDocument.clone(ocdDocument))
+            }
+            return
+        }
         if (dragging) {
             console.info('OcdCanvas: SVG Drag End', ocdDocument.dragResource)
             const hasMoved = coordinates.x !== 0 || coordinates.y !== 0
@@ -607,6 +690,7 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
                         <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse"><rect width="80" height="80" fill="url(#small-grid)"></rect><path d="M 80 0 L 0 0 0 80" fill="none" stroke="darkgray" strokeWidth="1"></path></pattern>
                     </defs>
                     {page.grid && <OcdCanvasGrid/>}
+                    <PortConnectContext.Provider value={portConnectApi}>
                     <g id='matrix-group' transform={`matrix(${transformMatrix.join(' ')})`}>
                         <g>
                             {visibleCoords.map((r: OcdViewCoords) => {
@@ -657,6 +741,12 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
                                 x1={src.x + hw} y1={src.y + hh}
                                 x2={ghostTranslate.x + hw} y2={ghostTranslate.y + hh} />
                         })()}
+                        {/* Hover-port connect rubber-band (always-available path). */}
+                        {portConnect.active && (
+                            <line className='ocd-connect-rubber-band'
+                                x1={portStart.x} y1={portStart.y}
+                                x2={portCursor.x} y2={portCursor.y} />
+                        )}
                         <g className='ocd-ghost-group'
                             transform={`translate(${ghostTranslate.x}, ${ghostTranslate.y})`}
                             >
@@ -669,7 +759,8 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
                                         />}
                         </g>
                     </g>
-                    {contextMenu.show && contextMenu.resource && <OcdSvgContextMenu 
+                    </PortConnectContext.Provider>
+                    {contextMenu.show && contextMenu.resource && <OcdSvgContextMenu
                                             contextMenu={contextMenu} 
                                             ocdDocument={ocdDocument}
                                             setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)}
