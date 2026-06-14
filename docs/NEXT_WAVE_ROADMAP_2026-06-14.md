@@ -362,7 +362,18 @@ Severity-corrected from raw agent reports:
   Gates: `npm test` = react 62/521 + query 3/24 + core 2/11 (556) · react lib tsc 0 ·
   query+core full compile 0 · redaction 0.
 
-## FINAL STATUS: 17 of 18 cards complete. Security ✅, Observability ✅, Engineering 4/5.
+- **2026-06-14 — W5-E3 (edit-time clone cost) — RESOLVED BY MEASUREMENT, refactor declined.**
+  Built a benchmark (`OcdDocument.cloneBenchmark.test.ts`) measuring `OcdDocument.clone`
+  (full-design `structuredClone`): median **0.37ms @100, 1.03ms @300, 1.71ms @500 resources** —
+  sub-2ms even at 500, well inside a 16ms keystroke budget. The audit's "deep-clone per edit
+  is a bottleneck" premise does not hold; `structuredClone` is native/fast and the real
+  edit-latency cost is React re-render, not the clone. An `immer`/structural-sharing rewrite
+  of OcdDocument's central mutation path is high-risk (shared-reference mutation bugs) AND
+  `immer` needs `npm install` (violates the appdmg/overrides guardrail) — strongly negative-ROI
+  for ~1ms. Decision: **do not refactor**; benchmark retained as a regression guard so it's
+  re-measurable if the design model grows heavy (e.g. large embedded payloads).
+
+## FINAL STATUS: all 18 cards resolved. Security ✅, Observability ✅, Engineering ✅ (E3 = measured, no change warranted).
 **Only W5-E3 (edit-time clone cost) remains — intentionally deferred.** Rationale: it is the
 riskiest card (rewrites OcdDocument's central clone/mutation semantics — the "shared-reference
 mutation regression" risk), the prior wave sequenced its equivalent (Batch 4) last with
