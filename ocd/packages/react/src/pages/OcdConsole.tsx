@@ -19,6 +19,7 @@ import { ConsolePageProps, ConsoleToolbarProps, OcdSelectedResource } from '../t
 // initial entry chunk — each loads on first navigation to its page.
 const OcdBom = React.lazy(() => import('./OcdBom'))
 const OcdLandingZone = React.lazy(() => import('./OcdLandingZone'))
+const OcdSoftware = React.lazy(() => import('./OcdSoftware'))
 const OcdDiscovery = React.lazy(() => import('./OcdDiscovery'))
 const OcdClassicParity = React.lazy(() => import('./OcdClassicParity'))
 const OcdArchitectureAgent = React.lazy(() => import('./OcdArchitectureAgent'))
@@ -520,6 +521,9 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
             break;
         case 'landingzone':
             DisplayPage = OcdLandingZone
+            break;
+        case 'software':
+            DisplayPage = OcdSoftware
             break;
         case 'markdown':
             DisplayPage = OcdMarkdown

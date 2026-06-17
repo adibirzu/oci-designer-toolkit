@@ -257,6 +257,12 @@ export const menuItems: MenuItem[] = [
                 }
             },
             {
+                label: 'Software & Ansible Provisioning',
+                click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
+                    openSoftwareProvisioning(ocdConsoleConfig, setOcdConsoleConfig)
+                }
+            },
+            {
                 label: 'Export',
                 click: undefined,
                 submenu: [
@@ -760,6 +766,12 @@ export const editLandingZoneInWizard = (ocdDocument: OcdDocument, ocdConsoleConf
     }
     stageWizardSeed(seed)
     ocdConsoleConfig.config.displayPage = 'landingzone'
+    setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+}
+
+/** Switch to the Software & Ansible Provisioning page for the current design. */
+export const openSoftwareProvisioning = (ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function): void => {
+    ocdConsoleConfig.config.displayPage = 'software'
     setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
 }
 
