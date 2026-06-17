@@ -109,6 +109,8 @@ okitclassic/instance/
 baselines/oci-landing-zones/
 addons/oci-observability-end-to-end/dist/
 external/lz-addons/
+# Never commit env files into the embedded vendored LZNG copy (placeholder keys trip the redaction gate)
+ocd/external/landing-zone-next-gen/.env*
 
 # Testing
 test
