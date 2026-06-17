@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest'
 import { OcdViewCoords } from '@ocd/model'
 import { ArchitectureRelationGraph } from '../../architecture-agent/OcdArchitectureAgent'
-import { buildRelationInspectionRows, buildRelationOverlayConnectors, calculateSvgHeight, calculateSvgWidth } from '../OcdCanvas'
+import { buildRelationInspectionRows, buildRelationOverlayConnectors, calculateSvgHeight, calculateSvgWidth, compactRelationConnectorLabel } from '../OcdCanvas'
 
 const coords = (overrides: Partial<OcdViewCoords>): OcdViewCoords => ({
     id: 'coords',
@@ -65,13 +65,13 @@ describe('OcdCanvas derived data helpers', () => {
         expect(result.parentConnectors).toEqual([{
             startCoordsId: 'vcn-coords',
             endCoordsId: 'subnet-coords',
-            label: 'contained by',
+            label: 'contains',
             kind: 'parent',
         }])
         expect(result.associationConnectors).toEqual([{
             startCoordsId: 'instance-coords',
             endCoordsId: 'subnet-coords',
-            label: 'references subnetId',
+            label: 'subnetId',
             kind: 'association',
         }])
         expect(result.hiddenEdgeCount).toBe(0)
@@ -112,9 +112,15 @@ describe('OcdCanvas derived data helpers', () => {
         expect(result.associationConnectors).toEqual([{
             startCoordsId: 'route-table-coords',
             endCoordsId: 'drg-coords',
-            label: 'references drgId; routes traffic to DRG',
+            label: 'drgId; routes traffic to DRG',
             kind: 'association',
         }])
+    })
+
+    it('compacts verbose relation labels for canvas display', () => {
+        expect(compactRelationConnectorLabel('parent', 'Private subnet contained by App VCN')).toBe('contains')
+        expect(compactRelationConnectorLabel('association', 'OKE Cluster references options.serviceLbSubnetIds')).toBe('serviceLbSubnetIds')
+        expect(compactRelationConnectorLabel('association', 'Function references config.subnetIds[0]')).toBe('subnetIds')
     })
 
     it('builds relation inspector rows with display names and visibility state', () => {

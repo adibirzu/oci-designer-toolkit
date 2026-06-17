@@ -154,6 +154,107 @@ const discoveryMigrationBatch = [
     },
 ] as const
 
+const databaseMigrationBatch = [
+    {
+        terraformType: 'oci_database_migration_connection',
+        modelType: 'database_migration_connection',
+        requiredAttributes: ['display_name', 'connection_type', 'technology_type', 'username', 'password', 'key_id', 'vault_id'],
+    },
+    {
+        terraformType: 'oci_database_migration_job',
+        modelType: 'database_migration_job',
+        requiredAttributes: ['display_name', 'job_id', 'suspend_trigger'],
+    },
+] as const
+
+const securityBatch = [
+    {
+        terraformType: 'oci_vulnerability_scanning_container_scan_recipe',
+        modelType: 'vss_container_scan_recipe',
+        requiredAttributes: ['display_name', 'image_count', 'scan_settings.scan_level'],
+    },
+    {
+        terraformType: 'oci_vulnerability_scanning_container_scan_target',
+        modelType: 'vss_container_scan_target',
+        requiredAttributes: ['display_name', 'container_scan_recipe_id', 'target_registry.compartment_id', 'target_registry.type'],
+    },
+] as const
+
+const healthChecksBatch = [
+    {
+        terraformType: 'oci_health_checks_http_probe',
+        modelType: 'health_checks_http_probe',
+        requiredAttributes: ['protocol', 'targets', 'path', 'method', 'timeout_in_seconds'],
+    },
+    {
+        terraformType: 'oci_health_checks_ping_probe',
+        modelType: 'health_checks_ping_probe',
+        requiredAttributes: ['protocol', 'targets', 'port', 'timeout_in_seconds'],
+    },
+] as const
+
+const licenseManagerBatch = [
+    {
+        terraformType: 'oci_license_manager_configuration',
+        modelType: 'license_manager_configuration',
+        requiredAttributes: ['email_ids'],
+    },
+    {
+        terraformType: 'oci_license_manager_license_record',
+        modelType: 'license_manager_license_record',
+        requiredAttributes: ['display_name', 'product_license_id', 'is_perpetual', 'is_unlimited', 'license_count'],
+    },
+    {
+        terraformType: 'oci_license_manager_product_license',
+        modelType: 'license_manager_product_license',
+        requiredAttributes: ['display_name', 'is_vendor_oracle', 'license_unit', 'images.listing_id', 'images.package_version'],
+    },
+] as const
+
+const announcementsBatch = [
+    {
+        terraformType: 'oci_announcements_service_announcement_subscription',
+        modelType: 'announcement_subscription',
+        requiredAttributes: ['display_name', 'description', 'ons_topic_id', 'preferred_language', 'preferred_time_zone'],
+    },
+    {
+        terraformType: 'oci_announcements_service_announcement_subscriptions_filter_group',
+        modelType: 'announcement_subscription_filter_group',
+        requiredAttributes: ['announcement_subscription_id', 'name', 'filters.type', 'filters.value'],
+    },
+] as const
+
+const analyticsAccessBatch = [
+    {
+        terraformType: 'oci_analytics_analytics_instance_private_access_channel',
+        modelType: 'analytics_instance_private_access_channel',
+        requiredAttributes: ['analytics_instance_id', 'display_name', 'subnet_id', 'vcn_id', 'private_source_scan_hosts.scan_hostname'],
+    },
+    {
+        terraformType: 'oci_analytics_analytics_instance_vanity_url',
+        modelType: 'analytics_instance_vanity_url',
+        requiredAttributes: ['analytics_instance_id', 'hosts', 'ca_certificate', 'private_key', 'public_certificate'],
+    },
+] as const
+
+const serviceConfigurationBatch = [
+    {
+        terraformType: 'oci_audit_configuration',
+        modelType: 'audit_configuration',
+        requiredAttributes: ['retention_period_days'],
+    },
+    {
+        terraformType: 'oci_artifacts_container_configuration',
+        modelType: 'artifacts_container_configuration',
+        requiredAttributes: ['is_repository_created_on_first_push'],
+    },
+    {
+        terraformType: 'oci_cloud_guard_cloud_guard_configuration',
+        modelType: 'cloud_guard_configuration',
+        requiredAttributes: ['reporting_region', 'self_manage_resources', 'status'],
+    },
+] as const
+
 describe('OciResourceMap catalog curation', () => {
     it('maps the ADM and AI batch to stable OCD resource names', () => {
         curatedBatch.forEach(({ terraformType, modelType }) => {
@@ -216,5 +317,195 @@ describe('OciResourceMap catalog curation', () => {
 
     it('omits discovery attributes that cannot resolve to stable generated lookups', () => {
         expect(resourceAttributes.oci_log_analytics_log_analytics_entity).not.toContain('cloud_resource_id')
+    })
+
+    it('maps Database Migration connection and job resources to stable OCD resource names', () => {
+        databaseMigrationBatch.forEach(({ terraformType, modelType }) => {
+            expect(resourceMap[terraformType]).toBe(modelType)
+        })
+    })
+
+    it('curates Database Migration attributes without large computed result payloads', () => {
+        databaseMigrationBatch.forEach(({ terraformType, requiredAttributes }) => {
+            const attributes = resourceAttributes[terraformType] ?? []
+
+            requiredAttributes.forEach((attribute) => {
+                expect(attributes).toContain(attribute)
+            })
+        })
+
+        expect(resourceAttributes.oci_database_migration_job).not.toContain('progress')
+        expect(resourceAttributes.oci_database_migration_connection).not.toContain('ingress_ips')
+    })
+
+    it('resolves Database Migration connection references to generated resource keys', () => {
+        expect(elementOverrides.lookupOverrides.oci_database_migration_migration.source_database_connection_id).toEqual({
+            list: 'database_migration_connection',
+            element: 'id',
+        })
+        expect(elementOverrides.lookupOverrides.oci_database_migration_migration.target_database_connection_id).toEqual({
+            list: 'database_migration_connection',
+            element: 'id',
+        })
+        expect(elementOverrides.lookupOverrides.oci_database_migration_connection.vault_id).toEqual({
+            list: 'vault',
+            element: 'id',
+        })
+    })
+
+    it('maps container vulnerability scanning resources to stable VSS resource names', () => {
+        securityBatch.forEach(({ terraformType, modelType }) => {
+            expect(resourceMap[terraformType]).toBe(modelType)
+        })
+    })
+
+    it('curates container vulnerability scanning recipe and target attributes', () => {
+        securityBatch.forEach(({ terraformType, requiredAttributes }) => {
+            const attributes = resourceAttributes[terraformType] ?? []
+
+            requiredAttributes.forEach((attribute) => {
+                expect(attributes).toContain(attribute)
+            })
+        })
+    })
+
+    it('resolves container vulnerability scanning targets to VSS container recipes', () => {
+        expect(elementOverrides.lookupOverrides.oci_vulnerability_scanning_container_scan_target.container_scan_recipe_id).toEqual({
+            list: 'vss_container_scan_recipe',
+            element: 'id',
+        })
+    })
+
+    it('maps Health Checks probe resources to stable OCD resource names', () => {
+        healthChecksBatch.forEach(({ terraformType, modelType }) => {
+            expect(resourceMap[terraformType]).toBe(modelType)
+        })
+    })
+
+    it('curates editable Health Checks probe inputs without computed result URLs', () => {
+        healthChecksBatch.forEach(({ terraformType, requiredAttributes }) => {
+            const attributes = resourceAttributes[terraformType] ?? []
+
+            requiredAttributes.forEach((attribute) => {
+                expect(attributes).toContain(attribute)
+            })
+
+            expect(attributes).not.toContain('results_url')
+        })
+    })
+
+    it('maps License Manager resources to stable OCD resource names', () => {
+        licenseManagerBatch.forEach(({ terraformType, modelType }) => {
+            expect(resourceMap[terraformType]).toBe(modelType)
+        })
+    })
+
+    it('curates editable License Manager inputs without computed inventory counters', () => {
+        licenseManagerBatch.forEach(({ terraformType, requiredAttributes }) => {
+            const attributes = resourceAttributes[terraformType] ?? []
+
+            requiredAttributes.forEach((attribute) => {
+                expect(attributes).toContain(attribute)
+            })
+        })
+
+        expect(resourceAttributes.oci_license_manager_license_record).not.toContain('product_id')
+        expect(resourceAttributes.oci_license_manager_license_record).not.toContain('license_unit')
+        expect(resourceAttributes.oci_license_manager_product_license).not.toContain('active_license_record_count')
+        expect(resourceAttributes.oci_license_manager_product_license).not.toContain('images.id')
+    })
+
+    it('resolves License Manager license records to product licenses', () => {
+        expect(elementOverrides.lookupOverrides.oci_license_manager_license_record.product_license_id).toEqual({
+            list: 'license_manager_product_license',
+            element: 'id',
+        })
+    })
+
+    it('maps Announcements subscription resources to stable OCD resource names', () => {
+        announcementsBatch.forEach(({ terraformType, modelType }) => {
+            expect(resourceMap[terraformType]).toBe(modelType)
+        })
+    })
+
+    it('curates editable Announcements subscription inputs without action-only resources', () => {
+        announcementsBatch.forEach(({ terraformType, requiredAttributes }) => {
+            const attributes = resourceAttributes[terraformType] ?? []
+
+            requiredAttributes.forEach((attribute) => {
+                expect(attributes).toContain(attribute)
+            })
+        })
+
+        expect(resourceMap.oci_announcements_service_announcement_subscriptions_actions_change_compartment).toBeUndefined()
+        expect(resourceAttributes.oci_announcements_service_announcement_subscription).not.toContain('filter_groups.name')
+    })
+
+    it('resolves Announcements subscriptions to ONS topics and filter groups to subscriptions', () => {
+        expect(elementOverrides.lookupOverrides.oci_announcements_service_announcement_subscription.ons_topic_id).toEqual({
+            list: 'notification_topic',
+            element: 'id',
+        })
+        expect(elementOverrides.lookupOverrides.oci_announcements_service_announcement_subscriptions_filter_group.announcement_subscription_id).toEqual({
+            list: 'announcement_subscription',
+            element: 'id',
+        })
+    })
+
+    it('maps Analytics access endpoint resources to stable OCD resource names', () => {
+        analyticsAccessBatch.forEach(({ terraformType, modelType }) => {
+            expect(resourceMap[terraformType]).toBe(modelType)
+        })
+    })
+
+    it('curates editable Analytics access endpoint inputs without computed connection outputs', () => {
+        analyticsAccessBatch.forEach(({ terraformType, requiredAttributes }) => {
+            const attributes = resourceAttributes[terraformType] ?? []
+
+            requiredAttributes.forEach((attribute) => {
+                expect(attributes).toContain(attribute)
+            })
+        })
+
+        expect(resourceAttributes.oci_analytics_analytics_instance_private_access_channel).not.toContain('ip_address')
+        expect(resourceAttributes.oci_analytics_analytics_instance_private_access_channel).not.toContain('egress_source_ip_addresses')
+    })
+
+    it('resolves Analytics access endpoint references to generated resource keys', () => {
+        expect(elementOverrides.lookupOverrides.oci_analytics_analytics_instance_private_access_channel.analytics_instance_id).toEqual({
+            list: 'analytics_instance',
+            element: 'id',
+        })
+        expect(elementOverrides.lookupOverrides.oci_analytics_analytics_instance_private_access_channel.subnet_id).toEqual({
+            list: 'subnet',
+            element: 'id',
+        })
+        expect(elementOverrides.lookupOverrides.oci_analytics_analytics_instance_private_access_channel.network_security_group_ids).toEqual({
+            list: 'network_security_group',
+            element: 'id',
+        })
+        expect(elementOverrides.lookupOverrides.oci_analytics_analytics_instance_vanity_url.analytics_instance_id).toEqual({
+            list: 'analytics_instance',
+            element: 'id',
+        })
+    })
+
+    it('maps tenancy-level service configuration resources to stable OCD resource names', () => {
+        serviceConfigurationBatch.forEach(({ terraformType, modelType }) => {
+            expect(resourceMap[terraformType]).toBe(modelType)
+        })
+    })
+
+    it('curates editable service configuration inputs without computed provider metadata', () => {
+        serviceConfigurationBatch.forEach(({ terraformType, requiredAttributes }) => {
+            const attributes = resourceAttributes[terraformType] ?? []
+
+            requiredAttributes.forEach((attribute) => {
+                expect(attributes).toContain(attribute)
+            })
+        })
+
+        expect(resourceAttributes.oci_artifacts_container_configuration).not.toContain('namespace')
+        expect(resourceAttributes.oci_cloud_guard_cloud_guard_configuration).not.toContain('id')
     })
 })

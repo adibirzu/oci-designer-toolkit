@@ -125,6 +125,8 @@ export const resourceMap: OcdResourceMap = {
     "oci_service_mesh_mesh": "service_mesh",
     // Health Checks
     "oci_health_checks_http_monitor": "health_checks_http_monitor",
+    "oci_health_checks_http_probe": "health_checks_http_probe",
+    "oci_health_checks_ping_probe": "health_checks_ping_probe",
     // Log Analytics
     "oci_log_analytics_log_analytics_log_group": "log_analytics_log_group",
     // Management Agent
@@ -160,6 +162,8 @@ export const resourceMap: OcdResourceMap = {
     // Vulnerability Scanning
     "oci_vulnerability_scanning_host_scan_recipe": "vss_host_scan_recipe",
     "oci_vulnerability_scanning_host_scan_target": "vss_host_scan_target",
+    "oci_vulnerability_scanning_container_scan_recipe": "vss_container_scan_recipe",
+    "oci_vulnerability_scanning_container_scan_target": "vss_container_scan_target",
     // AI Language
     "oci_ai_language_project": "ai_language_project",
     // AI Vision
@@ -359,6 +363,23 @@ export const resourceMap: OcdResourceMap = {
     "oci_ai_anomaly_detection_ai_private_endpoint": "ai_anomaly_detection_private_endpoint",
     "oci_ai_anomaly_detection_data_asset": "ai_anomaly_detection_data_asset",
     "oci_ai_anomaly_detection_detect_anomaly_job": "ai_anomaly_detection_job",
+    // Batch 12 — Database Migration connections and job controls
+    "oci_database_migration_connection": "database_migration_connection",
+    "oci_database_migration_job": "database_migration_job",
+    // Batch 13 — License Manager configuration and license inventory
+    "oci_license_manager_configuration": "license_manager_configuration",
+    "oci_license_manager_license_record": "license_manager_license_record",
+    "oci_license_manager_product_license": "license_manager_product_license",
+    // Batch 14 — Announcements subscriptions
+    "oci_announcements_service_announcement_subscription": "announcement_subscription",
+    "oci_announcements_service_announcement_subscriptions_filter_group": "announcement_subscription_filter_group",
+    // Batch 15 — Analytics instance access endpoints
+    "oci_analytics_analytics_instance_private_access_channel": "analytics_instance_private_access_channel",
+    "oci_analytics_analytics_instance_vanity_url": "analytics_instance_vanity_url",
+    // Batch 16 — Tenancy-level service configuration
+    "oci_audit_configuration": "audit_configuration",
+    "oci_artifacts_container_configuration": "artifacts_container_configuration",
+    "oci_cloud_guard_cloud_guard_configuration": "cloud_guard_configuration",
     // Batch 11 — Block volume backups, DNS records, FSS snapshots, MySQL backups/config/replicas
     "oci_core_volume_backup": "volume_backup",
     "oci_core_volume_backup_policy": "volume_backup_policy",
@@ -1607,6 +1628,23 @@ export const resourceAttributes: OcdIncludedElements = {
         "is_enabled",
         "vantage_point_names"
     ],
+    "oci_health_checks_http_probe": [
+        "protocol",
+        "targets",
+        "port",
+        "path",
+        "method",
+        "headers",
+        "timeout_in_seconds",
+        "vantage_point_names"
+    ],
+    "oci_health_checks_ping_probe": [
+        "protocol",
+        "targets",
+        "port",
+        "timeout_in_seconds",
+        "vantage_point_names"
+    ],
     "oci_log_analytics_log_analytics_log_group": [
         "display_name",
         "description",
@@ -1817,6 +1855,22 @@ export const resourceAttributes: OcdIncludedElements = {
         "host_scan_recipe_id",
         "target_compartment_id",
         "instance_ids"
+    ],
+    "oci_vulnerability_scanning_container_scan_recipe": [
+        "display_name",
+        "image_count",
+        "scan_settings",
+        "scan_settings.scan_level"
+    ],
+    "oci_vulnerability_scanning_container_scan_target": [
+        "display_name",
+        "description",
+        "container_scan_recipe_id",
+        "target_registry",
+        "target_registry.compartment_id",
+        "target_registry.repositories",
+        "target_registry.type",
+        "target_registry.url"
     ],
     "oci_ai_language_project": [
         "display_name",
@@ -2915,6 +2969,102 @@ export const resourceAttributes: OcdIncludedElements = {
         "source_database_connection_id",
         "source_container_database_connection_id",
         "target_database_connection_id"
+    ],
+    "oci_database_migration_connection": [
+        "display_name",
+        "description",
+        "connection_type",
+        "technology_type",
+        "database_name",
+        "connection_string",
+        "host",
+        "port",
+        "username",
+        "password",
+        "replication_username",
+        "replication_password",
+        "db_system_id",
+        "key_id",
+        "vault_id",
+        "subnet_id",
+        "nsg_ids",
+        "security_protocol",
+        "ssl_mode",
+        "additional_attributes",
+        "additional_attributes.name",
+        "additional_attributes.value"
+    ],
+    "oci_database_migration_job": [
+        "display_name",
+        "job_id",
+        "suspend_trigger"
+    ],
+    "oci_license_manager_configuration": [
+        "email_ids"
+    ],
+    "oci_license_manager_license_record": [
+        "display_name",
+        "product_license_id",
+        "is_perpetual",
+        "is_unlimited",
+        "license_count",
+        "expiration_date",
+        "support_end_date"
+    ],
+    "oci_license_manager_product_license": [
+        "display_name",
+        "is_vendor_oracle",
+        "license_unit",
+        "vendor_name",
+        "images",
+        "images.listing_id",
+        "images.package_version"
+    ],
+    "oci_announcements_service_announcement_subscription": [
+        "display_name",
+        "description",
+        "ons_topic_id",
+        "preferred_language",
+        "preferred_time_zone"
+    ],
+    "oci_announcements_service_announcement_subscriptions_filter_group": [
+        "announcement_subscription_id",
+        "name",
+        "filters",
+        "filters.type",
+        "filters.value"
+    ],
+    "oci_analytics_analytics_instance_private_access_channel": [
+        "analytics_instance_id",
+        "display_name",
+        "network_security_group_ids",
+        "subnet_id",
+        "vcn_id",
+        "private_source_dns_zones",
+        "private_source_dns_zones.dns_zone",
+        "private_source_scan_hosts",
+        "private_source_scan_hosts.scan_hostname",
+        "private_source_scan_hosts.scan_port"
+    ],
+    "oci_analytics_analytics_instance_vanity_url": [
+        "analytics_instance_id",
+        "ca_certificate",
+        "description",
+        "hosts",
+        "passphrase",
+        "private_key",
+        "public_certificate"
+    ],
+    "oci_audit_configuration": [
+        "retention_period_days"
+    ],
+    "oci_artifacts_container_configuration": [
+        "is_repository_created_on_first_push"
+    ],
+    "oci_cloud_guard_cloud_guard_configuration": [
+        "reporting_region",
+        "self_manage_resources",
+        "status"
     ],
     "oci_ocvp_sddc": [
         "display_name",

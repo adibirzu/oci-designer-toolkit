@@ -4,7 +4,7 @@
 */
 
 import { describe, expect, it } from 'vitest'
-import { clampDesignerCommandCenterPosition, getDesignerCommandCenterMode } from '../OcdDesigner'
+import { clampDesignerCommandCenterPosition, getDesignerCommandCenterActionMetadata, getDesignerCommandCenterMode } from '../OcdDesigner'
 
 describe('OcdDesigner command center', () => {
     it('uses the start panel for an empty active canvas', () => {
@@ -28,5 +28,17 @@ describe('OcdDesigner command center', () => {
         expect(clampDesignerCommandCenterPosition({ x: -20, y: 0 }, bounds)).toEqual({ x: 8, y: 8 })
         expect(clampDesignerCommandCenterPosition({ x: 400, y: 300 }, bounds)).toEqual({ x: 172, y: 132 })
         expect(clampDesignerCommandCenterPosition({ x: 100, y: 90 }, bounds)).toEqual({ x: 100, y: 90 })
+    })
+
+    it('exposes AI Architect alongside Landing Zone in the shortcut actions', () => {
+        const actions = getDesignerCommandCenterActionMetadata()
+
+        expect(actions.map((action) => action.id)).toEqual(expect.arrayContaining(['landing-zone', 'ai-architect']))
+        expect(actions.find((action) => action.id === 'ai-architect')).toMatchObject({
+            label: 'AI Architect',
+            icon: 'AI',
+            title: 'Open AI Architect',
+            tone: 'primary',
+        })
     })
 })
