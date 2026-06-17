@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+    architectureRelationshipWarnings,
     buildArchitectureAgentPrompt,
     buildArchitectureAgentReadiness,
     buildArchitectureTerraformPreview,
@@ -11,6 +12,51 @@ import {
     parseArchitecturePlanResponse,
     validateArchitecturePlan,
 } from '../OcdArchitectureAgent'
+
+describe('OcdArchitectureAgent — silent-drop + relationship feedback', () => {
+    it('captures unsupported resource kinds the model asked for instead of dropping them silently', () => {
+        const response = JSON.stringify({
+            title: 'Plan',
+            summary: 'A plan',
+            assumptions: [],
+            resources: [
+                { kind: 'vcn', displayName: 'VCN' },
+                { kind: 'subnet', displayName: 'Subnet', public: true },
+                { kind: 'autonomous_database', displayName: 'ADB' },
+                { kind: 'mysql_db_system', displayName: 'MySQL' },
+            ],
+        })
+        const plan = parseArchitecturePlanResponse(response)
+        expect(plan.resources.map((r) => r.kind)).toEqual(['vcn', 'subnet'])
+        expect(plan.droppedKinds).toEqual(['autonomous_database', 'mysql_db_system'])
+        const validation = validateArchitecturePlan(plan)
+        expect(validation.warnings.some((w) => w.includes('autonomous_database') && w.includes('mysql_db_system'))).toBe(true)
+    })
+
+    it('warns when a dependent resource is missing its required peer', () => {
+        expect(architectureRelationshipWarnings({
+            title: 't', summary: 's', assumptions: [],
+            resources: [{ kind: 'oke_node_pool', displayName: 'np' }],
+        }).some((w) => w.includes('OKE node pool'))).toBe(true)
+
+        expect(architectureRelationshipWarnings({
+            title: 't', summary: 's', assumptions: [],
+            resources: [{ kind: 'functions_function', displayName: 'fn' }],
+        }).some((w) => w.includes('Functions function'))).toBe(true)
+    })
+
+    it('does not warn when dependent resources have their peers', () => {
+        const warnings = architectureRelationshipWarnings({
+            title: 't', summary: 's', assumptions: [],
+            resources: [
+                { kind: 'oke_cluster', displayName: 'c' },
+                { kind: 'oke_node_pool', displayName: 'np' },
+                { kind: 'subnet', displayName: 'pub', public: true },
+            ],
+        })
+        expect(warnings.some((w) => w.includes('node pool'))).toBe(false)
+    })
+})
 
 describe('OcdArchitectureAgent', () => {
     it('creates a deterministic OKE architecture plan from a chat prompt', () => {
@@ -33,15 +79,23 @@ describe('OcdArchitectureAgent', () => {
             'functions_function',
             'dynamic_group',
             'policy',
+            'network_security_group',
+            'bastion',
             'vault',
             'cloud_guard_target',
             'data_safe_target_database',
             'log_analytics_log_group',
+            'streaming_stream_pool',
+            'streaming_stream',
             'service_connector',
         ]))
         expect(design.model.oci.resources.api_gateway).toHaveLength(1)
         expect(design.model.oci.resources.functions_application).toHaveLength(1)
         expect(design.model.oci.resources.functions_function).toHaveLength(1)
+        expect(design.model.oci.resources.network_security_group).toHaveLength(3)
+        expect(design.model.oci.resources.bastion).toHaveLength(1)
+        expect(design.model.oci.resources.streaming_stream_pool).toHaveLength(1)
+        expect(design.model.oci.resources.streaming_stream).toHaveLength(1)
         expect(design.model.oci.resources.cloud_guard_target).toHaveLength(1)
         expect(design.model.oci.resources.service_connector).toHaveLength(1)
     })

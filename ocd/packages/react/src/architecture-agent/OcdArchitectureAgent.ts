@@ -9,11 +9,13 @@ export type ArchitectureResourceKind =
     | 'internet_gateway'
     | 'nat_gateway'
     | 'service_gateway'
+    | 'network_security_group'
     | 'load_balancer'
     | 'instance'
     | 'db_system'
     | 'oke_cluster'
     | 'oke_node_pool'
+    | 'bastion'
     | 'vault'
     | 'key'
     | 'log_group'
@@ -30,6 +32,8 @@ export type ArchitectureResourceKind =
     | 'cloud_guard_target'
     | 'log_analytics_log_group'
     | 'service_connector'
+    | 'streaming_stream_pool'
+    | 'streaming_stream'
 
 export interface ArchitecturePlanResource {
     readonly kind: ArchitectureResourceKind
@@ -46,6 +50,12 @@ export interface ArchitecturePlan {
     readonly summary: string
     readonly assumptions: readonly string[]
     readonly resources: readonly ArchitecturePlanResource[]
+    /**
+     * Resource kinds the model asked for that this tool does not support yet.
+     * Captured at normalize time (before unsupported kinds are filtered out) so
+     * the user is TOLD what was dropped instead of it vanishing silently.
+     */
+    readonly droppedKinds?: readonly string[]
 }
 
 export type ArchitectureValidationStatus = 'ready' | 'warning' | 'blocked'
@@ -119,11 +129,13 @@ const SUPPORTED_KINDS: ArchitectureResourceKind[] = [
     'internet_gateway',
     'nat_gateway',
     'service_gateway',
+    'network_security_group',
     'load_balancer',
     'instance',
     'db_system',
     'oke_cluster',
     'oke_node_pool',
+    'bastion',
     'vault',
     'key',
     'log_group',
@@ -140,6 +152,8 @@ const SUPPORTED_KINDS: ArchitectureResourceKind[] = [
     'cloud_guard_target',
     'log_analytics_log_group',
     'service_connector',
+    'streaming_stream_pool',
+    'streaming_stream',
 ]
 
 const MAX_PLAN_RESOURCES = 120
@@ -280,11 +294,44 @@ export function validateArchitecturePlan(plan: ArchitecturePlan): ArchitecturePl
     if (!plan.resources.some((resource) => resource.kind === 'vcn')) warnings.push('Architecture plan does not include a VCN resource.')
     if (!plan.resources.some((resource) => resource.kind === 'subnet')) warnings.push('Architecture plan does not include subnet resources.')
 
+    // Tell the user what the model asked for that we could not build, instead of
+    // silently dropping it (normalizePlan filters unsupported kinds out).
+    if (plan.droppedKinds && plan.droppedKinds.length > 0) {
+        warnings.push(`Dropped ${plan.droppedKinds.length} unsupported resource kind(s): ${plan.droppedKinds.join(', ')}. They are not in the design and will not be provisioned.`)
+    }
+
+    warnings.push(...architectureRelationshipWarnings(plan))
+
     return {
         status: statusFromFindings(errors, warnings),
         errors,
         warnings,
     }
+}
+
+/**
+ * Catch plans that schema-validate but will not deploy: dependent resources whose
+ * required peer is missing. Surfaced as warnings so the user can fix the prompt
+ * before exporting Terraform that would only fail at OCI apply time.
+ */
+export function architectureRelationshipWarnings(plan: ArchitecturePlan): string[] {
+    const warnings: string[] = []
+    const has = (kind: ArchitectureResourceKind) => plan.resources.some((resource) => resource.kind === kind)
+    const hasPublicSubnet = plan.resources.some((resource) => resource.kind === 'subnet' && resource.public === true)
+
+    if (has('oke_node_pool') && !has('oke_cluster')) {
+        warnings.push('OKE node pool has no OKE cluster in the plan; it cannot be provisioned on its own.')
+    }
+    if (has('functions_function') && !has('functions_application')) {
+        warnings.push('Functions function has no Functions application in the plan; it cannot be provisioned on its own.')
+    }
+    if (has('load_balancer') && !plan.resources.some((resource) => resource.kind === 'subnet')) {
+        warnings.push('Load balancer has no subnet in the plan; OCI requires at least one subnet.')
+    }
+    if (has('oke_cluster') && !hasPublicSubnet) {
+        warnings.push('OKE cluster has no public subnet; the service load balancer subnet usually must be public.')
+    }
+    return warnings
 }
 
 export function buildArchitectureRelationGraph(design: OcdDesign): ArchitectureRelationGraph {
@@ -431,7 +478,7 @@ export function buildArchitectureAgentPrompt(userPrompt: string): string {
         `Supported resource kinds: ${SUPPORTED_KINDS.join(', ')}.`,
         'Prefer secure private subnets, explicit network tiers, observability, governance tags, and cost controls when relevant.',
         'For agentic AI or Zero Trust requests, separate reasoning from execution: reasoning proposes, policy decides, and a scoped identity executes.',
-        'For agentic AI or Zero Trust requests, include API Gateway, Functions policy gate, dynamic group, IAM policy, Vault, Data Safe, Cloud Guard, Logging Analytics, and Service Connector resources when relevant.',
+        'For agentic AI or Zero Trust requests, include API Gateway, Functions policy gate, dynamic group, IAM policy, Vault, NSGs, Bastion, Data Safe, Cloud Guard, Logging Analytics, Service Connector, and Streaming resources when relevant.',
         `User request: ${userPrompt}`,
     ].join('\n')
 }
@@ -598,6 +645,7 @@ export function buildDesignFromArchitecturePlan(plan: ArchitecturePlan): OcdDesi
     let loadBalancerId = ''
     let functionsApplicationId = ''
     let dbSystemId = ''
+    let streamPoolId = ''
 
     plan.resources.forEach((resource) => {
         switch (resource.kind) {
@@ -623,6 +671,14 @@ export function buildDesignFromArchitecturePlan(plan: ArchitecturePlan): OcdDesi
                 item.compartmentId = compartment.id
                 item.vcnId = vcn.id
                 push(design, 'service_gateway', item)
+                break
+            }
+            case 'network_security_group': {
+                const item = OciModelResources.OciNetworkSecurityGroup.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.vcnId = vcn.id
+                push(design, 'network_security_group', item)
                 break
             }
             case 'load_balancer': {
@@ -670,6 +726,17 @@ export function buildDesignFromArchitecturePlan(plan: ArchitecturePlan): OcdDesi
                 item.compartmentId = compartment.id
                 item.subnetIds = appSubnetId ? [appSubnetId] : []
                 push(design, 'oke_node_pool', item)
+                break
+            }
+            case 'bastion': {
+                const item = OciModelResources.OciBastion.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.bastionType = 'standard'
+                item.targetSubnetId = appSubnetId
+                item.maxSessionTtlInSeconds = 10800
+                item.clientCidrBlockAllowList = []
+                push(design, 'bastion', item)
                 break
             }
             case 'vault': {
@@ -806,6 +873,26 @@ export function buildDesignFromArchitecturePlan(plan: ArchitecturePlan): OcdDesi
                 push(design, 'service_connector', item)
                 break
             }
+            case 'streaming_stream_pool': {
+                const item = OciModelResources.OciStreamingStreamPool.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.isPrivate = true
+                if (item.privateEndpointSettings) item.privateEndpointSettings.subnetId = appSubnetId
+                push(design, 'streaming_stream_pool', item)
+                streamPoolId = item.id
+                break
+            }
+            case 'streaming_stream': {
+                const item = OciModelResources.OciStreamingStream.newResource()
+                item.displayName = resource.displayName
+                item.compartmentId = compartment.id
+                item.partitions = Math.max(1, resource.count ?? 1)
+                item.retentionInHours = 24 * 7
+                item.streamPoolId = streamPoolId || design.model.oci.resources.streaming_stream_pool?.[0]?.id || ''
+                push(design, 'streaming_stream', item)
+                break
+            }
             default:
                 break
         }
@@ -827,10 +914,16 @@ export function buildDesignFromArchitecturePlan(plan: ArchitecturePlan): OcdDesi
 
 function normalizePlan(value: any): ArchitecturePlan {
     const resources = Array.isArray(value?.resources) ? value.resources : []
+    const droppedKinds = unique(
+        resources
+            .map((resource: any) => (typeof resource?.kind === 'string' ? resource.kind : ''))
+            .filter((kind: string) => kind && !SUPPORTED_KINDS.includes(kind as ArchitectureResourceKind)),
+    )
     return {
         title: String(value?.title || 'Agent Generated OCI Architecture'),
         summary: String(value?.summary || 'Generated by the architecture agent.'),
         assumptions: Array.isArray(value?.assumptions) ? value.assumptions.map(String) : [],
+        droppedKinds: droppedKinds.length > 0 ? droppedKinds : undefined,
         resources: resources
             .filter((resource: any) => SUPPORTED_KINDS.includes(resource?.kind as ArchitectureResourceKind))
             .map((resource: any): ArchitecturePlanResource => ({
@@ -932,6 +1025,9 @@ function buildAgenticZeroTrustPlan(_prompt: string): ArchitecturePlan {
             { kind: 'internet_gateway', displayName: 'Controlled Internet Gateway' },
             { kind: 'nat_gateway', displayName: 'Agent Egress NAT Gateway' },
             { kind: 'service_gateway', displayName: 'Private OCI Service Gateway' },
+            { kind: 'network_security_group', displayName: 'API Gateway Boundary NSG' },
+            { kind: 'network_security_group', displayName: 'Agent Runtime Boundary NSG' },
+            { kind: 'network_security_group', displayName: 'Data Control Boundary NSG' },
             { kind: 'load_balancer', displayName: 'Agent Tool Ingress Load Balancer' },
             { kind: 'web_app_firewall', displayName: 'Agent Tool Web Application Firewall' },
             { kind: 'api_gateway', displayName: 'Agent Tool API Gateway', public: true },
@@ -939,6 +1035,7 @@ function buildAgenticZeroTrustPlan(_prompt: string): ArchitecturePlan {
             { kind: 'functions_function', displayName: 'Deterministic Policy Decision Function' },
             { kind: 'oke_cluster', displayName: 'Reasoning Sandbox OKE Cluster' },
             { kind: 'oke_node_pool', displayName: 'Private Agent Runtime Node Pool' },
+            { kind: 'bastion', displayName: 'Break Glass Agent Runtime Bastion' },
             { kind: 'dynamic_group', displayName: 'Scoped Agent Execution Dynamic Group' },
             { kind: 'policy', displayName: 'Least Agency Execution Policy' },
             { kind: 'vault', displayName: 'Agent Secret Vault' },
@@ -949,6 +1046,8 @@ function buildAgenticZeroTrustPlan(_prompt: string): ArchitecturePlan {
             { kind: 'cloud_guard_target', displayName: 'Agentic Compartment Cloud Guard Target' },
             { kind: 'log_group', displayName: 'Agent Action Log Group' },
             { kind: 'log_analytics_log_group', displayName: 'Agent Evidence Analytics Log Group' },
+            { kind: 'streaming_stream_pool', displayName: 'Private Agent Evidence Stream Pool' },
+            { kind: 'streaming_stream', displayName: 'Policy Decision Evidence Stream', count: 3 },
             { kind: 'service_connector', displayName: 'Evidence Service Connector' },
             { kind: 'monitoring_alarm', displayName: 'Policy Gate Health Alarm' },
             { kind: 'budget', displayName: 'Agentic AI Cost Guardrail Budget' },

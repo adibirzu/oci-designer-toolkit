@@ -38,9 +38,11 @@
     "dist"
   ],
   "scripts": {
+    "predev": "node scripts/copy-static-assets.mjs",
     "dev": "vite",
     "clean": "rm -rf lib dist build",
     "purge": "npm run clean && rm -rf node_modules",
+    "prebuild": "node scripts/copy-static-assets.mjs",
     "build": "tsc -b ./tsconfig.lib.json && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

@@ -5,7 +5,7 @@
       "label": "OCI Operating Entities",
       "repo": "oci-landing-zones/oci-landing-zone-operating-entities",
       "kind": "commit",
-      "pinnedRef": "9a9a401b931e0460e461859f30d294d3d30a8aac",
+      "pinnedRef": "9d390e9581b9c7b70e0f6115b64289b36a1affcc",
       "role": "vendored-jsonnet",
       "setup": {
         "cloneSubdir": "gen",
@@ -20,7 +20,7 @@
       "label": "Landing Zone Next Gen",
       "repo": "iwanhoogendoorn/landing-zone-next-gen",
       "kind": "commit",
-      "pinnedRef": "caf8df8ae02161b3fbc5e87fcd08fe9da2ced464",
+      "pinnedRef": "47438563279915d93ab4e8f1013f9378de6b9f82",
       "role": "project-addon",
       "setup": {
         "localSubdir": "external/lz-addons/landing-zone-next-gen",
