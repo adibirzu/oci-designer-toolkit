@@ -21,6 +21,7 @@
 
 import { GeneratedFile } from './OcdLzGenerator'
 import { buildOcdDesignFromLz, OcdLzToModelResult } from './OcdLzToModel'
+import { adoptDesignIntoLandingZone } from './OcdLzFromDesign'
 
 /** A raw uploaded file: a name (possibly a full path) and its text content. */
 export interface LzUploadFile {
@@ -135,5 +136,9 @@ export function buildDesignFromLzUpload(
             'No recognised Landing Zone files found. Select the generated LZ output (at least iam.json or network.json).',
         )
     }
-    return buildOcdDesignFromLz(files, title)
+    const result = buildOcdDesignFromLz(files, title)
+    // Generated LZ JSON is LZ-origin but carries no wizard config, so derive one
+    // from its topology — that makes the imported design editable in the wizard
+    // and eligible for scaffold reconcile, the same as a wizard-authored design.
+    return { ...result, design: adoptDesignIntoLandingZone(result.design) }
 }
