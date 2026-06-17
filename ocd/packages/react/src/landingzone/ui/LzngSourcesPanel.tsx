@@ -45,11 +45,12 @@ function deriveBadge(status: LzUpdateStatus): Badge {
 }
 
 /** Display order + labels for the role groups. */
-const ROLE_ORDER: LzSourceRole[] = ['vendored-jsonnet', 'project-addon', 'reference']
+const ROLE_ORDER: LzSourceRole[] = ['vendored-jsonnet', 'project-addon', 'software-addon', 'reference']
 
 const ROLE_LABELS: Record<LzSourceRole, string> = {
     'vendored-jsonnet': 'Vendored jsonnet',
     'project-addon': 'Project add-ons',
+    'software-addon': 'Software add-ons',
     'reference': 'Reference',
 }
 
