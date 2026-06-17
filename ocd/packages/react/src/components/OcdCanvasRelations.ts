@@ -48,6 +48,19 @@ export type OcdDisplayConnector = OcdViewConnector & { label?: string }
 
 const connectorKey = (connector: OcdViewConnector): string => `${connector.startCoordsId}:${connector.endCoordsId}`
 
+const compactReferencePath = (label: string): string => {
+    const referenceMatch = label.match(/\breferences\s+(.+)$/)
+    const rawPath = referenceMatch?.[1]?.trim() ?? label.trim()
+    const pathSegments = rawPath.split('.').filter((segment) => segment.trim() !== '')
+    const lastSegment = pathSegments[pathSegments.length - 1] ?? rawPath
+    return lastSegment.replace(/\[\d+\]/g, '')
+}
+
+export const compactRelationConnectorLabel = (kind: ArchitectureRelationKind, label: string): string => {
+    if (kind === 'parent') return 'contains'
+    return compactReferencePath(label)
+}
+
 export const mergeConnectorLabels = (existingLabel = '', incomingLabel = ''): string | undefined => {
     const labels = [...existingLabel.split(';'), ...incomingLabel.split(';')]
         .map((label) => label.trim())
@@ -93,7 +106,7 @@ export const buildRelationOverlayConnectors = (
                 parentConnectors: addUniqueConnector(result.parentConnectors, {
                     startCoordsId: targetCoords.id,
                     endCoordsId: sourceCoords.id,
-                    label: edge.label,
+                    label: compactRelationConnectorLabel(edge.kind, edge.label),
                     kind: edge.kind,
                 }),
             }
@@ -103,7 +116,7 @@ export const buildRelationOverlayConnectors = (
             associationConnectors: addUniqueConnector(result.associationConnectors, {
                 startCoordsId: sourceCoords.id,
                 endCoordsId: targetCoords.id,
-                label: edge.label,
+                label: compactRelationConnectorLabel(edge.kind, edge.label),
                 kind: edge.kind,
             }),
         }

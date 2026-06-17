@@ -25,6 +25,7 @@ interface JsonnetGlobals {
 const globalScope = globalThis as unknown as JsonnetGlobals
 
 const WASM_FILENAME = 'libjsonnet.wasm'
+const VITE_DEV_WASM_URL = '/src/landingzone/wasm/libjsonnet.wasm'
 const WASM_MAGIC = [0x00, 0x61, 0x73, 0x6d]
 
 // The .wasm ships as a deterministic copy under the renderer's public root
@@ -32,6 +33,9 @@ const WASM_MAGIC = [0x00, 0x61, 0x73, 0x6d]
 // Candidates cover web dev, packaged file://, and worker asset contexts.
 function wasmCandidateUrls(): string[] {
     const candidates: string[] = []
+    // Vite dev serves source assets directly; the packaged desktop app copies
+    // the same binary to the public root as /libjsonnet.wasm.
+    candidates.push(VITE_DEV_WASM_URL)
     try {
         if (typeof document !== 'undefined' && document.baseURI) {
             candidates.push(new URL(WASM_FILENAME, document.baseURI).href)

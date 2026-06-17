@@ -58,6 +58,84 @@ interface DesignerAction {
 
 export const getDesignerCommandCenterMode = (coordsCount: number): 'empty' | 'compact' => coordsCount === 0 ? 'empty' : 'compact'
 
+export type DesignerCommandCenterActionId =
+    | 'landing-zone'
+    | 'ai-architect'
+    | 'terraform'
+    | 'lz-json'
+    | 'open'
+    | 'drawio'
+    | 'template'
+    | 'discovery'
+    | 'palette'
+
+export interface DesignerCommandCenterActionMetadata {
+    readonly id: DesignerCommandCenterActionId
+    readonly label: string
+    readonly icon: string
+    readonly title: string
+    readonly tone?: DesignerActionTone
+}
+
+export const getDesignerCommandCenterActionMetadata = (): DesignerCommandCenterActionMetadata[] => [
+    {
+        id: 'landing-zone',
+        label: 'Build from Landing Zone',
+        icon: 'LZ',
+        title: 'Open Landing Zone Next-Gen',
+        tone: 'primary',
+    },
+    {
+        id: 'ai-architect',
+        label: 'AI Architect',
+        icon: 'AI',
+        title: 'Open AI Architect',
+        tone: 'primary',
+    },
+    {
+        id: 'terraform',
+        label: 'Import Terraform',
+        icon: 'TF',
+        title: 'Import Terraform into the Designer',
+    },
+    {
+        id: 'lz-json',
+        label: 'Import LZ JSON',
+        icon: 'JS',
+        title: 'Import generated Landing Zone JSON files',
+    },
+    {
+        id: 'open',
+        label: 'Open Design',
+        icon: 'OP',
+        title: 'Open an OCD design file',
+    },
+    {
+        id: 'drawio',
+        label: 'Import draw.io',
+        icon: 'DI',
+        title: 'Import an uncompressed draw.io diagram',
+    },
+    {
+        id: 'template',
+        label: 'Use Template',
+        icon: 'TP',
+        title: 'Open architecture templates',
+    },
+    {
+        id: 'discovery',
+        label: 'Discovery',
+        icon: 'DS',
+        title: 'Open OCI Discovery',
+    },
+    {
+        id: 'palette',
+        label: 'Add Manually',
+        icon: 'AD',
+        title: 'Show the resource palette',
+    },
+]
+
 const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max)
 
 export const clampDesignerCommandCenterPosition = (
@@ -100,65 +178,23 @@ const OcdDesignerCommandCenter = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDo
         consoleConfig.config.showPalette = true
         setOcdConsoleConfig(consoleConfig)
     }
-    const actions = useMemo<DesignerAction[]>(() => [
-        {
-            id: 'landing-zone',
-            label: 'Build from Landing Zone',
-            icon: 'LZ',
-            title: 'Open Landing Zone Next-Gen',
-            tone: 'primary',
-            onClick: () => openPage('landingzone'),
-        },
-        {
-            id: 'terraform',
-            label: 'Import Terraform',
-            icon: 'TF',
-            title: 'Import Terraform into the Designer',
-            onClick: () => { void importFromTerraform(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig, setActiveFile) },
-        },
-        {
-            id: 'lz-json',
-            label: 'Import LZ JSON',
-            icon: 'JS',
-            title: 'Import generated Landing Zone JSON files',
-            onClick: () => { void importFromLandingZoneFiles(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig) },
-        },
-        {
-            id: 'open',
-            label: 'Open Design',
-            icon: 'OP',
-            title: 'Open an OCD design file',
-            onClick: () => { void loadDesign('', setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig, setActiveFile) },
-        },
-        {
-            id: 'drawio',
-            label: 'Import draw.io',
-            icon: 'DI',
-            title: 'Import an uncompressed draw.io diagram',
-            onClick: () => { void importFromDrawio(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig) },
-        },
-        {
-            id: 'template',
-            label: 'Use Template',
-            icon: 'TP',
-            title: 'Open architecture templates',
-            onClick: openTemplateGallery,
-        },
-        {
-            id: 'discovery',
-            label: 'Discovery',
-            icon: 'DS',
-            title: 'Open OCI Discovery',
-            onClick: () => openPage('discovery'),
-        },
-        {
-            id: 'palette',
-            label: 'Add Manually',
-            icon: 'AD',
-            title: 'Show the resource palette',
-            onClick: showResourcePalette,
-        },
-    ], [ocdConsoleConfig, ocdDocument, setActiveFile, setOcdConsoleConfig, setOcdDocument])
+    const actions = useMemo<DesignerAction[]>(() => {
+        const handlers: Record<DesignerCommandCenterActionId, () => void> = {
+            'landing-zone': () => openPage('landingzone'),
+            'ai-architect': () => openPage('agent'),
+            terraform: () => { void importFromTerraform(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig, setActiveFile) },
+            'lz-json': () => { void importFromLandingZoneFiles(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig) },
+            open: () => { void loadDesign('', setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig, setActiveFile) },
+            drawio: () => { void importFromDrawio(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig) },
+            template: openTemplateGallery,
+            discovery: () => openPage('discovery'),
+            palette: showResourcePalette,
+        }
+        return getDesignerCommandCenterActionMetadata().map((action) => ({
+            ...action,
+            onClick: handlers[action.id],
+        }))
+    }, [ocdConsoleConfig, ocdDocument, setActiveFile, setOcdConsoleConfig, setOcdDocument])
     const visibleActions = emptyCanvas ? actions : actions.filter((action) => action.id !== 'palette')
     const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
         if (event.button !== 0) return

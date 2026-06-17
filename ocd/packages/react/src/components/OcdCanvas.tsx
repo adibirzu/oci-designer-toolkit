@@ -8,7 +8,7 @@ import { OcdAddResourceResponse, OcdDocument } from './OcdDocument'
 import { OcdResourceSvg, OcdConnector, OcdDragResourceGhostSvg, OcdSvgContextMenu } from './OcdResourceSvg'
 import { OcdResource, OcdViewConnector, OcdViewCoords, OcdViewLayer, OcdViewPage } from '@ocd/model'
 import { CanvasProps, OcdMouseEvents } from '../types/ReactComponentProperties'
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { newDragData } from '../types/DragData'
 import { ActiveFileContext, SelectedResourceContext } from '../pages/OcdConsole'
 import { OcdUtils } from '@ocd/core'
@@ -25,6 +25,7 @@ export {
     mergeConnectors,
     mergeConnectorLabels,
     addUniqueConnector,
+    compactRelationConnectorLabel,
 } from './OcdCanvasRelations'
 export type {
     OcdRelationOverlayConnectors,
@@ -92,6 +93,11 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
     const {activeFile, setActiveFile} = useContext(ActiveFileContext)
     const uuid = () => `gid-${uuidv4()}`
     const page: OcdViewPage = ocdDocument.getActivePage()
+    const architectureAgentState = ocdDocument.design.userDefined?.architectureAgent
+    const isArchitectureAgentDesign = architectureAgentState?.generated === true
+    const architectureRelationPresetKey = isArchitectureAgentDesign
+        ? `${architectureAgentState?.planTitle ?? ocdDocument.design.metadata.title}:${architectureAgentState?.relationGraph?.nodes?.length ?? ocdDocument.getResources().length}`
+        : ''
     const visibleLayers = useMemo(() => page.layers.filter((l: OcdViewLayer) => l.visible).map((l: OcdViewLayer) => l.id), [page.layers])
     const visibleResourceIds = useMemo(() => ocdDocument.getResources().filter((r: any) => visibleLayers.includes(r.compartmentId)).map((r: any) => r.id), [ocdDocument, visibleLayers])
     const updateOcdDocument = useCallback((ocdDocument: OcdDocument) => setOcdDocument(ocdDocument), [setOcdDocument])
@@ -115,6 +121,16 @@ export const OcdCanvas = ({ dragData, setDragData, ocdConsoleConfig, ocdDocument
     const [relationAssociationVisible, setRelationAssociationVisible] = useState(true)
     const [relationLabelsVisible, setRelationLabelsVisible] = useState(true)
     const [relationInspectorVisible, setRelationInspectorVisible] = useState(false)
+    const appliedArchitectureRelationPresetKey = useRef('')
+    useEffect(() => {
+        if (!isArchitectureAgentDesign || !architectureRelationPresetKey || appliedArchitectureRelationPresetKey.current === architectureRelationPresetKey) return
+        setRelationOverlayVisible(true)
+        setRelationParentVisible(false)
+        setRelationAssociationVisible(true)
+        setRelationLabelsVisible(false)
+        setRelationInspectorVisible(false)
+        appliedArchitectureRelationPresetKey.current = architectureRelationPresetKey
+    }, [architectureRelationPresetKey, isArchitectureAgentDesign])
     const resourceDragHandlerState = useRef({
         activeFile,
         contextMenuShow: contextMenu.show,

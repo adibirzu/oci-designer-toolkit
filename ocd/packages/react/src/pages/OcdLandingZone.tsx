@@ -12,9 +12,9 @@
 **     Download JSON / Reset actions
 **   - clickable 5-step stepper (LzngStepper)
 **   - two-column body: left = step content (Back/Continue footer), right = a
-**     lightweight structural compartment preview (LzngPreviewDiagram) built
-**     directly from config — NO jsonnet run per step. The full generated IAM
-**     diagram is shown only on the Review step (LzngIamDiagram).
+**     live React-Flow Network Diagram built directly from config — NO jsonnet
+**     run per step. The full generated IAM diagram is shown only on the Review
+**     step (LzngIamDiagram).
 **   - a Debug slide-over drawer (LzngDebugDrawer) showing config.jsonnet
 **
 ** The page is theme-independent: all styling lives in css/ocd-lzng.css scoped
@@ -61,10 +61,7 @@ import { LzngHubStep } from '../landingzone/ui/LzngHubStep'
 import { LzngProjectsStep } from '../landingzone/ui/LzngProjectsStep'
 import { LzngTemplatesStep } from '../landingzone/ui/LzngTemplatesStep'
 import { LzngReviewStep } from '../landingzone/ui/LzngReviewStep'
-import { LzngPreviewDiagram, LzngPreviewFocus } from '../landingzone/ui/LzngPreviewDiagram'
-// LzngNetworkDiagram (full React-Flow resource view) is intentionally no longer
-// used on steps 1-4 — those now show the lightweight structural preview. The full
-// generated IAM diagram lives in the Review step (LzngIamDiagram).
+import { LzngNetworkDiagram } from '../landingzone/ui/LzngNetworkDiagram'
 import { LzngStepFooter } from '../landingzone/ui/LzngStepFooter'
 import { LzngDebugDrawer } from '../landingzone/ui/LzngDebugDrawer'
 import { buildDiagramModel } from '../landingzone/ui/LzngDiagramModel'
@@ -103,6 +100,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
     const [editingTitle, setEditingTitle] = useState(false)
     const [layout, setLayout] = useState<LzngLayout>('split')
     const [activeStep, setActiveStep] = useState(0)
+    const [diagramCollapsed, setDiagramCollapsed] = useState(false)
     const [notice, setNotice] = useState<{ kind: 'info' | 'error'; text: string } | null>(null)
     const [busy, setBusy] = useState(false)
     const [githubToken, setGithubToken] = useState('')
@@ -249,9 +247,6 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
     // diagram + downloads), regardless of the split/list/diagram layout toggle.
     const showLeft = isReview || layout === 'split' || layout === 'list'
     const showRight = (layout === 'split' || layout === 'diagram') && !isReview
-
-    const PREVIEW_FOCUS: LzngPreviewFocus[] = ['foundation', 'hub', 'projects', 'templates']
-    const previewFocus = PREVIEW_FOCUS[activeStep] ?? 'foundation'
 
     function goToStep(index: number): void {
         setActiveStep(Math.max(0, Math.min(LZNG_STEPS.length - 1, index)))
@@ -427,14 +422,37 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
 
                     {showRight && (
                         <div className='ocd-lzng-col-right'>
-                            <section className='ocd-lzng-card ocd-lzng-diagram-card'>
-                                <div className='ocd-lzng-card-head'>
-                                    <h2 className='ocd-lzng-card-title'>Preview from generated iam.json</h2>
-                                </div>
-                                <div className='ocd-lzng-prev-canvas'>
-                                    <LzngPreviewDiagram config={config} focus={previewFocus} />
-                                </div>
-                            </section>
+                            {layout === 'split' && diagramCollapsed ? (
+                                <button
+                                    type='button'
+                                    className='ocd-lzng-diagram-rail'
+                                    title='Show network diagram'
+                                    aria-label='Show network diagram'
+                                    onClick={() => setDiagramCollapsed(false)}
+                                >
+                                    <span className='ocd-lzng-diagram-rail-chevron' aria-hidden>‹</span>
+                                    <span className='ocd-lzng-diagram-rail-label'>Network Diagram</span>
+                                </button>
+                            ) : (
+                                <section className='ocd-lzng-card ocd-lzng-diagram-card'>
+                                    <div className='ocd-lzng-card-head'>
+                                        <h2 className='ocd-lzng-card-title'>Network Diagram</h2>
+                                        {layout === 'split' && (
+                                            <button
+                                                type='button'
+                                                className='ocd-lzng-btn'
+                                                title='Collapse to the side'
+                                                onClick={() => setDiagramCollapsed(true)}
+                                            >
+                                                Collapse ›
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className='ocd-lzng-diagram-canvas'>
+                                        <LzngNetworkDiagram config={config} />
+                                    </div>
+                                </section>
+                            )}
                         </div>
                     )}
                 </div>
