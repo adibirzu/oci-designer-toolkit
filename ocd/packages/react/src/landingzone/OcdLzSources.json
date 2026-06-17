@@ -22,6 +22,8 @@
       "kind": "commit",
       "pinnedRef": "47438563279915d93ab4e8f1013f9378de6b9f82",
       "role": "project-addon",
+      "default": true,
+      "embedded": "ocd/external/landing-zone-next-gen",
       "setup": {
         "localSubdir": "external/lz-addons/landing-zone-next-gen",
         "gitIgnored": true,

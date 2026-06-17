@@ -45,6 +45,10 @@ export interface LzSource {
     pinnedRef: string
     /** How the app uses this upstream source. */
     role?: LzSourceRole
+    /** Marks the canonical/always-used source for its role (e.g. the LZNG wizard source). */
+    default?: boolean
+    /** Repo-relative path of the committed, vendored (embedded) copy of this source, if any. */
+    embedded?: string
     /** Optional sub-path used to scope a compare URL (reserved; not required by the check). */
     comparePath?: string
     /** Local vendoring instructions for setup_landing_zone.mjs. */
