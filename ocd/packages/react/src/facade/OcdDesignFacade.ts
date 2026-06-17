@@ -6,6 +6,7 @@
 import { OcdDesign } from "@ocd/model"
 import { OcdTerraformImporter } from "@ocd/import"
 import { OcdDesignerBrowserActions } from "../actions/OcdDesignBrowserActions"
+import { adoptDesignIntoLandingZone } from "../landingzone/OcdLzFromDesign"
 
 /*
 ** Facade exists so we can switch between Electron based and Web based which will require a web server
@@ -147,13 +148,20 @@ export namespace OcdDesignFacade {
         return window.ocdAPI ? window.ocdAPI.exportToTerraform(design, directory) : Promise.reject(new Error('Currently Not Implemented'))
     }
     export const importFromTerraform = (): Promise<any> => {
-        if (window.ocdAPI) return window.ocdAPI.importFromTerraform()
+        // Brownfield adoption: turn the imported design into an editable Landing
+        // Zone wizard config (derives hub/spokes from the VCN topology) so existing
+        // Terraform can be round-tripped through the LZNG wizard, not just viewed.
+        const adopt = (result: any): any =>
+            result && result.design && !result.canceled
+                ? { ...result, design: adoptDesignIntoLandingZone(result.design) }
+                : result
+        if (window.ocdAPI) return window.ocdAPI.importFromTerraform().then(adopt)
         // Web path: pick .tf/.tf.json files in the browser and parse them with the
         // dependency-free importer (same one the Electron main process uses).
         return pickAndReadTextFiles('.tf').then(({ canceled, filename, text }) => {
             if (canceled || !text.trim()) return { canceled: true, filename: '', design: undefined }
             const importer = new OcdTerraformImporter()
-            return { canceled: false, filename, design: importer.import(text) }
+            return adopt({ canceled: false, filename, design: importer.import(text) })
         })
     }
 }
