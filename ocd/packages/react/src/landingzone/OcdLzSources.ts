@@ -18,7 +18,7 @@
 import lzSourcesManifest from './OcdLzSources.json'
 
 export type LzSourceKind = 'commit' | 'release'
-export type LzSourceRole = 'vendored-jsonnet' | 'reference' | 'project-addon'
+export type LzSourceRole = 'vendored-jsonnet' | 'reference' | 'project-addon' | 'software-addon'
 
 export interface LzSourceSetup {
     cloneSubdir?: string

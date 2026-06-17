@@ -42,6 +42,8 @@ export interface OcdSoftwarePackage {
         role: string
     }
     defaultVars?: Record<string, unknown>
+    /** Set on entries contributed by a registered `software-addon` source (its key). */
+    addonSource?: string
 }
 
 const PY = { tool: 'python3', minVersion: '3.8' } as const
@@ -176,19 +178,40 @@ export const OCD_SOFTWARE_CATALOG: readonly OcdSoftwarePackage[] = [
     },
 ]
 
-/** Lookup by id. */
-export function findSoftwarePackage(id: string): OcdSoftwarePackage | undefined {
-    return OCD_SOFTWARE_CATALOG.find((pkg) => pkg.id === id)
+/**
+ * Compose the effective catalogue from the seed list plus packages contributed
+ * by registered `software-addon` sources (already validated + id-namespaced by
+ * OcdSoftwareAddon). Seed entries win on id collision; add-on entries keep their
+ * stable order after the seed. Pass `[]` (the default) for the seed-only view.
+ */
+export function buildSoftwareCatalog(addonPackages: ReadonlyArray<OcdSoftwarePackage> = []): OcdSoftwarePackage[] {
+    const byId = new Map<string, OcdSoftwarePackage>()
+    for (const pkg of OCD_SOFTWARE_CATALOG) byId.set(pkg.id, pkg)
+    for (const pkg of addonPackages) if (!byId.has(pkg.id)) byId.set(pkg.id, pkg)
+    return [...byId.values()]
+}
+
+/** Lookup by id within a catalogue (defaults to the seed catalogue). */
+export function findSoftwarePackage(
+    id: string,
+    catalog: ReadonlyArray<OcdSoftwarePackage> = OCD_SOFTWARE_CATALOG,
+): OcdSoftwarePackage | undefined {
+    return catalog.find((pkg) => pkg.id === id)
 }
 
 /**
  * Case-insensitive search across id, name, vendor, category, and tags. Empty
- * query returns the full catalogue (stable order) so the UI can show everything.
+ * query returns the whole catalogue (stable order) so the UI can show
+ * everything. Defaults to the seed catalogue; pass a composed catalogue (from
+ * buildSoftwareCatalog) to include add-on packages.
  */
-export function searchSoftwareCatalog(query: string): OcdSoftwarePackage[] {
+export function searchSoftwareCatalog(
+    query: string,
+    catalog: ReadonlyArray<OcdSoftwarePackage> = OCD_SOFTWARE_CATALOG,
+): OcdSoftwarePackage[] {
     const q = query.trim().toLowerCase()
-    if (!q) return [...OCD_SOFTWARE_CATALOG]
-    return OCD_SOFTWARE_CATALOG.filter((pkg) =>
+    if (!q) return [...catalog]
+    return catalog.filter((pkg) =>
         [pkg.id, pkg.name, pkg.vendor, pkg.category, ...pkg.tags].some((field) => field.toLowerCase().includes(q)),
     )
 }
