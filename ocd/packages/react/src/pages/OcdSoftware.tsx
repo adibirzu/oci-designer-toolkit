@@ -12,10 +12,15 @@
 
 import React, { useMemo, useState } from 'react'
 import { ConsolePageProps } from '../types/Console'
+import { OcdDocument } from '../components/OcdDocument'
 import { buildSoftwareCatalog, searchSoftwareCatalog } from '../software/OcdSoftwareCatalog'
 import { PrereqSeverity, validateSoftwarePrerequisites } from '../software/OcdSoftwarePrereqs'
 import { buildAnsibleBundle } from '../software/OcdAnsibleBundle'
+import { getAnsibleSelection, writeAnsibleSelection } from '../software/OcdAnsibleSelection'
 import { DownloadFile, downloadTar, downloadTextFile } from '../landingzone/OcdLzDownloads'
+
+const sameSet = (a: ReadonlySet<string>, b: ReadonlySet<string>): boolean =>
+    a.size === b.size && [...a].every((id) => b.has(id))
 
 const SEVERITY_META: Record<PrereqSeverity, { label: string; color: string }> = {
     blocker: { label: 'Blocker', color: '#c0392b' },
@@ -25,14 +30,23 @@ const SEVERITY_META: Record<PrereqSeverity, { label: string; color: string }> = 
 }
 const SEVERITY_ORDER: PrereqSeverity[] = ['blocker', 'warning', 'manual', 'ok']
 
-const OcdSoftware = ({ ocdDocument }: ConsolePageProps): JSX.Element => {
+const OcdSoftware = ({ ocdDocument, setOcdDocument }: ConsolePageProps): JSX.Element => {
     const design = ocdDocument.design
     // Add-on packages would be merged in here once their manifests are loaded;
     // seed-only catalogue for now (buildSoftwareCatalog([]) ).
     const catalog = useMemo(() => buildSoftwareCatalog(), [])
     const [query, setQuery] = useState('')
-    const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(new Set())
+    // Seed the selection from what was persisted on the design (survives reload).
+    const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(() => new Set(getAnsibleSelection(design)))
+    const [savedIds, setSavedIds] = useState<ReadonlySet<string>>(() => new Set(getAnsibleSelection(design)))
     const [activeFile, setActiveFile] = useState('playbook.yml')
+
+    const dirty = !sameSet(selectedIds, savedIds)
+    const onSaveSelection = () => {
+        writeAnsibleSelection(design, [...selectedIds])
+        setOcdDocument(OcdDocument.clone(ocdDocument))
+        setSavedIds(new Set(selectedIds))
+    }
 
     const results = useMemo(() => searchSoftwareCatalog(query, catalog), [query, catalog])
     const selected = useMemo(() => catalog.filter((p) => selectedIds.has(p.id)), [catalog, selectedIds])
@@ -89,7 +103,13 @@ const OcdSoftware = ({ ocdDocument }: ConsolePageProps): JSX.Element => {
             </section>
 
             <section aria-labelledby='software-plan-heading' style={{ minWidth: 0 }}>
-                <h2 id='software-plan-heading' style={{ margin: '0 0 .5rem' }}>Provisioning Plan</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', margin: '0 0 .5rem' }}>
+                    <h2 id='software-plan-heading' style={{ margin: 0 }}>Provisioning Plan</h2>
+                    {dirty && <span title='Unsaved selection' style={{ color: '#b9770e', fontSize: '.8rem' }}>● unsaved</span>}
+                    <button type='button' onClick={onSaveSelection} disabled={!dirty} style={{ marginLeft: 'auto', padding: '.35rem .7rem', cursor: dirty ? 'pointer' : 'default' }}>
+                        Save to design
+                    </button>
+                </div>
                 <p style={{ margin: '0 0 .75rem' }}>
                     <strong>{selected.length}</strong> selected ·{' '}
                     {counts.filter((c) => c.n > 0).map((c) => (
