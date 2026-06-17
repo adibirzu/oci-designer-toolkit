@@ -25,10 +25,26 @@ describe('buildAnsibleBundle', () => {
         instance: [{ id: 'i-1', displayName: 'web-01' }, { id: 'i-2', displayName: 'db-01' }],
     })
 
-    it('emits the four bundle files plus the derived host list', () => {
+    it('emits the bundle files plus the derived host list', () => {
         const bundle = buildAnsibleBundle(design, [docker])
-        expect(Object.keys(bundle.files).sort()).toEqual(['inventory.yml', 'playbook.yml', 'requirements.yml', 'run.sh'])
+        expect(Object.keys(bundle.files).sort()).toEqual(['inventory.yml', 'outputs.tf', 'playbook.yml', 'requirements.yml', 'run.sh'])
         expect(bundle.hosts).toEqual(['web_01', 'db_01'])
+    })
+
+    it('prefers the exporter terraformResourceName and emits a matching outputs.tf', () => {
+        const exported = designWith({
+            instance: [{ id: 'i-1', displayName: 'Web 01', terraformResourceName: 'web_server' }],
+        })
+        const bundle = buildAnsibleBundle(exported, [docker])
+        expect(bundle.hosts).toEqual(['web_server'])
+        expect(bundle.files['inventory.yml']).toContain('ansible_host: "{{ web_server_public_ip }}"')
+        expect(bundle.files['outputs.tf']).toContain('output "web_server_public_ip" {')
+        expect(bundle.files['outputs.tf']).toContain('value = oci_core_instance.web_server.public_ip')
+    })
+
+    it('flags instances with no exported TF name for manual outputs wiring', () => {
+        const outputs = buildAnsibleBundle(design, [docker]).files['outputs.tf']
+        expect(outputs).toContain('# TODO: define output "web_01_public_ip"')
     })
 
     it('lists Galaxy roles by name and GitHub roles by src in requirements.yml', () => {
