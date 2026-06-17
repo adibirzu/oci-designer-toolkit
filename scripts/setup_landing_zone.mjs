@@ -85,22 +85,29 @@ function findSource(key) {
     return lzSources.find((source) => source.key === key)
 }
 
+// Each installable role checks out under its own sandboxed root inside external/.
+const ADDON_CHECKOUT_ROOTS = {
+    'project-addon': 'external/lz-addons',
+    'software-addon': 'external/software-addons',
+}
+
 function assertSafeExternalAddonPath(source) {
+    const allowedSubroot = ADDON_CHECKOUT_ROOTS[source.role]
     const localSubdir = source.setup?.localSubdir
-    if (!localSubdir || !localSubdir.startsWith('external/lz-addons/')) {
-        throw new Error(`Source '${source.key}' does not declare a safe external add-on checkout path`)
+    if (!allowedSubroot || !localSubdir || !localSubdir.startsWith(`${allowedSubroot}/`)) {
+        throw new Error(`Source '${source.key}' does not declare a safe external add-on checkout path under ${allowedSubroot ?? 'external/'}`)
     }
     const resolved = path.resolve(repoRoot, localSubdir)
-    const allowedRoot = path.resolve(repoRoot, 'external', 'lz-addons')
+    const allowedRoot = path.resolve(repoRoot, ...allowedSubroot.split('/'))
     if (!(resolved === allowedRoot || resolved.startsWith(`${allowedRoot}${path.sep}`))) {
-        throw new Error(`Source '${source.key}' checkout path escapes external/lz-addons`)
+        throw new Error(`Source '${source.key}' checkout path escapes ${allowedSubroot}`)
     }
     return resolved
 }
 
-function ensureInstallableProjectAddon(source) {
-    if (source.role !== 'project-addon') {
-        throw new Error(`Source '${source.key}' is not a project add-on and cannot be installed with --install`)
+function ensureInstallableAddon(source) {
+    if (!Object.prototype.hasOwnProperty.call(ADDON_CHECKOUT_ROOTS, source.role)) {
+        throw new Error(`Source '${source.key}' role '${source.role ?? ''}' is not installable with --install`)
     }
     if (source.setup?.install?.mode !== 'git-checkout') {
         throw new Error(`Source '${source.key}' does not declare setup.install.mode=git-checkout`)
@@ -192,7 +199,7 @@ async function updateSourcePin(source) {
 }
 
 async function installProjectAddon(source) {
-    const checkoutDir = ensureInstallableProjectAddon(source)
+    const checkoutDir = ensureInstallableAddon(source)
     const latest = useLatest || !source.pinnedRef ? await latestRef(source) : source.pinnedRef
     if (!latest) {
         throw new Error(`Could not resolve checkout ref for ${source.key}`)
