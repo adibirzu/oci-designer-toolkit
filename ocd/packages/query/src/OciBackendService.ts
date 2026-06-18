@@ -12,7 +12,7 @@
 */
 
 import { common } from 'oci-sdk'
-import { OciGenAiArchitectureQuery, OciGenAiArchitectureRequest, OciGenAiArchitectureResponse } from './OciGenAiArchitectureQuery.js'
+import { OciGenAiArchitectureImageRequest, OciGenAiArchitectureQuery, OciGenAiArchitectureRequest, OciGenAiArchitectureResponse } from './OciGenAiArchitectureQuery.js'
 import { OciQuery } from './OciQuery.js'
 import { OciReferenceDataQuery } from './OciReferenceDataQuery.js'
 import { OciResourceManagerJobOptions, OciResourceManagerPlanReview, OciResourceManagerQuery } from './OciResourceManagerQuery.js'
@@ -56,6 +56,7 @@ export interface ResourceManagerJobReviewRequest {
 }
 
 export type GenAiArchitecturePlanRequest = OciGenAiArchitectureRequest
+export type GenAiArchitecturePlanImageRequest = OciGenAiArchitectureImageRequest
 export type GenAiArchitecturePlanResponse = OciGenAiArchitectureResponse
 
 interface ParsedOciConfig {
@@ -199,4 +200,9 @@ export const getResourceManagerPlanReview = (request: ResourceManagerJobReviewRe
 export const generateArchitecturePlanWithGenAi = (request: GenAiArchitecturePlanRequest): Promise<GenAiArchitecturePlanResponse> => {
     const query = new OciGenAiArchitectureQuery(request.profile, request.region)
     return query.generateArchitecturePlan(request)
+}
+
+export const generateArchitecturePlanFromImageWithGenAi = (request: GenAiArchitecturePlanImageRequest): Promise<GenAiArchitecturePlanResponse> => {
+    const query = new OciGenAiArchitectureQuery(request.profile, request.region)
+    return query.generateArchitecturePlanFromImage(request)
 }

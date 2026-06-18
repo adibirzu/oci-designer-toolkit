@@ -1,6 +1,8 @@
 import type { OutputDataStringArray } from '@ocd/export'
 import {
+    validateGenAiArchitectureImageRequest,
     validateGenAiArchitectureRequest,
+    type GenAiArchitecturePlanImageRequest,
     type GenAiArchitecturePlanRequest,
     type OciResourceManagerJobOptions,
 } from '@ocd/query'
@@ -51,6 +53,7 @@ export interface ValidatedLzAddonUpdateRequest {
 }
 
 export type ValidatedGenAiArchitectureRouteRequest = GenAiArchitecturePlanRequest
+export type ValidatedGenAiArchitectureImageRouteRequest = GenAiArchitecturePlanImageRequest
 
 const isRecord = (value: unknown): value is UnknownRecord =>
     Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -209,6 +212,27 @@ export const validateGenAiArchitectureRouteRequest = (
         compartmentId: stringValue(request.compartmentId, 'compartmentId'),
         modelId: stringValue(request.modelId, 'modelId'),
         prompt: promptValue(request.prompt),
+        temperature: optionalNumber(request.temperature),
+        maxTokens: optionalNumber(request.maxTokens),
+    })
+}
+
+/*
+** Vision (image) route validator. imageDataUri is NOT run through stringValue because
+** a base64 image data-URI exceeds the generic MAX_STRING_LENGTH cap; the @ocd/query
+** validator enforces the image/* prefix and the decoded size cap instead.
+*/
+export const validateGenAiArchitectureImageRouteRequest = (
+    body: unknown,
+): ValidatedGenAiArchitectureImageRouteRequest => {
+    const request = bodyRecord(body)
+    return validateGenAiArchitectureImageRequest({
+        profile: stringValue(request.profile, 'profile', 'DEFAULT'),
+        region: stringValue(request.region, 'region'),
+        compartmentId: stringValue(request.compartmentId, 'compartmentId'),
+        modelId: stringValue(request.modelId, 'modelId'),
+        prompt: promptValue(request.prompt),
+        imageDataUri: typeof request.imageDataUri === 'string' ? request.imageDataUri : '',
         temperature: optionalNumber(request.temperature),
         maxTokens: optionalNumber(request.maxTokens),
     })

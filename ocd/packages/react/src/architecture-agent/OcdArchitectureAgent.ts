@@ -483,6 +483,26 @@ export function buildArchitectureAgentPrompt(userPrompt: string): string {
     ].join('\n')
 }
 
+/*
+** Vision prompt: instructs a multimodal model to read the attached architecture diagram
+** and emit the SAME strict ArchitecturePlan JSON the text path produces. Reuses the exact
+** schema/kinds text from buildArchitectureAgentPrompt so both paths stay in lock-step.
+*/
+export function buildArchitectureVisionPrompt(userPrompt: string): string {
+    const trimmed = userPrompt.trim()
+    return [
+        'You are an OCI architecture design agent for oci-designer-toolkit-next-gen.',
+        'Read the attached architecture diagram image and replicate the architecture it shows as an OCI architecture plan.',
+        'Identify every component, network tier, and connection visible in the diagram and map them to supported OCI resource kinds.',
+        'Return only valid JSON. Do not include markdown outside the JSON object.',
+        'Schema: {"title": string, "summary": string, "assumptions": string[], "resources": [{"kind": string, "displayName": string, "cidrBlock"?: string, "tier"?: string, "public"?: boolean, "count"?: number, "notes"?: string}]}',
+        `Supported resource kinds: ${SUPPORTED_KINDS.join(', ')}.`,
+        'Prefer secure private subnets, explicit network tiers, observability, governance tags, and cost controls when relevant.',
+        'For agentic AI or Zero Trust diagrams, separate reasoning from execution: reasoning proposes, policy decides, and a scoped identity executes.',
+        `Additional context from the user: ${trimmed || 'Replicate the architecture shown in the attached diagram as faithfully as possible.'}`,
+    ].join('\n')
+}
+
 export async function callOpenAiCompatibleArchitectureAgent(
     config: ArchitectureAgentLlmConfig,
     userPrompt: string,

@@ -17,6 +17,7 @@ const expectedOciBackendKeys: Array<keyof OciBackend> = [
     'queryDropdown',
     'queryDiscoverySnapshot',
     'generateArchitecturePlanWithGenAi',
+    'generateArchitecturePlanFromImageWithGenAi',
     'listStacks',
     'createStack',
     'updateStack',

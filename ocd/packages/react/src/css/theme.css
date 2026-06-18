@@ -1495,6 +1495,44 @@ details[open] > summary.summary-background {
     font: inherit;
 }
 
+.ocd-agent-provider-readiness {
+    display: grid;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid #CBD0CF;
+    border-radius: 8px;
+    background: #F7F8F7;
+    color: #2A2F2F;
+    font-size: 12px;
+}
+
+.ocd-agent-provider-readiness.is-ready {
+    border-color: #8BB3A0;
+    background: #F3FAF6;
+}
+
+.ocd-agent-provider-readiness.needs-config {
+    border-color: #D99B80;
+    background: #FFF7F2;
+}
+
+.ocd-agent-provider-readiness div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ocd-agent-provider-readiness span {
+    padding: 3px 7px;
+    border: 1px solid #E4E7E6;
+    border-radius: 999px;
+    background: #fff;
+    color: #3B4140;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 11px;
+}
+
 .ocd-agent-primary,
 .ocd-agent-apply {
     min-height: 34px;

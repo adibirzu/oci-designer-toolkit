@@ -22,6 +22,7 @@ contextBridge.exposeInMainWorld('ocdAPI', {
   queryDropdown: (profile: string, region: string) => ipcRenderer.invoke('ociQuery:queryDropdown', profile, region),
   queryDiscoverySnapshot: (profile: string, region: string, compartmentIds: string[] = []) => ipcRenderer.invoke('ociQuery:discoverySnapshot', profile, region, compartmentIds),
   generateArchitecturePlanWithGenAi: (profile: string, region: string, compartmentId: string, modelId: string, prompt: string, temperature?: number, maxTokens?: number) => ipcRenderer.invoke('ociGenAi:architecturePlan', profile, region, compartmentId, modelId, prompt, temperature, maxTokens),
+  generateArchitecturePlanFromImageWithGenAi: (profile: string, region: string, compartmentId: string, modelId: string, prompt: string, imageDataUri: string, temperature?: number, maxTokens?: number) => ipcRenderer.invoke('ociGenAi:architecturePlanFromImage', profile, region, compartmentId, modelId, prompt, imageDataUri, temperature, maxTokens),
   listStacks: (profile: string, region: string, compartmentId: string) => ipcRenderer.invoke('ociQuery:listStacks', profile, region, compartmentId),
   // Resource Manager
   createStack: (profile: string, region: string, compartmentId: string, stackName: string, data: OutputDataStringArray, jobOptions: OciResourceManagerJobOptions) => ipcRenderer.invoke('OciResourceManager:createStack', profile, region, compartmentId, stackName, data, jobOptions),

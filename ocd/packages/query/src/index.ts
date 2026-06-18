@@ -7,12 +7,18 @@ export { OciQuery } from './OciQuery.js'
 export { OciReferenceDataQuery } from './OciReferenceDataQuery.js'
 export {
     buildGenAiArchitectureChatRequest,
+    buildGenAiArchitectureVisionChatRequest,
+    DEFAULT_OCI_GENAI_VISION_MODEL_ID,
     extractGenAiArchitectureText,
     OciGenAiArchitectureQuery,
     redactArchitecturePrompt,
+    resolveGenAiArchitectureRequestDefaults,
+    validateArchitectureImageDataUri,
+    validateGenAiArchitectureImageRequest,
     validateGenAiArchitectureRequest,
 } from './OciGenAiArchitectureQuery.js'
 export type {
+    OciGenAiArchitectureImageRequest,
     OciGenAiArchitectureRequest,
     OciGenAiArchitectureResponse,
 } from './OciGenAiArchitectureQuery.js'
@@ -59,6 +65,7 @@ export {
     createJob,
     createStack,
     errorMessage,
+    generateArchitecturePlanFromImageWithGenAi,
     generateArchitecturePlanWithGenAi,
     getResourceManagerPlanReview,
     getOciConfigProfileNames,
@@ -76,6 +83,7 @@ export {
 } from './OciBackendService.js'
 export type {
     ProfilesResult,
+    GenAiArchitecturePlanImageRequest,
     GenAiArchitecturePlanRequest,
     GenAiArchitecturePlanResponse,
     QueryDiscoverySnapshotRequest,

@@ -6,10 +6,18 @@
 import { describe, expect, it } from 'vitest'
 import {
     buildGenAiArchitectureChatRequest,
+    buildGenAiArchitectureVisionChatRequest,
+    DEFAULT_OCI_GENAI_VISION_MODEL_ID,
     extractGenAiArchitectureText,
+    OciGenAiArchitectureQuery,
     redactArchitecturePrompt,
+    resolveGenAiArchitectureRequestDefaults,
+    validateArchitectureImageDataUri,
     validateGenAiArchitectureRequest,
 } from '../../../../query/src/OciGenAiArchitectureQuery'
+
+// Tiny synthetic 1x1 transparent PNG data-URI (no real diagram content).
+const TINY_PNG_DATA_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
 
 describe('OciGenAiArchitectureQuery helpers', () => {
     it('redacts OCI identifiers, key material labels, and sensitive topology before inference', () => {
@@ -59,14 +67,94 @@ describe('OciGenAiArchitectureQuery helpers', () => {
         })
     })
 
-    it('requires explicit profile, region, compartment, model, and prompt', () => {
+    it('requires region, compartment, and prompt after applying defaults', () => {
         expect(() => validateGenAiArchitectureRequest({
+            profile: 'DEFAULT',
+            region: '',
+            compartmentId: '<GENAI_COMPARTMENT_ID>',
+            modelId: '',
+            prompt: 'Create a VCN.',
+        })).toThrow('OCI region is required.')
+    })
+
+    it('resolves OCI GenAI defaults from backend environment variables', () => {
+        expect(resolveGenAiArchitectureRequestDefaults({
             profile: '',
+            region: '',
+            compartmentId: '',
+            modelId: '',
+            prompt: 'Create a VCN.',
+        }, {
+            OCD_ARCHITECT_OCI_PROFILE: 'ARCHITECT',
+            OCD_ARCHITECT_OCI_REGION: 'eu-frankfurt-1',
+            OCD_ARCHITECT_OCI_COMPARTMENT_ID: '<GENAI_COMPARTMENT_ID>',
+        })).toMatchObject({
+            profile: 'ARCHITECT',
             region: 'eu-frankfurt-1',
             compartmentId: '<GENAI_COMPARTMENT_ID>',
             modelId: 'cohere.command-a-03-2025',
-            prompt: 'Create a VCN.',
-        })).toThrow('OCI profile is required.')
+        })
+    })
+
+    it('builds a vision chat request with both a text part and the image data-URI, defaulting to the vision model', () => {
+        const ocid = ['ocid1', 'compartment', 'oc1', '', 'exampleuniquevalue'].join('.')
+        const request = buildGenAiArchitectureVisionChatRequest({
+            profile: 'DEFAULT',
+            region: 'eu-frankfurt-1',
+            compartmentId: '<GENAI_COMPARTMENT_ID>',
+            modelId: '',
+            prompt: `Replicate the diagram. Use ${ocid}`,
+            imageDataUri: TINY_PNG_DATA_URI,
+        })
+
+        // Vision model default applied when modelId is empty.
+        expect(request.chatDetails.servingMode).toMatchObject({
+            servingType: 'ON_DEMAND',
+            modelId: DEFAULT_OCI_GENAI_VISION_MODEL_ID,
+        })
+        const content = (request.chatDetails.chatRequest as { messages: Array<{ content: unknown[] }> }).messages[0].content as Array<Record<string, unknown>>
+        expect(content).toHaveLength(2)
+        const textPart = content.find((part) => part.type === 'TEXT') as { text: string }
+        const imagePart = content.find((part) => part.type === 'IMAGE') as { imageUrl: { url: string } }
+        expect(imagePart.imageUrl.url).toBe(TINY_PNG_DATA_URI)
+        // The text prompt is still redacted before inference.
+        expect(textPart.text).toContain('<OCI_OCID>')
+        expect(textPart.text).not.toContain(ocid)
+    })
+
+    it('honours an explicit vision modelId override', () => {
+        const request = buildGenAiArchitectureVisionChatRequest({
+            profile: 'DEFAULT',
+            region: 'eu-frankfurt-1',
+            compartmentId: '<GENAI_COMPARTMENT_ID>',
+            modelId: 'meta.llama-3.2-11b-vision-instruct',
+            prompt: 'Replicate the diagram.',
+            imageDataUri: TINY_PNG_DATA_URI,
+        })
+        expect(request.chatDetails.servingMode).toMatchObject({ modelId: 'meta.llama-3.2-11b-vision-instruct' })
+    })
+
+    it('validates the image data-URI: accepts a small png, rejects missing prefix, non-image, and oversized payloads', () => {
+        expect(validateArchitectureImageDataUri(TINY_PNG_DATA_URI)).toBe(TINY_PNG_DATA_URI)
+        expect(() => validateArchitectureImageDataUri('')).toThrow('Architecture diagram image is required.')
+        expect(() => validateArchitectureImageDataUri('not-a-data-uri')).toThrow(/base64 data URI/)
+        expect(() => validateArchitectureImageDataUri('data:application/pdf;base64,AAAA')).toThrow(/base64 data URI/)
+        const oversized = `data:image/png;base64,${'A'.repeat(8 * 1024 * 1024 * 2)}`
+        expect(() => validateArchitectureImageDataUri(oversized)).toThrow(/too large/)
+    })
+
+    it('rejects a ReadableStream response from the vision path', async () => {
+        const query = new OciGenAiArchitectureQuery('DEFAULT', undefined, () => ({
+            chat: async () => new ReadableStream<Uint8Array>(),
+        }))
+        await expect(query.generateArchitecturePlanFromImage({
+            profile: 'DEFAULT',
+            region: 'eu-frankfurt-1',
+            compartmentId: '<GENAI_COMPARTMENT_ID>',
+            modelId: '',
+            prompt: 'Replicate the diagram.',
+            imageDataUri: TINY_PNG_DATA_URI,
+        })).rejects.toThrow('OCI GenAI streaming responses are not supported for architecture planning.')
     })
 
     it('extracts text from generic chat choices', () => {
