@@ -5,7 +5,9 @@ test.describe('Architecture Agent smoke', () => {
     await page.goto('/')
     await expect(page.locator('.ocd-console')).toBeVisible({ timeout: 20_000 })
 
-    const agentButton = page.getByRole('button', { name: 'AI Architect' })
+    // Two "AI Architect" buttons exist (the console hero CTA and the command-bar
+    // action). Scope to the hero CTA to avoid a strict-mode clash.
+    const agentButton = page.locator('.ocd-agent-cta')
     await expect(agentButton).toBeVisible({ timeout: 10_000 })
     await agentButton.click()
 
