@@ -4,11 +4,13 @@
 */
 
 // import palette from '../json/palette.json'
+import { useEffect } from 'react'
 import { palette } from '../data/OcdPalette'
 import { PaletteResource } from '@ocd/model'
 import { DragData, Point } from '../types/DragData'
 import { PaletteProps } from '../types/ReactComponentProperties'
 import { normalizePaletteSearch, paletteSearchMatches } from './OcdPaletteSearch'
+import { CustomStencilManifest, hydrateStencilCss, manifestToPaletteProvider } from '../stencils/OcdStencilRegistry'
 
 type OcdPaletteGroup = {
     title: string
@@ -16,9 +18,36 @@ type OcdPaletteGroup = {
     resources: PaletteResource[]
 }
 
-const OcdProviderPalette = ({ ocdConsoleConfig, setDragData, searchTerm }: PaletteProps): JSX.Element => {
+// Build the runtime 'custom' palette providers (0 or 1) from the imported
+// stencil manifests stored on the design. Search-filtered like the static
+// providers. Wrapped by the caller in try/catch so a bad manifest never breaks
+// the static palette.
+const buildCustomProviders = (ocdDocument: PaletteProps['ocdDocument'], query: string): any[] => {
+    const customStencils = ocdDocument?.design?.userDefined?.customStencils as Record<string, CustomStencilManifest> | undefined
+    if (!customStencils || Object.keys(customStencils).length === 0) return []
+    const provider = manifestToPaletteProvider(Object.values(customStencils))
+    const groups = provider.groups
+        .map((group) => {
+            const groupMatches = paletteSearchMatches(query, provider.title, provider.provider, group.title)
+            const resources = groupMatches
+                ? group.resources
+                : group.resources.filter((resource) => paletteSearchMatches(query, provider.title, provider.provider, group.title, resource.title, resource.class))
+            return { ...group, resources }
+        })
+        .filter((group) => group.resources.length > 0)
+    return groups.length > 0 ? [{ ...provider, groups }] : []
+}
+
+const OcdProviderPalette = ({ ocdConsoleConfig, setDragData, searchTerm, ocdDocument }: PaletteProps): JSX.Element => {
     const query = normalizePaletteSearch(searchTerm)
-    const visibleProviders = palette.providers
+    // Inject runtime icon CSS for imported stencils once per design change so the
+    // tiles (and dropped canvas icons) render. Idempotent + DOM-guarded.
+    useEffect(() => {
+        try {
+            if (ocdDocument?.design) hydrateStencilCss(ocdDocument.design)
+        } catch { /* never let a bad stencil break the palette */ }
+    }, [ocdDocument?.design?.userDefined?.customStencils])
+    const staticProviders = palette.providers
         .filter((p) => ocdConsoleConfig.config.visibleProviderPalettes.includes(p.title))
         .map((provider) => {
             const groups = provider.groups
@@ -33,6 +62,11 @@ const OcdProviderPalette = ({ ocdConsoleConfig, setDragData, searchTerm }: Palet
             return { ...provider, groups }
         })
         .filter((provider) => provider.groups.length > 0)
+    let customProviders: any[] = []
+    try {
+        customProviders = buildCustomProviders(ocdDocument, query)
+    } catch { customProviders = [] }
+    const visibleProviders = [...staticProviders, ...customProviders]
     return (
         <div className='ocd-designer-palette'>
             {visibleProviders.map((provider) => {

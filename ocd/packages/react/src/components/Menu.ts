@@ -17,6 +17,7 @@ import { autoLayoutOptions } from '../data/OcdAutoLayoutOptions'
 import { OcdExternalFacade } from '../facade/OcdExternalFacade'
 import { buildDesignFromLzUpload } from '../landingzone/OcdLzFileImport'
 import { buildDesignFromDrawio } from '../import/OcdDrawioImport'
+import { injectStencilCss, validateStencilManifest } from '../stencils/OcdStencilRegistry'
 import { lzConfigToWizardSeed, stageWizardSeed } from '../landingzone/OcdLzWizardContext'
 import { OcdLogger } from '@ocd/core'
 // import { OcdDesign } from '../../../model/lib/cjs'
@@ -234,6 +235,12 @@ export const menuItems: MenuItem[] = [
                         label: 'draw.io Diagram',
                         click: (ocdDocument: OcdDocument, setOcdDocument: Function, ocdConsoleConfig: OcdConsoleConfig, setOcdConsoleConfig: Function) => {
                             importFromDrawio(setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig)
+                        }
+                    },
+                    {
+                        label: 'Custom Stencil (.json)',
+                        click: (ocdDocument: OcdDocument, setOcdDocument: Function) => {
+                            importStencilManifest(ocdDocument, setOcdDocument)
                         }
                     },
                     // {
@@ -820,6 +827,47 @@ export const importFromDrawio = (setOcdDocument: Function, ocdConsoleConfig: Ocd
 }
 
 
+/**
+ * Import a custom-stencil JSON manifest (single object or array) into the CURRENT
+ * design without a rebuild. Reuses the same File System Access `showOpenFilePicker`
+ * flow as the OKIT Json import. Each validated manifest is persisted to
+ * design.userDefined.customStencils[class] (so it travels with save/load) and its
+ * icon CSS is injected immediately; the imported stencils then appear in the
+ * palette and can be dropped onto the canvas.
+ */
+export const importStencilManifest = (ocdDocument: OcdDocument, setOcdDocument: Function): Promise<any> => {
+    const pickFile = async (): Promise<string> => {
+        const options = {
+            multiple: false,
+            types: [
+                {
+                    description: 'Custom Stencil Manifest (.json)',
+                    accept: { 'application/json': ['.json'] },
+                },
+            ],
+        }
+        // @ts-ignore - File System Access API
+        const [handle] = await window.showOpenFilePicker(options)
+        const file = await handle.getFile()
+        return file.text()
+    }
+    return pickFile().then((contents) => {
+        const manifests = validateStencilManifest(JSON.parse(contents))
+        const clone = OcdDocument.clone(ocdDocument)
+        if (!clone.design.userDefined.customStencils) clone.design.userDefined.customStencils = {}
+        manifests.forEach((manifest) => {
+            clone.design.userDefined.customStencils[manifest.class] = manifest
+            injectStencilCss(manifest)
+        })
+        logger.info(`Imported ${manifests.length} custom stencil(s)`)
+        setOcdDocument(clone)
+    }).catch((reason: any) => {
+        // AbortError = user dismissed the picker; only surface real failures.
+        if (reason?.name === 'AbortError') return
+        logger.warn('Custom stencil import failed', reason?.message ?? reason)
+        if (reason?.message) alert(reason.message)
+    })
+}
 
 export const saveDesign = () => {
 

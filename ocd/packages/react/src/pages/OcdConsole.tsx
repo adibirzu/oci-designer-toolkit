@@ -59,6 +59,7 @@ import { reconcileLzScaffold, addRealmAdFdFrames } from '../landingzone/OcdLzSca
 import { applyObservabilityOverlay, LZ_OBSERVABILITY_ENABLED_KEY } from '../landingzone/OcdLzObservability'
 import { applyOkeNativeOverlay, LZ_OKE_NATIVE_ENABLED_KEY } from '../landingzone/OcdLzOke'
 import { applyIamBlueprintOverlay, LZ_IAM_BLUEPRINT_ENABLED_KEY } from '../landingzone/OcdLzIamBlueprint'
+import { applyCrossTenancyHubSpokeOverlay, LZ_CROSSTENANCY_HUBSPOKE_ENABLED_KEY } from '../landingzone/OcdLzCrossTenancyHubSpoke'
 import { isLzOriginDesign } from '../landingzone/OcdLzPlacement'
 // Context Providers
 import { CacheProvider, useCache, useCacheDispatch } from '../contexts/OcdCacheContext'
@@ -331,6 +332,15 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         document.design.userDefined[LZ_IAM_BLUEPRINT_ENABLED_KEY] = true
         setOcdDocument(document)
     }
+    // Add the best-practice cross-tenancy hub-spoke topology (per-tenancy DRG +
+    // Remote Peering Connection naming the peer tenancy, non-overlapping CIDRs,
+    // DRG attachments) for connecting two OCI tenancies.
+    const onApplyCrossTenancy = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design.userDefined[LZ_CROSSTENANCY_HUBSPOKE_ENABLED_KEY] = true
+        document.design = applyCrossTenancyHubSpokeOverlay(document.design)
+        setOcdDocument(document)
+    }
     const onDesignerPage = ocdConsoleConfig.config.displayPage === 'designer'
     const isLzOrigin = isLzOriginDesign(ocdDocument.design)
     // Drag-to-connect mode toggle. When on, dropping a resource on another wires
@@ -439,6 +449,7 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                     {onDesignerPage && isLzOrigin && <div className='ocd-lz-observability ocd-console-toolbar-icon' title='Add DB Observability add-on (DBM/OPSI endpoints, Database Insight, Management Agent)' onClick={onApplyObservability} aria-hidden></div>}
                     {onDesignerPage && isLzOrigin && <div className='ocd-lz-oke ocd-console-toolbar-icon' title='Add OKE-native add-on (native subnets, enhanced cluster, node pool, workload identity, Vault)' onClick={onApplyOke} aria-hidden></div>}
                     {onDesignerPage && isLzOrigin && <div className='ocd-lz-iam ocd-console-toolbar-icon' title='Add Enterprise IAM blueprint (groups, least-privilege policies, governance tag namespace)' onClick={onApplyIamBlueprint} aria-hidden></div>}
+                    {onDesignerPage && isLzOrigin && <div className='ocd-lz-crosstenancy ocd-console-toolbar-icon' title='Add Cross-Tenancy hub-spoke (per-tenancy DRG + Remote Peering Connection naming the peer tenancy, non-overlapping CIDRs) — connect two OCI tenancies' onClick={onApplyCrossTenancy} aria-hidden></div>}
                     {onDesignerPage && <div className={`ocd-connect-mode ocd-console-toolbar-icon ${connectMode ? 'on' : ''}`} title='Connect mode: drag one resource onto another to wire their association' onClick={onConnectModeToggle} aria-hidden></div>}
                     <div className='cost-estimate ocd-console-toolbar-icon' title='BoM and Cost Estimate' onClick={onEstimateClick} aria-hidden></div>
                 </div>

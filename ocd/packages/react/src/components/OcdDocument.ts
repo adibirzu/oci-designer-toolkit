@@ -4,14 +4,17 @@
 */
 
 import { v4 as uuidv4 } from 'uuid'
-import { OcdAutoLayout, OcdDesign, OcdViewPage, OcdViewCoords, OcdViewLayer, OcdBaseModel, OcdViewPoint, OcdViewCoordsStyle, OcdResource, PaletteResource, 
+import { OcdAutoLayout, OcdDesign, OcdViewPage, OcdViewCoords, OcdViewLayer, OcdBaseModel, OcdViewPoint, OcdViewCoordsStyle, OcdResource, PaletteResource,
     OciModelResources, OciResource,
-    AzureModelResources, AzureResource, 
+    AwsModelResources, AwsResource,
+    AzureModelResources, AzureResource,
     GoogleModelResources, GoogleResource,
-    GeneralModelResources, GeneralResource } from '@ocd/model'
+    GeneralModelResources, GeneralResource,
+    CustomResource } from '@ocd/model'
 import { OcdUtils } from '@ocd/core'
 import { additionTitleInfo } from '../data/OcdAdditionTitleInfo'
 import { OcdDragResource, OcdSelectedResourceModel, OcdSelectedResource, OcdSelectedResourceView } from '../types/Console'
+import { newCustomResourceInstance } from '../stencils/OcdStencilRegistry'
 
 export interface OcdAddResourceResponse {
     modelResource: OcdResource | undefined
@@ -100,6 +103,7 @@ export class OcdDocument {
     isOciResourceList(key: string): boolean {return Object.hasOwn(this.design.model.oci.resources, key)}
     getOciResourceList(key: string) {return OcdDesign.getOciResourceList(this.design, key)}
     getOciResourcesObject() {return this.design.model.oci.resources}
+    getAwsResourcesObject() {return Object.hasOwn(this.design.model, 'aws') ? this.design.model.aws!.resources : {}}
     getAzureResourcesObject() {return this.design.model.azure.resources}
     getGoogleResourcesObject() {return this.design.model.google.resources}
     getResourceLists() {return OcdDesign.getResourceLists(this.design)}
@@ -109,6 +113,11 @@ export class OcdDocument {
         if (!Object.hasOwn(this.design.model, 'oci')) this.design.model.oci = {resources: {}, vars: [], tags: {}}
         if (!Object.hasOwn(this.design.model.oci.resources, key)) this.design.model.oci.resources[key] = []
         this.design.model.oci.resources[key].push(modelResource)
+    }
+    addAwsReasourceToList(key: string, modelResource: AwsResource) {
+        if (!Object.hasOwn(this.design.model, 'aws')) this.design.model.aws = {resources: {}, vars: []}
+        if (!Object.hasOwn(this.design.model.aws!.resources, key)) this.design.model.aws!.resources[key] = []
+        this.design.model.aws!.resources[key].push(modelResource)
     }
     addAzureReasourceToList(key: string, modelResource: AzureResource) {
         if (!Object.hasOwn(this.design.model, 'azure')) this.design.model.azure = {resources: {}, vars: []}
@@ -125,20 +134,40 @@ export class OcdDocument {
         if (!Object.hasOwn(this.design.model.general.resources, key)) this.design.model.general.resources[key] = []
         this.design.model.general.resources[key].push(modelResource)
     }
+    addCustomReasourceToList(key: string, modelResource: CustomResource) {
+        if (!Object.hasOwn(this.design.model, 'custom')) this.design.model.custom = {resources: {}, vars: []}
+        if (!Object.hasOwn(this.design.model.custom!.resources, key)) this.design.model.custom!.resources[key] = []
+        this.design.model.custom!.resources[key].push(modelResource)
+    }
     addResource(paletteResource: PaletteResource, compartmentId: string): OcdAddResourceResponse {
         switch(paletteResource.provider) {
             case 'oci':
                 return this.addOciResource(paletteResource, compartmentId)
+            case 'aws':
+                return this.addAwsResource(paletteResource, compartmentId)
             case 'azure':
                 return this.addAzureResource(paletteResource, compartmentId)
             case 'google':
                 return this.addGoogleResource(paletteResource, compartmentId)
             case 'general':
                 return this.addGeneralResource(paletteResource, compartmentId)
+            case 'custom':
+                return this.addCustomResource(paletteResource, compartmentId)
             default:
                 alert(`Provider ${paletteResource.provider} has not yet been implemented.`)
                 return {modelResource: undefined, additionalResources: []}
         }
+    }
+    addCustomResource(paletteResource: PaletteResource, compartmentId: string): OcdAddResourceResponse {
+        // Manifest was persisted to design.userDefined.customStencils[class] at import time.
+        const manifest = this.design.userDefined?.customStencils?.[paletteResource.class]
+        if (!manifest) {
+            alert(`Custom stencil ${paletteResource.class} could not be found. Re-import the stencil JSON via File > Import > Custom Stencil.`)
+            return {modelResource: undefined, additionalResources: []}
+        }
+        const modelResource = newCustomResourceInstance(manifest, compartmentId)
+        this.addCustomReasourceToList(paletteResource.class, modelResource)
+        return {modelResource: modelResource, additionalResources: []}
     }
     addOciResource(paletteResource: PaletteResource, compartmentId: string): OcdAddResourceResponse {
         const resourceList = paletteResource.class.split('-').slice(1).join('_')
@@ -171,11 +200,42 @@ export class OcdDocument {
             return {modelResource: undefined, additionalResources: []}
         }
     }
+    addAwsResource(paletteResource: PaletteResource, compartmentId: string): OcdAddResourceResponse {
+        const resourceList = paletteResource.class.split('-').slice(1).join('_')
+        const resourceClass = paletteResource.class.toLowerCase().split('-').map((w) => `${w.charAt(0).toUpperCase()}${w.slice(1)}`).join('')
+        const resourceNamespace: string = `${resourceClass}`
+        // @ts-ignore
+        const client = AwsModelResources[resourceNamespace]
+        console.debug('OcdDocument: Namespace',resourceNamespace , client)
+        if (client) {
+            const modelResource = client.newResource()
+            modelResource.compartmentId = compartmentId
+            console.debug('OcdDocument:', modelResource)
+            this.addAwsReasourceToList(resourceList, modelResource)
+            const response: OcdAddResourceResponse = {modelResource: modelResource, additionalResources: []}
+            const additionalResources = client.getAdditionalResources?.() // Use Optional Chaining to test if function exists
+            if (additionalResources) {
+                console.debug('OcdDocument: Creating Additional Resources', additionalResources)
+                additionalResources.forEach((r: PaletteResource) => {
+                    const additionalResource = this.addAwsResource(r, compartmentId).modelResource
+                    if (additionalResource) {
+                        response.additionalResources.push(additionalResource)
+                        this.setResourceParent(additionalResource.id, modelResource.id)
+                        client.setAdditionalResourceValues?.(modelResource, additionalResource)
+                    }
+                })
+            }
+            return response
+        } else {
+            alert(`Aws Resource ${resourceClass} has not yet been implemented.`)
+            return {modelResource: undefined, additionalResources: []}
+        }
+    }
     addAzureResource(paletteResource: PaletteResource, compartmentId: string): OcdAddResourceResponse {
         const resourceList = paletteResource.class.split('-').slice(1).join('_')
         const resourceClass = paletteResource.class.toLowerCase().split('-').map((w) => `${w.charAt(0).toUpperCase()}${w.slice(1)}`).join('')
         const resourceNamespace: string = `${resourceClass}`
-        // @ts-ignore 
+        // @ts-ignore
         const client = AzureModelResources[resourceNamespace]
         console.debug('OcdDocument: Namespace',resourceNamespace , client)
         if (client) {
