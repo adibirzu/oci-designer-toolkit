@@ -180,6 +180,27 @@ canvas:
   using `OciModelResources` factories and stores provenance in
   `design.userDefined.architectureAgent`.
 
+Provider defaults are resolved by
+`@ocd/react/src/architecture-agent/OcdArchitectureAgentConfig.ts`.
+Browser-visible defaults use `VITE_` variables:
+
+- `VITE_OCD_ARCHITECT_PROVIDER`: `local`, `openai`, or `oci-genai`.
+- `VITE_OCD_ARCHITECT_OPENAI_ENDPOINT` and
+  `VITE_OCD_ARCHITECT_OPENAI_MODEL`: preselect the OpenAI-compatible provider.
+  API keys remain runtime-only UI input and are not read from `VITE_` variables.
+- `VITE_OCD_ARCHITECT_OCI_PROFILE`, `VITE_OCD_ARCHITECT_OCI_REGION`,
+  `VITE_OCD_ARCHITECT_OCI_COMPARTMENT_ID`, and
+  `VITE_OCD_ARCHITECT_OCI_MODEL_ID`: preselect the OCI GenAI provider. The model
+  defaults to `cohere.command-a-03-2025`.
+- `VITE_OCD_ARCHITECT_TEMPERATURE` and `VITE_OCD_ARCHITECT_MAX_TOKENS`: shared
+  model tuning defaults.
+
+The local web backend and desktop bridge also accept backend-only OCI GenAI
+defaults: `OCD_ARCHITECT_OCI_PROFILE`, `OCD_ARCHITECT_OCI_REGION`,
+`OCD_ARCHITECT_OCI_COMPARTMENT_ID`, and `OCD_ARCHITECT_OCI_MODEL_ID`. These do
+not carry credentials; OCI authentication continues to come from the selected
+OCI SDK profile.
+
 Agentic Zero Trust plans map the reasoning -> policy -> scoped-execution pattern
 to editable OCI resources where the designer model supports them: API Gateway,
 Functions, Web Application Firewall, Dynamic Groups, IAM policies, Vault, Data
