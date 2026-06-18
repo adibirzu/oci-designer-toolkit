@@ -975,12 +975,50 @@ export const palette = {
         //         }
         //     ]
         // },
-        // {
-        //     "title": "AWS",
-        //     "provider": "aws",
-        //     "class": "aws-provider",
-        //     "groups": []
-        // },
+        {
+            "title": "AWS",
+            "provider": "aws",
+            "class": "aws-provider",
+            "groups": [
+                {
+                    "title": "Networking",
+                    "class": "aws-network",
+                    "resources": [
+                        {
+                            "container": true,
+                            "title": "VPC",
+                            "class": "aws-vpc"
+                        },
+                        {
+                            "container": true,
+                            "title": "Subnet",
+                            "class": "aws-subnet"
+                        },
+                        {
+                            "container": false,
+                            "title": "Internet Gateway",
+                            "class": "aws-internet-gateway"
+                        },
+                        {
+                            "container": false,
+                            "title": "Security Group",
+                            "class": "aws-security-group"
+                        }
+                    ]
+                },
+                {
+                    "title": "Compute",
+                    "class": "aws-compute",
+                    "resources": [
+                        {
+                            "container": false,
+                            "title": "Instance",
+                            "class": "aws-instance"
+                        }
+                    ]
+                }
+            ]
+        },
         // {
         //     "title": "Azure",
         //     "provider": "azure",

@@ -6,6 +6,8 @@
 import { OcdResource } from '@ocd/model'
 import { OcdUtils } from '@ocd/core'
 import { OcdDocument } from './OcdDocument'
+import { AwsResourceProperties } from './properties/provider/aws/AwsResourceProperties'
+import { CustomResourceProperties } from './properties/provider/custom/CustomResourceProperties'
 import * as azureResources from './properties/provider/azure/resources'
 import * as googleResources from './properties/provider/google/resources'
 import { OcdCacheData } from './OcdCache'
@@ -84,6 +86,12 @@ export const getResourceProperties = async (selectedModelResource: OcdResource):
     const resourceJSXMethod = `${OcdUtils.toTitleCase(provider)}${resourceType}`
     console.debug(`> OcdProperies: OcdResourceProperties: Render(JMX(${resourceJSXMethod}))`)
     switch (provider) {
+        case 'aws':
+            // AWS has a single generic properties component (no codegen per-resource wrappers).
+            return AwsResourceProperties
+        case 'custom':
+            // Runtime custom stencils render a schema-driven panel from their manifest.
+            return CustomResourceProperties
         case 'azure':
             // @ts-ignore
             return azureResources[resourceJSXMethod]

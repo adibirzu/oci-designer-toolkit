@@ -45,6 +45,7 @@ import { reconcileLzScaffold } from '../landingzone/OcdLzScaffold'
 import { LZ_SCAFFOLD_ENABLED_KEY } from '../landingzone/OcdLzReconcile'
 import { applyObservabilityOverlay, LZ_OBSERVABILITY_ENABLED_KEY } from '../landingzone/OcdLzObservability'
 import { applyOkeNativeOverlay, LZ_OKE_NATIVE_ENABLED_KEY } from '../landingzone/OcdLzOke'
+import { applyCrossTenancyHubSpokeOverlay, LZ_CROSSTENANCY_HUBSPOKE_ENABLED_KEY } from '../landingzone/OcdLzCrossTenancyHubSpoke'
 import {
     DEFAULT_CONFIG,
     LandingZoneConfig,
@@ -62,6 +63,7 @@ import { LzngProjectsStep } from '../landingzone/ui/LzngProjectsStep'
 import { LzngTemplatesStep } from '../landingzone/ui/LzngTemplatesStep'
 import { LzngReviewStep } from '../landingzone/ui/LzngReviewStep'
 import { LzngNetworkDiagram } from '../landingzone/ui/LzngNetworkDiagram'
+import { LzngPreviewDiagram, LzngPreviewFocus } from '../landingzone/ui/LzngPreviewDiagram'
 import { LzngStepFooter } from '../landingzone/ui/LzngStepFooter'
 import { LzngDebugDrawer } from '../landingzone/ui/LzngDebugDrawer'
 import { buildDiagramModel } from '../landingzone/ui/LzngDiagramModel'
@@ -87,7 +89,7 @@ function friendlyError(message: string): string {
 
 interface WizardBodyProps {
     onExit: () => void
-    onOpenInDesigner: (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean, observabilityEnabled: boolean, okeNativeEnabled: boolean) => void
+    onOpenInDesigner: (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean, observabilityEnabled: boolean, okeNativeEnabled: boolean, crossTenancyEnabled: boolean) => void
 }
 
 function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element {
@@ -96,6 +98,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
     const [scaffoldEnabled, setScaffoldEnabled] = useState<boolean>(() => Boolean(data.scaffoldEnabled))
     const [observabilityEnabled, setObservabilityEnabled] = useState<boolean>(() => Boolean(data.observabilityEnabled))
     const [okeNativeEnabled, setOkeNativeEnabled] = useState<boolean>(() => Boolean(data.okeNativeEnabled))
+    const [crossTenancyEnabled, setCrossTenancyEnabled] = useState<boolean>(() => Boolean(data.crossTenancyEnabled))
     const [title, setTitle] = useState<string>(() => (typeof data.title === 'string' && data.title ? data.title : DEFAULT_TITLE))
     const [editingTitle, setEditingTitle] = useState(false)
     const [layout, setLayout] = useState<LzngLayout>('split')
@@ -163,6 +166,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         setField('scaffoldEnabled', scaffoldEnabled)
         setField('observabilityEnabled', observabilityEnabled)
         setField('okeNativeEnabled', okeNativeEnabled)
+        setField('crossTenancyEnabled', crossTenancyEnabled)
         setNotice({ kind: 'info', text: 'Draft saved.' })
     }
 
@@ -183,6 +187,12 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
         const next = !okeNativeEnabled
         setOkeNativeEnabled(next)
         setField('okeNativeEnabled', next)
+    }
+
+    function toggleCrossTenancy(): void {
+        const next = !crossTenancyEnabled
+        setCrossTenancyEnabled(next)
+        setField('crossTenancyEnabled', next)
     }
 
     function commitConfig(next: LandingZoneConfig): void {
@@ -248,6 +258,14 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
     const showLeft = isReview || layout === 'split' || layout === 'list'
     const showRight = (layout === 'split' || layout === 'diagram') && !isReview
 
+    // The structural compartment preview annotates a different subset per step
+    // (Foundation → canonical structure, Hub → network compartment, Projects →
+    // project compartments, Templates → platform compartments). Steps beyond
+    // Templates (i.e. Review) fall back to 'foundation' but Review never renders
+    // the right column anyway (showRight is false there).
+    const PREVIEW_FOCUS: LzngPreviewFocus[] = ['foundation', 'hub', 'projects', 'templates']
+    const previewFocus: LzngPreviewFocus = PREVIEW_FOCUS[activeStep] ?? 'foundation'
+
     function goToStep(index: number): void {
         setActiveStep(Math.max(0, Math.min(LZNG_STEPS.length - 1, index)))
         setNotice(null)
@@ -270,7 +288,7 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                         config={config}
                         title={title}
                         onError={(message) => setNotice({ kind: 'error', text: friendlyError(message) })}
-                        onOpenInDesigner={(files) => onOpenInDesigner(title, files, config, scaffoldEnabled, observabilityEnabled, okeNativeEnabled)}
+                        onOpenInDesigner={(files) => onOpenInDesigner(title, files, config, scaffoldEnabled, observabilityEnabled, okeNativeEnabled, crossTenancyEnabled)}
                     />
                 )
         }
@@ -343,6 +361,14 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                                 onChange={toggleOkeNative}
                             />
                             <span>OKE Native</span>
+                        </label>
+                        <label className='ocd-lzng-scaffold-toggle' title='When ticked, opening in the Designer adds a best-practice cross-tenancy hub-spoke topology (per-tenancy DRG + Remote Peering Connection naming the peer tenancy, non-overlapping CIDRs, DRG attachments) — for connecting two OCI tenancies.'>
+                            <input
+                                type='checkbox'
+                                checked={crossTenancyEnabled}
+                                onChange={toggleCrossTenancy}
+                            />
+                            <span>Cross-Tenancy</span>
                         </label>
                         <span className='ocd-lzng-action-sep' aria-hidden />
                         <button type='button' className='ocd-lzng-btn ocd-lzng-btn-primary' onClick={saveDraft}>
@@ -434,24 +460,34 @@ function WizardBody({ onExit, onOpenInDesigner }: WizardBodyProps): JSX.Element 
                                     <span className='ocd-lzng-diagram-rail-label'>Network Diagram</span>
                                 </button>
                             ) : (
-                                <section className='ocd-lzng-card ocd-lzng-diagram-card'>
-                                    <div className='ocd-lzng-card-head'>
-                                        <h2 className='ocd-lzng-card-title'>Network Diagram</h2>
-                                        {layout === 'split' && (
-                                            <button
-                                                type='button'
-                                                className='ocd-lzng-btn'
-                                                title='Collapse to the side'
-                                                onClick={() => setDiagramCollapsed(true)}
-                                            >
-                                                Collapse ›
-                                            </button>
-                                        )}
-                                    </div>
-                                    <div className='ocd-lzng-diagram-canvas'>
-                                        <LzngNetworkDiagram config={config} />
-                                    </div>
-                                </section>
+                                <>
+                                    <section className='ocd-lzng-card ocd-lzng-diagram-card'>
+                                        <div className='ocd-lzng-card-head'>
+                                            <h2 className='ocd-lzng-card-title'>Compartment Structure</h2>
+                                            {layout === 'split' && (
+                                                <button
+                                                    type='button'
+                                                    className='ocd-lzng-btn'
+                                                    title='Collapse to the side'
+                                                    onClick={() => setDiagramCollapsed(true)}
+                                                >
+                                                    Collapse ›
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className='ocd-lzng-prev-canvas'>
+                                            <LzngPreviewDiagram config={config} focus={previewFocus} />
+                                        </div>
+                                    </section>
+                                    <section className='ocd-lzng-card ocd-lzng-diagram-card'>
+                                        <div className='ocd-lzng-card-head'>
+                                            <h2 className='ocd-lzng-card-title'>Network Diagram</h2>
+                                        </div>
+                                        <div className='ocd-lzng-diagram-canvas'>
+                                            <LzngNetworkDiagram config={config} />
+                                        </div>
+                                    </section>
+                                </>
                             )}
                         </div>
                     )}
@@ -476,13 +512,14 @@ const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdC
     // active document, and switch the console to the Designer page. The wizard
     // config is persisted into the design (design.userDefined.lzConfig) so the
     // idempotent scaffold reconcile has a source of truth that survives saves.
-    const onOpenInDesigner = (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean, observabilityEnabled: boolean, okeNativeEnabled: boolean): void => {
+    const onOpenInDesigner = (title: string, files: GeneratedFile[], config: LandingZoneConfig, scaffoldEnabled: boolean, observabilityEnabled: boolean, okeNativeEnabled: boolean, crossTenancyEnabled: boolean): void => {
         const { design, topCompartmentIds } = buildOcdDesignFromLz(files, title, config)
         // Record the wizard ticks on the design so the designer-side toggles and
         // idempotent overlays know they apply.
         design.userDefined[LZ_SCAFFOLD_ENABLED_KEY] = scaffoldEnabled
         design.userDefined[LZ_OBSERVABILITY_ENABLED_KEY] = observabilityEnabled
         design.userDefined[LZ_OKE_NATIVE_ENABLED_KEY] = okeNativeEnabled
+        design.userDefined[LZ_CROSSTENANCY_HUBSPOKE_ENABLED_KEY] = crossTenancyEnabled
         const document = OcdDocument.new()
         document.design = design
         // Add one layer per top-level compartment (first selected), mirroring the
@@ -497,6 +534,9 @@ const OcdLandingZone = ({ ocdDocument, setOcdDocument, ocdConsoleConfig, setOcdC
         }
         if (okeNativeEnabled) {
             document.design = applyOkeNativeOverlay(document.design)
+        }
+        if (crossTenancyEnabled) {
+            document.design = applyCrossTenancyHubSpokeOverlay(document.design)
         }
         document.autoLayout(document.getActivePage().id, true, ocdConsoleConfig.config.defaultAutoArrangeStyle)
         // The Realm > Region > AD > FD scaffold manages its own nested container

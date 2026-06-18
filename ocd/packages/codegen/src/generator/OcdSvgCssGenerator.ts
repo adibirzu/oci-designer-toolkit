@@ -39,6 +39,7 @@ export const svgCssData: Record<string, string> = {
 }
 
 export const ociSvgThemeCss = svgCssData['oci-theme.css']
+export const awsSvgThemeCss = svgCssData['aws-theme.css']
 export const azureSvgThemeCss = svgCssData['azure-theme.css']
 export const generalSvgThemeCss = svgCssData['general-theme.css']
 export const googleSvgThemeCss = svgCssData['google-theme.css']
@@ -47,6 +48,7 @@ export const svgSvgCss = svgCssData['ocd-svg.css']
 export const getSvgCssData = (design: OcdDesign): string[] => {
     let cssData = [ociSvgThemeCss, svgSvgCss]
     if (design.model.general && Object.keys(design.model.general).length > 0) cssData = [...cssData, generalSvgThemeCss]
+    if (design.model.aws && Object.keys(design.model.aws).length > 0) cssData = [...cssData, awsSvgThemeCss]
     if (design.model.azure && Object.keys(design.model.azure).length > 0) cssData = [...cssData, azureSvgThemeCss]
     if (design.model.google && Object.keys(design.model.google).length > 0) cssData = [...cssData, googleSvgThemeCss]
     return cssData

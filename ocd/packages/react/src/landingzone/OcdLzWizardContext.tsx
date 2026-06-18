@@ -14,6 +14,7 @@ import { getLzConfig } from './OcdLzToModel'
 import { LZ_SCAFFOLD_ENABLED_KEY } from './OcdLzReconcile'
 import { LZ_OBSERVABILITY_ENABLED_KEY } from './OcdLzObservability'
 import { LZ_OKE_NATIVE_ENABLED_KEY } from './OcdLzOke'
+import { LZ_CROSSTENANCY_HUBSPOKE_ENABLED_KEY } from './OcdLzCrossTenancyHubSpoke'
 
 const STORAGE_KEY = 'ocd.lz.wizard.draft'
 // One-shot key: a staged wizard seed produced when the user chooses to edit an
@@ -98,6 +99,7 @@ export function lzConfigToWizardSeed(design: LzSeedDesignLike | null | undefined
         scaffoldEnabled: Boolean(userDefined[LZ_SCAFFOLD_ENABLED_KEY]),
         observabilityEnabled: Boolean(userDefined[LZ_OBSERVABILITY_ENABLED_KEY]),
         okeNativeEnabled: Boolean(userDefined[LZ_OKE_NATIVE_ENABLED_KEY]),
+        crossTenancyEnabled: Boolean(userDefined[LZ_CROSSTENANCY_HUBSPOKE_ENABLED_KEY]),
     }
     const title = design?.metadata?.title
     if (typeof title === 'string' && title.trim()) data.title = title
