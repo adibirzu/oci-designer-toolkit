@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { ChangeEvent, useMemo, useState } from 'react'
 import { ConsolePageProps } from '../types/Console'
 import { OcdDocument } from '../components/OcdDocument'
 import {
@@ -8,6 +8,7 @@ import {
     buildArchitectureAgentReadiness,
     buildArchitectureRelationGraph,
     buildArchitectureTerraformPreview,
+    buildArchitectureVisionPrompt,
     buildDesignFromArchitecturePlan,
     callOpenAiCompatibleArchitectureAgent,
     createArchitecturePlanFromPrompt,
@@ -16,9 +17,19 @@ import {
 import { OcdConsoleConfig } from '../components/OcdConsoleConfiguration'
 import { OciApiFacade } from '../facade/OciApiFacade'
 import { agentPromptTemplates, zeroTrustControls, zeroTrustFlowSteps } from '../security/OcdZeroTrustReference'
+import {
+    ArchitecturePlannerMode,
+    getArchitectureAgentProviderReadiness,
+    resolveArchitectureAgentProviderConfig,
+} from '../architecture-agent/OcdArchitectureAgentConfig'
 
 const defaultPrompt = agentPromptTemplates[0].prompt
-type PlannerMode = 'local' | 'openai' | 'oci-genai'
+
+const boundedNumber = (value: string, fallback: number, min: number, max: number): number => {
+    const parsed = Number(value)
+    if (!Number.isFinite(parsed)) return fallback
+    return Math.min(max, Math.max(min, parsed))
+}
 
 const executionResourceKinds = new Set([
     'api_gateway',
@@ -30,26 +41,38 @@ const executionResourceKinds = new Set([
 ])
 
 const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, setOcdDocument }: ConsolePageProps): JSX.Element => {
+    const providerConfig = useMemo(() => resolveArchitectureAgentProviderConfig(), [])
     const discoveryPrompt = typeof ocdDocument.design.userDefined.discoveryAgentPrompt === 'string'
         ? ocdDocument.design.userDefined.discoveryAgentPrompt
         : ''
     const [prompt, setPrompt] = useState(discoveryPrompt || defaultPrompt)
-    const [plannerMode, setPlannerMode] = useState<PlannerMode>('local')
-    const [endpoint, setEndpoint] = useState('')
-    const [model, setModel] = useState('')
+    const [plannerMode, setPlannerMode] = useState<ArchitecturePlannerMode>(providerConfig.plannerMode)
+    const [endpoint, setEndpoint] = useState(providerConfig.openAiEndpoint)
+    const [model, setModel] = useState(providerConfig.openAiModel)
     const [apiKey, setApiKey] = useState('')
-    const [ociProfile, setOciProfile] = useState('DEFAULT')
-    const [ociRegion, setOciRegion] = useState('')
-    const [ociCompartmentId, setOciCompartmentId] = useState('')
-    const [ociModelId, setOciModelId] = useState('cohere.command-a-03-2025')
+    const [ociProfile, setOciProfile] = useState(providerConfig.ociProfile)
+    const [ociRegion, setOciRegion] = useState(providerConfig.ociRegion)
+    const [ociCompartmentId, setOciCompartmentId] = useState(providerConfig.ociCompartmentId)
+    const [ociModelId, setOciModelId] = useState(providerConfig.ociModelId)
+    const [temperature, setTemperature] = useState(String(providerConfig.temperature))
+    const [maxTokens, setMaxTokens] = useState(String(providerConfig.maxTokens))
     const [plan, setPlan] = useState<ArchitecturePlan>(() => createArchitecturePlanFromPrompt(discoveryPrompt || defaultPrompt))
     const [status, setStatus] = useState(discoveryPrompt ? 'Discovery brief loaded' : 'Local planner ready')
     const [busy, setBusy] = useState(false)
-    const providerLabel = useMemo(() => {
-        if (plannerMode === 'oci-genai') return 'OCI GenAI'
-        if (plannerMode === 'openai') return 'OpenAI-compatible'
-        return 'Local'
-    }, [plannerMode])
+    const [imageDataUri, setImageDataUri] = useState('')
+    const [imageFileName, setImageFileName] = useState('')
+    const currentProviderConfig = useMemo(() => ({
+        ...providerConfig,
+        plannerMode,
+        openAiEndpoint: endpoint,
+        openAiModel: model,
+        ociProfile,
+        ociRegion,
+        ociCompartmentId,
+        ociModelId,
+    }), [endpoint, model, ociCompartmentId, ociModelId, ociProfile, ociRegion, plannerMode, providerConfig])
+    const providerReadiness = useMemo(() => getArchitectureAgentProviderReadiness(currentProviderConfig), [currentProviderConfig])
+    const providerLabel = providerReadiness.label
     const planMetrics = useMemo(() => ({
         resources: plan.resources.length,
         execution: plan.resources.filter((resource) => executionResourceKinds.has(resource.kind)).length,
@@ -82,20 +105,68 @@ const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocume
     const relationGraph = useMemo(() => generatedDesign ? buildArchitectureRelationGraph(generatedDesign) : { nodes: [], edges: [] }, [generatedDesign])
     const terraformPreview = useMemo(() => buildArchitectureTerraformPreview(plan), [plan])
 
+    const onImageSelect = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+        const reader = new FileReader()
+        reader.onload = () => {
+            setImageDataUri(typeof reader.result === 'string' ? reader.result : '')
+            setImageFileName(file.name)
+            setStatus(`Diagram attached: ${file.name}`)
+        }
+        reader.onerror = () => setStatus('Could not read the selected image file.')
+        reader.readAsDataURL(file)
+    }
+
+    const onClearImage = () => {
+        setImageDataUri('')
+        setImageFileName('')
+    }
+
+    const useVisionPath = plannerMode === 'oci-genai' && imageDataUri !== ''
+
     const onGenerate = async () => {
+        if (!providerReadiness.ready) {
+            setStatus(providerReadiness.message)
+            return
+        }
         setBusy(true)
-        setStatus(plannerMode === 'local' ? 'Generating local plan' : `Calling ${providerLabel} planner`)
+        setStatus(plannerMode === 'local'
+            ? 'Generating local plan'
+            : useVisionPath
+                ? `Calling ${providerLabel} vision planner`
+                : `Calling ${providerLabel} planner`)
         try {
-            const nextPlan = plannerMode === 'oci-genai'
+            const modelTemperature = boundedNumber(temperature, providerConfig.temperature, 0, 1)
+            const modelMaxTokens = Math.round(boundedNumber(maxTokens, providerConfig.maxTokens, 256, 4000))
+            const nextPlan = useVisionPath
+                ? parseArchitecturePlanResponse((await OciApiFacade.generateArchitecturePlanFromImageWithGenAi(
+                    ociProfile,
+                    ociRegion,
+                    ociCompartmentId,
+                    ociModelId,
+                    buildArchitectureVisionPrompt(prompt),
+                    imageDataUri,
+                    modelTemperature,
+                    modelMaxTokens,
+                )).text)
+                : plannerMode === 'oci-genai'
                 ? parseArchitecturePlanResponse((await OciApiFacade.generateArchitecturePlanWithGenAi(
                     ociProfile,
                     ociRegion,
                     ociCompartmentId,
                     ociModelId,
                     prompt,
+                    modelTemperature,
+                    modelMaxTokens,
                 )).text)
                 : plannerMode === 'openai'
-                    ? await callOpenAiCompatibleArchitectureAgent({ endpoint, model, apiKey } as ArchitectureAgentLlmConfig, prompt)
+                    ? await callOpenAiCompatibleArchitectureAgent({
+                        endpoint,
+                        model,
+                        apiKey,
+                        temperature: modelTemperature,
+                    } as ArchitectureAgentLlmConfig, prompt)
                     : createArchitecturePlanFromPrompt(prompt)
             setPlan(nextPlan)
             setStatus(`${providerLabel} plan ready`)
@@ -132,7 +203,7 @@ const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocume
                     <h1>Architecture Agent</h1>
                     <p>{status}. Generate editable OCI designs from a chat prompt, with zero-trust controls ready for review.</p>
                 </div>
-                <button className='ocd-agent-primary' disabled={busy} onClick={onGenerate} type='button'>
+                <button className='ocd-agent-primary' disabled={busy || !providerReadiness.ready} onClick={onGenerate} type='button'>
                     Generate plan
                 </button>
             </header>
@@ -176,7 +247,7 @@ const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocume
                             Planner
                             <select
                                 aria-label='Architecture planner'
-                                onChange={(event) => setPlannerMode(event.target.value as PlannerMode)}
+                                onChange={(event) => setPlannerMode(event.target.value as ArchitecturePlannerMode)}
                                 value={plannerMode}
                             >
                                 <option value='local'>Local deterministic</option>
@@ -257,7 +328,58 @@ const OcdArchitectureAgent = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocume
                                     value={ociModelId}
                                 />
                             </label>
+                            <label>
+                                Architecture diagram (optional)
+                                <input
+                                    accept='image/*'
+                                    aria-label='Architecture diagram image'
+                                    onChange={onImageSelect}
+                                    type='file'
+                                />
+                            </label>
+                            {imageFileName ? (
+                                <div className='ocd-agent-image-attachment' role='status'>
+                                    <span>Vision input: {imageFileName}</span>
+                                    <button onClick={onClearImage} type='button'>Clear image</button>
+                                </div>
+                            ) : null}
                         </> : null}
+                        {plannerMode !== 'local' ? <>
+                            <label>
+                                Temperature
+                                <input
+                                    aria-label='Architecture model temperature'
+                                    max='1'
+                                    min='0'
+                                    onChange={(event) => setTemperature(event.target.value)}
+                                    step='0.1'
+                                    type='number'
+                                    value={temperature}
+                                />
+                            </label>
+                            <label>
+                                Max Tokens
+                                <input
+                                    aria-label='Architecture model max tokens'
+                                    max='4000'
+                                    min='256'
+                                    onChange={(event) => setMaxTokens(event.target.value)}
+                                    step='128'
+                                    type='number'
+                                    value={maxTokens}
+                                />
+                            </label>
+                        </> : null}
+                    </div>
+                    <div className={`ocd-agent-provider-readiness ${providerReadiness.ready ? 'is-ready' : 'needs-config'}`} role='status'>
+                        <strong>{providerReadiness.message}</strong>
+                        {providerReadiness.issues.length > 0 ? (
+                            <div>
+                                {providerReadiness.issues.map((issue) => (
+                                    <span key={issue.field}>{issue.variable}</span>
+                                ))}
+                            </div>
+                        ) : null}
                     </div>
                     <div className='ocd-agent-control-panel' aria-label='Zero trust controls'>
                         <h2>Control model</h2>

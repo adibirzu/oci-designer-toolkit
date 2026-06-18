@@ -13,6 +13,7 @@ import {
 	cancelLandingZoneAddonUpdateJob,
 	createJob,
 	createStack,
+	generateArchitecturePlanFromImageWithGenAi,
 	generateArchitecturePlanWithGenAi,
 	getLandingZoneAddonUpdateJob,
 	getResourceManagerPlanReview,
@@ -330,6 +331,7 @@ app.whenReady().then(() => {
 	ipcMain.handle('ociQuery:queryDropdown', handleQueryDropdown)
 	ipcMain.handle('ociQuery:discoverySnapshot', handleQueryDiscoverySnapshot)
 	ipcMain.handle('ociGenAi:architecturePlan', handleGenerateArchitecturePlanWithGenAi)
+	ipcMain.handle('ociGenAi:architecturePlanFromImage', handleGenerateArchitecturePlanFromImageWithGenAi)
 	ipcMain.handle('ociQuery:listStacks', handleListStacks)
 	ipcMain.handle('OciResourceManager:createStack', handleCreateStack)
 	ipcMain.handle('OciResourceManager:updateStack', handleUpdateStack)
@@ -471,6 +473,21 @@ async function handleGenerateArchitecturePlanWithGenAi(
 ) {
 	logger.debug('Electron Main: handleGenerateArchitecturePlanWithGenAi')
 	return generateArchitecturePlanWithGenAi({ profile, region, compartmentId, modelId, prompt, temperature, maxTokens })
+}
+
+async function handleGenerateArchitecturePlanFromImageWithGenAi(
+	event: any,
+	profile: string,
+	region: string,
+	compartmentId: string,
+	modelId: string,
+	prompt: string,
+	imageDataUri: string,
+	temperature?: number,
+	maxTokens?: number,
+) {
+	logger.debug('Electron Main: handleGenerateArchitecturePlanFromImageWithGenAi')
+	return generateArchitecturePlanFromImageWithGenAi({ profile, region, compartmentId, modelId, prompt, imageDataUri, temperature, maxTokens })
 }
 
 async function handleListStacks(event: any, profile: string, region: string, compartmentId: string) {

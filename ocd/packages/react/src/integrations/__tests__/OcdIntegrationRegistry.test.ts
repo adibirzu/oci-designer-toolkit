@@ -5,6 +5,7 @@ import {
     ocdIntegrations,
     ocdIntegrationRuntimeLabels,
     ocdIntegrationStatusLabels,
+    resolveOcdIntegrations,
 } from '../OcdIntegrationRegistry'
 
 describe('OcdIntegrationRegistry', () => {
@@ -39,5 +40,24 @@ describe('OcdIntegrationRegistry', () => {
             needsConfig: ocdIntegrations.filter((integration) => integration.status === 'needs-config').length,
             localBackend: ocdIntegrations.filter((integration) => integration.runtime === 'local-backend').length,
         })
+    })
+
+    it('marks OCI GenAI architecture integration configured when required variables exist', () => {
+        const integrations = resolveOcdIntegrations({
+            VITE_OCD_ARCHITECT_OCI_REGION: 'eu-frankfurt-1',
+            VITE_OCD_ARCHITECT_OCI_COMPARTMENT_ID: '<GENAI_COMPARTMENT_ID>',
+            VITE_OCD_ARCHITECT_OCI_MODEL_ID: 'cohere.command-a-03-2025',
+        })
+
+        expect(integrations.find((integration) => integration.id === 'oci-genai-architect')?.status).toBe('configured')
+    })
+
+    it('marks OpenAI-compatible architecture integration configured when endpoint and model exist', () => {
+        const integrations = resolveOcdIntegrations({
+            VITE_OCD_ARCHITECT_OPENAI_ENDPOINT: 'https://api.example.com/v1/chat/completions',
+            VITE_OCD_ARCHITECT_OPENAI_MODEL: 'architecture-model',
+        })
+
+        expect(integrations.find((integration) => integration.id === 'openai-compatible-architect')?.status).toBe('configured')
     })
 })

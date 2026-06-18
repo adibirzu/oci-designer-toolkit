@@ -17,6 +17,7 @@ export interface OcdElectronAPI extends OcdBackend {
     queryDropdown: OcdBackend['queryDropdown']
     queryDiscoverySnapshot: OcdBackend['queryDiscoverySnapshot']
     generateArchitecturePlanWithGenAi: OcdBackend['generateArchitecturePlanWithGenAi']
+    generateArchitecturePlanFromImageWithGenAi: OcdBackend['generateArchitecturePlanFromImageWithGenAi']
     listStacks: OcdBackend['listStacks']
     createStack: OcdBackend['createStack']
     updateStack: OcdBackend['updateStack']

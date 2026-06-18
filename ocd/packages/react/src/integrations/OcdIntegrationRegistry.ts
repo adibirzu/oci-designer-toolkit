@@ -1,5 +1,11 @@
+import {
+    isOciGenAiConfigured,
+    isOpenAiCompatibleConfigured,
+    resolveArchitectureAgentProviderConfig,
+} from '../architecture-agent/OcdArchitectureAgentConfig'
+
 export type OcdIntegrationCategory = 'architecture-source' | 'terraform' | 'discovery' | 'ai' | 'governance'
-export type OcdIntegrationRuntime = 'local-backend' | 'electron' | 'static-reference'
+export type OcdIntegrationRuntime = 'local-backend' | 'electron' | 'external-api' | 'static-reference'
 export type OcdIntegrationStatus = 'available' | 'configured' | 'needs-config' | 'planned'
 export type OcdIntegrationDisplayPage = 'agent' | 'classic' | 'designer' | 'discovery' | 'governance' | 'landingzone' | 'plan' | 'terraform'
 export type OcdIntegrationActionKind = 'navigate' | 'external-link' | 'update-source'
@@ -52,10 +58,17 @@ export const ocdIntegrationStatusLabels: Record<OcdIntegrationStatus, string> = 
 export const ocdIntegrationRuntimeLabels: Record<OcdIntegrationRuntime, string> = {
     'local-backend': 'Local backend',
     electron: 'Desktop bridge',
+    'external-api': 'External API',
     'static-reference': 'Static reference',
 }
 
-export const ocdIntegrations: readonly OcdIntegrationDefinition[] = [
+export const resolveOcdIntegrations = (
+    env?: Record<string, string | undefined>,
+): readonly OcdIntegrationDefinition[] => {
+    const architectureAgentConfig = resolveArchitectureAgentProviderConfig(env)
+    const ociGenAiConfigured = isOciGenAiConfigured(architectureAgentConfig)
+    const openAiConfigured = isOpenAiCompatibleConfigured(architectureAgentConfig)
+    return [
     {
         id: 'landing-zone-next-gen',
         name: 'Landing Zone Next-Gen',
@@ -149,15 +162,31 @@ export const ocdIntegrations: readonly OcdIntegrationDefinition[] = [
         vendor: 'Oracle Cloud Infrastructure',
         category: 'ai',
         runtime: 'local-backend',
-        status: 'needs-config',
+        status: ociGenAiConfigured ? 'configured' : 'needs-config',
         summary: 'Use OCI Generative AI through the backend bridge, with redacted prompts and validated Architecture Plan output.',
-        capabilities: ['Prompt redaction', 'JSON plan contract', 'Designer apply gate'],
+        capabilities: ['OCI SDK profile auth', 'Prompt redaction', 'JSON plan contract', 'Designer apply gate'],
         healthChecks: [
             { id: 'backend', label: 'Local backend', kind: 'backend', required: true },
-            { id: 'genai', label: 'GenAI profile, region, compartment, model', kind: 'configuration', required: true },
+            { id: 'genai', label: ociGenAiConfigured ? 'OCI GenAI variables configured' : 'Set OCI GenAI profile, region, compartment, model', kind: 'configuration', required: true },
         ],
         actions: [
             { id: 'open-agent', label: 'Open agent', kind: 'navigate', displayPage: 'agent' },
+        ],
+    },
+    {
+        id: 'openai-compatible-architect',
+        name: 'OpenAI-Compatible Architecture Agent',
+        vendor: 'OpenAI-compatible endpoint',
+        category: 'ai',
+        runtime: 'external-api',
+        status: openAiConfigured ? 'configured' : 'needs-config',
+        summary: 'Use a Chat Completions-compatible endpoint for Architecture Plan generation. API keys stay in memory unless the operator enters them for the session.',
+        capabilities: ['Chat Completions contract', 'JSON plan validation', 'Designer apply gate'],
+        healthChecks: [
+            { id: 'openai-compatible', label: openAiConfigured ? 'Endpoint and model configured' : 'Set endpoint and model', kind: 'configuration', required: true },
+        ],
+        actions: [
+            { id: 'open-agent-openai', label: 'Open agent', kind: 'navigate', displayPage: 'agent' },
         ],
     },
     {
@@ -176,7 +205,9 @@ export const ocdIntegrations: readonly OcdIntegrationDefinition[] = [
             { id: 'open-governance', label: 'Open governance', kind: 'navigate', displayPage: 'governance' },
         ],
     },
-]
+]}
+
+export const ocdIntegrations: readonly OcdIntegrationDefinition[] = resolveOcdIntegrations()
 
 export const getOcdIntegrationSummary = (integrations: readonly OcdIntegrationDefinition[] = ocdIntegrations) => ({
     total: integrations.length,

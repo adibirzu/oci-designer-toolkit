@@ -11,6 +11,7 @@ import {
     createJob,
     createStack,
     errorMessage,
+    generateArchitecturePlanFromImageWithGenAi,
     generateArchitecturePlanWithGenAi,
     getLandingZoneAddonUpdateJob,
     getResourceManagerPlanReview,
@@ -28,6 +29,7 @@ import {
     updateStack
 } from './handlers.js'
 import {
+    validateGenAiArchitectureImageRouteRequest,
     validateGenAiArchitectureRouteRequest,
     validateLzAddonUpdateRequest,
     validateOciQueryRequest,
@@ -55,6 +57,7 @@ const defaultHandlers = {
     cancelLandingZoneAddonUpdateJob,
     createJob,
     createStack,
+    generateArchitecturePlanFromImageWithGenAi,
     generateArchitecturePlanWithGenAi,
     getLandingZoneAddonUpdateJob,
     getResourceManagerPlanReview,
@@ -383,6 +386,12 @@ export const handleOciWebRequest = async (
         if (method === 'POST' && pathname === '/api/oci/architecture/genai') {
             const body = validateGenAiArchitectureRouteRequest(await parseJsonBody<unknown>(req, maxBodyBytes))
             const result = await timedOperation(requestId, 'generateArchitecturePlanWithGenAi', () => handlers.generateArchitecturePlanWithGenAi(body))
+            sendOk(res, result)
+            return
+        }
+        if (method === 'POST' && pathname === '/api/oci/architecture/genai/image') {
+            const body = validateGenAiArchitectureImageRouteRequest(await parseJsonBody<unknown>(req, maxBodyBytes))
+            const result = await timedOperation(requestId, 'generateArchitecturePlanFromImageWithGenAi', () => handlers.generateArchitecturePlanFromImageWithGenAi(body))
             sendOk(res, result)
             return
         }

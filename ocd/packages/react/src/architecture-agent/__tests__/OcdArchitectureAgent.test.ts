@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
     architectureRelationshipWarnings,
     buildArchitectureAgentPrompt,
+    buildArchitectureVisionPrompt,
     buildArchitectureAgentReadiness,
     buildArchitectureTerraformPreview,
     buildDesignFromArchitecturePlan,
@@ -12,6 +13,21 @@ import {
     parseArchitecturePlanResponse,
     validateArchitecturePlan,
 } from '../OcdArchitectureAgent'
+
+describe('buildArchitectureVisionPrompt', () => {
+    it('instructs the model to read the diagram and emit the same ArchitecturePlan schema', () => {
+        const prompt = buildArchitectureVisionPrompt('Add a bastion host.')
+        expect(prompt).toMatch(/attached architecture diagram/i)
+        expect(prompt).toContain('Schema: {"title": string')
+        expect(prompt).toContain('"resources"')
+        expect(prompt).toContain('Add a bastion host.')
+    })
+
+    it('falls back to a sensible default instruction when the user prompt is empty', () => {
+        const prompt = buildArchitectureVisionPrompt('   ')
+        expect(prompt).toMatch(/Replicate the architecture shown in the attached diagram/i)
+    })
+})
 
 describe('OcdArchitectureAgent — silent-drop + relationship feedback', () => {
     it('captures unsupported resource kinds the model asked for instead of dropping them silently', () => {

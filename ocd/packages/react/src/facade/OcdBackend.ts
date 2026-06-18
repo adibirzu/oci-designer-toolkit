@@ -69,6 +69,7 @@ export interface OciBackend {
     queryDropdown: (profile: string, region: string) => Promise<OcdCacheRegionData>
     queryDiscoverySnapshot: (profile: string, region: string, compartmentIds?: string[]) => Promise<OciDiscoverySnapshot>
     generateArchitecturePlanWithGenAi: (profile: string, region: string, compartmentId: string, modelId: string, prompt: string, temperature?: number, maxTokens?: number) => Promise<GenAiArchitecturePlanResponse>
+    generateArchitecturePlanFromImageWithGenAi: (profile: string, region: string, compartmentId: string, modelId: string, prompt: string, imageDataUri: string, temperature?: number, maxTokens?: number) => Promise<GenAiArchitecturePlanResponse>
     listStacks: (profile: string, region: string, compartmentId: string) => Promise<OciResourceManagerStackList>
     createStack: (profile: string, region: string, compartmentId: string, stackName: string, data: OutputDataStringArray, jobOptions?: OciResourceManagerJobOptions) => Promise<OciResourceManagerActionResult>
     updateStack: (profile: string, region: string, stackId: string, data: OutputDataStringArray, jobOptions?: OciResourceManagerJobOptions) => Promise<OciResourceManagerActionResult>

@@ -205,6 +205,22 @@ export namespace OciApiFacade {
         if (window.ocdAPI) return window.ocdAPI.generateArchitecturePlanWithGenAi(profile, region, compartmentId, modelId, prompt, temperature, maxTokens)
         return webPost<GenAiArchitecturePlanResponse>('/architecture/genai', { profile, region, compartmentId, modelId, prompt, temperature, maxTokens })
     }
+    export const generateArchitecturePlanFromImageWithGenAi: OciBackend['generateArchitecturePlanFromImageWithGenAi'] = (
+        profile: string = 'DEFAULT',
+        region: string = 'uk-london-1',
+        compartmentId: string = '',
+        modelId: string = '',
+        prompt: string = '',
+        imageDataUri: string = '',
+        temperature: number = 0.2,
+        maxTokens: number = 2400,
+    ) => {
+        // Desktop: Electron bridge. Pure static build with no backend: webPost's
+        // ensureWebBackendAvailable throws BackendUnavailableError (same as the text
+        // path) so the UI surfaces "start the desktop app or local web server".
+        if (window.ocdAPI) return window.ocdAPI.generateArchitecturePlanFromImageWithGenAi(profile, region, compartmentId, modelId, prompt, imageDataUri, temperature, maxTokens)
+        return webPost<GenAiArchitecturePlanResponse>('/architecture/genai/image', { profile, region, compartmentId, modelId, prompt, imageDataUri, temperature, maxTokens })
+    }
     export const listStacks: OciBackend['listStacks'] = (profile: string = 'DEFAULT', region: string = 'uk-london-1', compartmentId: string = '') => {
         if (window.ocdAPI) return window.ocdAPI.listStacks(profile, region, compartmentId)
         return webGet<OciResourceManagerStackList>(`/resource-manager/stacks?profile=${encodeURIComponent(profile)}&region=${encodeURIComponent(region)}&compartmentId=${encodeURIComponent(compartmentId)}`)
@@ -283,6 +299,7 @@ export const ociApiBackend: OciBackend = {
     queryDropdown: OciApiFacade.queryDropdown,
     queryDiscoverySnapshot: OciApiFacade.queryDiscoverySnapshot,
     generateArchitecturePlanWithGenAi: OciApiFacade.generateArchitecturePlanWithGenAi,
+    generateArchitecturePlanFromImageWithGenAi: OciApiFacade.generateArchitecturePlanFromImageWithGenAi,
     listStacks: OciApiFacade.listStacks,
     createStack: OciApiFacade.createStack,
     updateStack: OciApiFacade.updateStack,
