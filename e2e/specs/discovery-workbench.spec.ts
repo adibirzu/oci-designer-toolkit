@@ -5,7 +5,9 @@ test.describe('OCI Discovery Workbench smoke', () => {
     await page.goto('/')
     await expect(page.locator('.ocd-console')).toBeVisible({ timeout: 20_000 })
 
-    const discoveryButton = page.getByRole('button', { name: 'Discovery' })
+    // Two "Discovery" buttons exist (the home CTA + the architecture command-center
+    // action). Target the home CTA specifically to avoid a strict-mode ambiguity.
+    const discoveryButton = page.locator('button.ocd-discovery-cta')
     await expect(discoveryButton).toBeVisible({ timeout: 10_000 })
     await discoveryButton.click()
 
@@ -45,10 +47,7 @@ test.describe('OCI Discovery Workbench smoke', () => {
     await expect(page.getByText('observability')).toBeVisible()
     await expect(page.getByText('Wave 3 - Legacy Critical')).toBeVisible()
     await expect(page.getByRole('cell', { name: 'Autonomous Database' }).first()).toBeVisible()
-
-    await page.getByRole('tab', { name: 'Resource Analytics', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Resource Analytics Integration' })).toBeVisible()
-    await expect(page.getByText('RESOURCE_DIM_V')).toBeVisible()
-    await expect(page.getByText('FETCH FIRST 50 ROWS ONLY')).toBeVisible()
+    // NOTE: the "Resource Analytics" tab was intentionally removed (Wave-5 Batch 12 —
+    // it was a static stub that never executed a query). Its assertions are gone with it.
   })
 })

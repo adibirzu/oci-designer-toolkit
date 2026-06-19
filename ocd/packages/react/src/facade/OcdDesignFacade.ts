@@ -6,6 +6,7 @@
 import { OcdDesign } from "@ocd/model"
 import { OcdTerraformImporter } from "@ocd/import"
 import { OcdDesignerBrowserActions } from "../actions/OcdDesignBrowserActions"
+import { adoptDesignIntoLandingZone } from "../landingzone/OcdLzFromDesign"
 
 /*
 ** Facade exists so we can switch between Electron based and Web based which will require a web server
@@ -42,6 +43,75 @@ const pickAndReadTextFiles = (accept: string, multiple = true): Promise<{ cancel
         input.click()
     })
 
+const LIBRARY_BASE_URL = '/library'
+const SAFE_LIBRARY_SEGMENT = /^[A-Za-z0-9_.-]+$/
+
+interface BrowserLibraryDesign {
+    title: string
+    description: string
+    okitFile: string
+    svgFile: string
+    dataUri?: string
+}
+
+type BrowserLibraryIndex = Record<string, BrowserLibraryDesign[]>
+
+const assertSafeLibrarySegment = (segment: string, label: string): string => {
+    if (!SAFE_LIBRARY_SEGMENT.test(segment)) throw new Error(`Invalid library ${label}: ${segment}`)
+    return segment
+}
+
+const libraryAssetUrl = (...segments: string[]): string => {
+    const path = ['library', ...segments].join('/')
+    if (typeof document === 'undefined' || !document.baseURI) return `${LIBRARY_BASE_URL}/${segments.join('/')}`
+    return new URL(path, document.baseURI).toString()
+}
+
+const fetchJson = async <T>(url: string): Promise<T> => {
+    const response = await fetch(url)
+    if (!response.ok) throw new Error(`Library fetch failed (${response.status})`)
+    const contentType = response.headers.get('content-type') ?? ''
+    if (
+        contentType
+        && !contentType.includes('application/json')
+        && !contentType.includes('application/octet-stream')
+        && !contentType.includes('text/plain')
+    ) {
+        throw new Error(`Library fetch returned unexpected content-type: ${contentType}`)
+    }
+    return (await response.json()) as T
+}
+
+const fetchText = async (url: string): Promise<string> => {
+    const response = await fetch(url)
+    if (!response.ok) throw new Error(`Library asset fetch failed (${response.status})`)
+    return response.text()
+}
+
+const loadBrowserLibraryIndex = async (): Promise<BrowserLibraryIndex> => {
+    const libraryIndex = await fetchJson<BrowserLibraryIndex>(libraryAssetUrl('referenceArchitectures.json'))
+    const hydrated = await Promise.all(Object.entries(libraryIndex).map(async ([section, designs]) => {
+        assertSafeLibrarySegment(section, 'section')
+        const nextDesigns = await Promise.all(designs.map(async (design) => {
+            assertSafeLibrarySegment(design.svgFile, 'svgFile')
+            const svg = await fetchText(libraryAssetUrl(section, design.svgFile))
+            return {
+                ...design,
+                dataUri: `data:image/svg+xml,${encodeURIComponent(svg)}`,
+            }
+        }))
+        return [section, nextDesigns] as const
+    }))
+    return Object.fromEntries(hydrated)
+}
+
+const loadBrowserLibraryDesign = async (section: string, filename: string): Promise<{ canceled: boolean; filename: string; design: OcdDesign }> => {
+    const safeSection = assertSafeLibrarySegment(section, 'section')
+    const safeFilename = assertSafeLibrarySegment(filename, 'filename')
+    const design = await fetchJson<OcdDesign>(libraryAssetUrl(safeSection, safeFilename))
+    return { canceled: false, filename: safeFilename, design }
+}
+
 export namespace OcdDesignFacade {
     export const loadDesign = (filename: string): Promise<any> => {
         return window.ocdAPI ? window.ocdAPI.loadDesign(filename) : OcdDesignerBrowserActions.loadDesign(filename)
@@ -54,10 +124,10 @@ export namespace OcdDesignFacade {
         return window.ocdAPI ? window.ocdAPI.discardConfirmation() : OcdDesignerBrowserActions.discardConfirmation()
     }
     export const loadLibraryIndex = (): Promise<any> => {
-        return window.ocdAPI ? window.ocdAPI.loadLibraryIndex() : Promise.reject(new Error('Currently Not Implemented'))
+        return window.ocdAPI ? window.ocdAPI.loadLibraryIndex() : loadBrowserLibraryIndex()
     }
     export const loadLibraryDesign = (section: string, filename: string): Promise<any> => {
-        return window.ocdAPI ? window.ocdAPI.loadLibraryDesign(section, filename) : Promise.reject(new Error('Currently Not Implemented'))
+        return window.ocdAPI ? window.ocdAPI.loadLibraryDesign(section, filename) : loadBrowserLibraryDesign(section, filename)
     }
     export const loadSvgCssFiles = (): Promise<any> => {
         return window.ocdAPI ? window.ocdAPI.loadSvgCssFiles() : Promise.reject(new Error('Currently Not Implemented'))
@@ -78,13 +148,20 @@ export namespace OcdDesignFacade {
         return window.ocdAPI ? window.ocdAPI.exportToTerraform(design, directory) : Promise.reject(new Error('Currently Not Implemented'))
     }
     export const importFromTerraform = (): Promise<any> => {
-        if (window.ocdAPI) return window.ocdAPI.importFromTerraform()
+        // Brownfield adoption: turn the imported design into an editable Landing
+        // Zone wizard config (derives hub/spokes from the VCN topology) so existing
+        // Terraform can be round-tripped through the LZNG wizard, not just viewed.
+        const adopt = (result: any): any =>
+            result && result.design && !result.canceled
+                ? { ...result, design: adoptDesignIntoLandingZone(result.design) }
+                : result
+        if (window.ocdAPI) return window.ocdAPI.importFromTerraform().then(adopt)
         // Web path: pick .tf/.tf.json files in the browser and parse them with the
         // dependency-free importer (same one the Electron main process uses).
         return pickAndReadTextFiles('.tf').then(({ canceled, filename, text }) => {
             if (canceled || !text.trim()) return { canceled: true, filename: '', design: undefined }
             const importer = new OcdTerraformImporter()
-            return { canceled: false, filename, design: importer.import(text) }
+            return adopt({ canceled: false, filename, design: importer.import(text) })
         })
     }
 }

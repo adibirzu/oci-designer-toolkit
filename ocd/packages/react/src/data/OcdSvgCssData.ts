@@ -13,6 +13,48 @@
 import { OcdDesign } from "@ocd/model"
 
 export const svgCssData: Record<string, string> = {
+    'aws-theme.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+/* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
+
+/*
+** Provider + Groups
+*/
+.aws-provider {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNSIgZmlsbD0iI0ZGOTkwMCIvPjxyZWN0IHg9IjciIHk9IjciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgcng9IjIiIGZpbGw9IiMyMzJGM0UiLz48L3N2Zz4=");
+}
+
+.aws-network {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNSIgZmlsbD0iI0ZGOTkwMCIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIzMkYzRSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMyIgZmlsbD0iIzIzMkYzRSIvPjwvc3ZnPg==");
+}
+
+.aws-compute {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNSIgZmlsbD0iI0ZGOTkwMCIvPjxyZWN0IHg9IjgiIHk9IjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgcng9IjIiIGZpbGw9IiMyMzJGM0UiLz48cmVjdCB4PSIxMiIgeT0iMTIiIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNGRjk5MDAiLz48L3N2Zz4=");
+}
+
+/*
+** Resources
+*/
+.aws-vpc {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNSIgZmlsbD0iI0ZGOTkwMCIvPjxyZWN0IHg9IjYiIHk9IjkiIHdpZHRoPSIyMCIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIzMkYzRSIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+");
+}
+
+.aws-subnet {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNSIgZmlsbD0iI0ZGOTkwMCIvPjxyZWN0IHg9IjkiIHk9IjkiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgcng9IjEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIzMkYzRSIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+");
+}
+
+.aws-internet-gateway {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNSIgZmlsbD0iI0ZGOTkwMCIvPjxwYXRoIGQ9Ik0xNiA2IEwyNCAxNiBMMTYgMjYgTDggMTYgWiIgZmlsbD0iIzIzMkYzRSIvPjwvc3ZnPg==");
+}
+
+.aws-security-group {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNSIgZmlsbD0iI0ZGOTkwMCIvPjxwYXRoIGQ9Ik0xNiA1IEwyNSA5IFYxNiBDMjUgMjIgMTYgMjcgMTYgMjcgQzE2IDI3IDcgMjIgNyAxNiBWOSBaIiBmaWxsPSIjMjMyRjNFIi8+PC9zdmc+");
+}
+
+.aws-instance {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNSIgZmlsbD0iI0ZGOTkwMCIvPjxyZWN0IHg9IjgiIHk9IjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgcng9IjIiIGZpbGw9IiMyMzJGM0UiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIzIiBmaWxsPSIjRkY5OTAwIi8+PC9zdmc+");
+}
+`,
+
     'azure-theme.css': `/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
 /* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl. */
 
@@ -1174,6 +1216,38 @@ details[open] > summary.summary-background-light-theme {
     min-height: 540px;
     display: flex;
     flex-direction: column;
+}
+
+.ocd-lzng-diagram-rail {
+    width: 100%;
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 18px 0;
+    border: 1px solid var(--oracle-border);
+    border-top: 3px solid var(--oracle-red);
+    border-radius: 8px;
+    background: var(--oracle-white);
+    color: var(--oracle-bark);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(49, 45, 42, 0.04);
+}
+
+.ocd-lzng-diagram-rail-chevron {
+    color: var(--oracle-red);
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.ocd-lzng-diagram-rail-label {
+    writing-mode: vertical-rl;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
 }
 
 .ocd-lzng-diagram-canvas {
@@ -7434,6 +7508,7 @@ details[open] > summary.summary-background {
 }
 
 export const ociSvgThemeCss = svgCssData['oci-theme.css']
+export const awsSvgThemeCss = svgCssData['aws-theme.css']
 export const azureSvgThemeCss = svgCssData['azure-theme.css']
 export const generalSvgThemeCss = svgCssData['general-theme.css']
 export const googleSvgThemeCss = svgCssData['google-theme.css']
@@ -7442,10 +7517,10 @@ export const svgSvgCss = svgCssData['ocd-svg.css']
 export const getSvgCssData = (design: OcdDesign): string[] => {
     let cssData = [ociSvgThemeCss, svgSvgCss]
     if (design.model.general && Object.keys(design.model.general).length > 0) cssData = [...cssData, generalSvgThemeCss]
+    if (design.model.aws && Object.keys(design.model.aws).length > 0) cssData = [...cssData, awsSvgThemeCss]
     if (design.model.azure && Object.keys(design.model.azure).length > 0) cssData = [...cssData, azureSvgThemeCss]
     if (design.model.google && Object.keys(design.model.google).length > 0) cssData = [...cssData, googleSvgThemeCss]
     return cssData
 }
 
 export default svgCssData
-

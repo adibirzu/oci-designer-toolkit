@@ -106,3 +106,44 @@ export function connectResources(design: OcdDesign, sourceModelId: string, targe
     }
     return { design: next, connected: true, field: connection.field }
 }
+
+/*
+** Hover-port connect (always-available drag-to-connect).
+**
+** These pure helpers model the lifecycle of a connection drag that starts from a
+** resource's hover "port" (no connect-mode toggle required). The UI in OcdCanvas
+** holds a PortConnectState and the transient cursor points; the logic that
+** decides whether a release wires an association lives here so it can be unit
+** tested without a DOM. The actual FK write reuses connectResources above — the
+** authoritative connect action — so semantics never diverge from the toggle path.
+*/
+
+export interface PortConnectState {
+    /** A port-connect drag is in progress. */
+    active: boolean
+    /** modelId (ocid) of the resource the drag started from. */
+    sourceModelId: string
+    /** coords id of the source (used for the source-side anchor / self-guard). */
+    sourceCoordsId: string
+}
+
+/** Idle (no port connection in progress). */
+export const idlePortConnect = (): PortConnectState => ({ active: false, sourceModelId: '', sourceCoordsId: '' })
+
+/** Begin a port connect from a source resource's coords. Pure: returns new state. */
+export function beginPortConnect(source: { id: string; ocid: string }): PortConnectState {
+    return { active: true, sourceModelId: source.ocid, sourceCoordsId: source.id }
+}
+
+/**
+ * Complete a port connect by wiring source -> target. Delegates to
+ * connectResources (the FK write). Returns connected=false with the original
+ * design when the drag is inactive, there is no target (released over empty
+ * space), or the pair is incompatible / self.
+ */
+export function completePortConnect(design: OcdDesign, state: PortConnectState, targetModelId?: string): ConnectResult {
+    if (!state.active || !state.sourceModelId || !targetModelId) {
+        return { design, connected: false, reason: 'No active port connection or drop target.' }
+    }
+    return connectResources(design, state.sourceModelId, targetModelId)
+}

@@ -42,6 +42,7 @@ import { getAvailabilityDomains } from './OcdLzADData'
 import { LandingZoneConfig } from './OcdLzConfig'
 import { getLzConfig } from './OcdLzToModel'
 import { isLzOriginDesign } from './OcdLzPlacement'
+import { cloneDesign } from './OcdLzOverlay'
 
 // ---------------------------------------------------------------------------
 // Scaffold marker model (the idempotency key store)
@@ -147,11 +148,6 @@ function findCoordsByOcid(coords: OcdViewCoords[], ocid: string): OcdViewCoords 
 // ---------------------------------------------------------------------------
 // Immutable helpers
 // ---------------------------------------------------------------------------
-
-/** Deep clone a design (mirrors OcdResource.cloneResource's JSON round-trip). */
-function cloneDesign(design: OcdDesign): OcdDesign {
-    return JSON.parse(JSON.stringify(design)) as OcdDesign
-}
 
 /** A label for a scaffold tier (display only; never used for matching). */
 function tierLabel(config: LandingZoneConfig, marker: ScaffoldMarker): string {

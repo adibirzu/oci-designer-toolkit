@@ -9,6 +9,9 @@ import {
     toGeneratedFiles,
     hasRecognisedLzFiles,
     buildDesignFromLzUpload,
+    parseLzJson,
+    LzImportError,
+    MAX_LZ_UPLOAD_BYTES,
 } from '../OcdLzFileImport'
 import { LZ_ORIGIN_KEY } from '../OcdLzToModel'
 
@@ -54,6 +57,50 @@ describe('toGeneratedFiles', () => {
         ])
         expect(files.map((f) => f.name)).toEqual(['iam.json'])
     })
+
+    it('rejects an upload over the size cap (named file + limit, typed error)', () => {
+        const huge = 'x'.repeat(MAX_LZ_UPLOAD_BYTES + 1)
+        let thrown: unknown
+        try {
+            toGeneratedFiles([{ name: 'dir/network.json', content: huge }])
+        } catch (e) {
+            thrown = e
+        }
+        expect(thrown).toBeInstanceOf(LzImportError)
+        expect((thrown as Error).message).toContain('network.json')
+        expect((thrown as Error).message).toMatch(/limit/)
+    })
+
+    it('surfaces a typed Invalid JSON error (not a raw SyntaxError) for malformed .json', () => {
+        let thrown: unknown
+        try {
+            toGeneratedFiles([{ name: 'iam.json', content: '{ not: valid json' }])
+        } catch (e) {
+            thrown = e
+        }
+        expect(thrown).toBeInstanceOf(LzImportError)
+        expect(thrown).not.toBeInstanceOf(SyntaxError)
+        expect((thrown as Error).message).toBe('Invalid JSON in iam.json')
+    })
+})
+
+describe('parseLzJson', () => {
+    it('parses valid JSON', () => {
+        expect(parseLzJson<{ a: number }>('{"a":1}', 'iam.json')).toEqual({ a: 1 })
+    })
+
+    it('throws a typed Invalid JSON error naming the file, never the contents', () => {
+        let thrown: unknown
+        try {
+            parseLzJson('not json', 'network.json')
+        } catch (e) {
+            thrown = e
+        }
+        expect(thrown).toBeInstanceOf(LzImportError)
+        expect((thrown as Error).message).toBe('Invalid JSON in network.json')
+        // The (untrusted) content must not be echoed into the message.
+        expect((thrown as Error).message).not.toContain('not json')
+    })
 })
 
 describe('hasRecognisedLzFiles', () => {
@@ -90,5 +137,10 @@ describe('buildDesignFromLzUpload', () => {
     it('ignores a full directory path on the uploaded file name', () => {
         const result = buildDesignFromLzUpload([{ name: 'some/dir/iam.json', content: IAM_JSON }])
         expect(result.counts.compartment).toBe(3)
+    })
+
+    it('rejects an over-cap upload before doing any import work', () => {
+        const huge = 'x'.repeat(MAX_LZ_UPLOAD_BYTES + 1)
+        expect(() => buildDesignFromLzUpload([{ name: 'iam.json', content: huge }])).toThrow(LzImportError)
     })
 })

@@ -8,45 +8,58 @@ import { OcdDesigner, OcdDesignerLeftToolbar, OcdDesignerRightToolbar } from './
 import { OcdDocument } from '../components/OcdDocument'
 import OcdConsoleMenuBar from '../components/OcdConsoleMenuBar'
 import { OcdConsoleConfig } from '../components/OcdConsoleConfiguration'
-import { ConsoleHeaderProps, ConsolePageProps, ConsoleToolbarProps, OcdSelectedResource } from '../types/Console'
-import OcdBom from './OcdBom'
-// Lazy-loaded: the Landing Zone wizard pulls in React Flow + the jsonnet-WASM
-// generator and is a distinct, mutually-exclusive page. Code-splitting it keeps
-// it out of the initial entry chunk (it loads only when the wizard is opened).
+import OcdErrorBoundary from '../components/OcdErrorBoundary'
+import { ConsolePageProps, ConsoleToolbarProps, OcdSelectedResource } from '../types/Console'
+// Lazy-loaded pages: every page below is mutually exclusive with the Designer
+// (the default landing surface, which stays eager so first paint is fast) and
+// is only reachable via the DisplayPage switch, which already renders inside
+// <OcdErrorBoundary> + <React.Suspense>. Code-splitting them keeps heavyweight
+// dependencies (React Flow + jsonnet-WASM, exceljs, the Terraform/Markdown
+// exporters, the SVG CSS data, the user guide, the cost catalogues) out of the
+// initial entry chunk — each loads on first navigation to its page.
+const OcdBom = React.lazy(() => import('./OcdBom'))
 const OcdLandingZone = React.lazy(() => import('./OcdLandingZone'))
+const OcdSoftware = React.lazy(() => import('./OcdSoftware'))
 const OcdDiscovery = React.lazy(() => import('./OcdDiscovery'))
 const OcdClassicParity = React.lazy(() => import('./OcdClassicParity'))
 const OcdArchitectureAgent = React.lazy(() => import('./OcdArchitectureAgent'))
-import OcdMarkdown, { OcdMarkdownLeftToolbar } from './OcdMarkdown'
-import OcdTabular, { OcdTabularLeftToolbar } from './OcdTabular'
-import OcdTerraform, { OcdTerraformLeftToolbar } from './OcdTerraform'
-import OcdVariables from './OcdVariables'
-import OcdLibrary from './OcdLibrary'
+const OcdIntegrations = React.lazy(() => import('./OcdIntegrations'))
+const OcdMarkdown = React.lazy(() => import('./OcdMarkdown'))
+const OcdMarkdownLeftToolbar = React.lazy(() => import('./OcdMarkdown').then((m) => ({ default: m.OcdMarkdownLeftToolbar })))
+const OcdTabular = React.lazy(() => import('./OcdTabular'))
+const OcdTabularLeftToolbar = React.lazy(() => import('./OcdTabular').then((m) => ({ default: m.OcdTabularLeftToolbar })))
+const OcdTerraform = React.lazy(() => import('./OcdTerraform'))
+const OcdTerraformLeftToolbar = React.lazy(() => import('./OcdTerraform').then((m) => ({ default: m.OcdTerraformLeftToolbar })))
+const OcdVariables = React.lazy(() => import('./OcdVariables'))
+const OcdLibrary = React.lazy(() => import('./OcdLibrary'))
 import { OcdQueryDialog } from '../components/dialogs/OcdQueryDialog'
 import { OcdConfigFacade } from '../facade/OcdConfigFacade'
-import OcdDocumentation from './OcdDocumentation'
+const OcdDocumentation = React.lazy(() => import('./OcdDocumentation'))
 import { loadDesign } from '../components/Menu'
 import { OcdValidationResult, OcdValidator } from '@ocd/model'
-import OcdValidation from './OcdValidation'
-import OcdGovernancePanel from '../governance/OcdGovernancePanel'
+import { OcdLogger } from '@ocd/core'
+const OcdValidation = React.lazy(() => import('./OcdValidation'))
+const OcdGovernancePanel = React.lazy(() => import('../governance/OcdGovernancePanel'))
 import { evaluateGovernance, applyRemediation, type GovernanceFinding } from '../governance/OcdGovernanceChecks'
 import { evaluateReachability } from '../analysis/OcdReachability'
-import OcdLzPlanPage from './OcdLzPlanPage'
+const OcdLzPlanPage = React.lazy(() => import('./OcdLzPlanPage'))
 import OcdTemplateGallery from '../landingzone/templates/OcdTemplateGallery'
 import { findTemplate } from '../landingzone/templates/OcdArchitectureTemplates'
 import { buildDetails } from '../data/OcdBuildDetails'
-import OcdHelp from './OcdHelp'
+const OcdHelp = React.lazy(() => import('./OcdHelp'))
 import OcdCommonTags from './OcdCommonTags'
 import { OcdReferenceDataQueryDialog } from '../components/dialogs/OcdReferenceDataQueryDialog'
 import { OcdActiveFileContext, OcdConsoleConfigContext, OcdDialogContext, OcdDocumentContext, OcdDragResourceContext, OcdSelectedResourceContext } from './OcdConsoleContext'
 // import { OcdActiveFileContext, OcdCacheContext, OcdConsoleConfigContext, OcdDialogContext, OcdDocumentContext, OcdDragResourceContext, OcdSelectedResourceContext } from './OcdConsoleContext'
 import { OcdExportToResourceManagerDialog } from '../components/dialogs/OcdExportToResourceManagerDialog'
+import { OcdResourceManagerRecentPlansDrawer, useResourceManagerRecentPlanCount } from '../resource-manager/OcdResourceManagerRecentPlansDrawer'
 import { ocdThemes } from '../data/OcdThemes'
 import { canReconcile, isReconcileEnabled, reconcileOnEdit, LZ_RECONCILE_ENABLED_KEY } from '../landingzone/OcdLzReconcile'
 import { reconcileLzScaffold, addRealmAdFdFrames } from '../landingzone/OcdLzScaffold'
 import { applyObservabilityOverlay, LZ_OBSERVABILITY_ENABLED_KEY } from '../landingzone/OcdLzObservability'
 import { applyOkeNativeOverlay, LZ_OKE_NATIVE_ENABLED_KEY } from '../landingzone/OcdLzOke'
 import { applyIamBlueprintOverlay, LZ_IAM_BLUEPRINT_ENABLED_KEY } from '../landingzone/OcdLzIamBlueprint'
+import { applyCrossTenancyHubSpokeOverlay, LZ_CROSSTENANCY_HUBSPOKE_ENABLED_KEY } from '../landingzone/OcdLzCrossTenancyHubSpoke'
 import { isLzOriginDesign } from '../landingzone/OcdLzPlacement'
 // Context Providers
 import { CacheProvider, useCache, useCacheDispatch } from '../contexts/OcdCacheContext'
@@ -60,6 +73,8 @@ export const DocumentContext = createContext<OcdDocumentContext>({ocdDocument: O
 export const SelectedResourceContext = createContext<OcdSelectedResourceContext>({selectedResource: OcdDocument.newSelectedResource(), setSelectedResource: () => {}})
 export const DragResourceContext = createContext<OcdDragResourceContext>({dragResource: OcdDocument.newDragResource(), setDragResource: () => {}})
 export const DialogContext = createContext<OcdDialogContext>({displayDialog: '', setDisplayDialog: () => {}})
+
+const logger = OcdLogger.scope('OcdConsole')
 
 export const OcdConsole = (): JSX.Element => {
     // State Variables
@@ -90,14 +105,14 @@ export const OcdConsole = (): JSX.Element => {
     useEffect(() => {
         // @ts-ignore
         if (window.ocdAPI) window.ocdAPI.onOpenFile((event, filePath) => { // Running as an Electron App
-            console.debug('OcdConsole: onOpenFile', filePath)
+            logger.debug('onOpenFile', filePath)
             loadDesign(filePath, setOcdDocument, ocdConsoleConfig, setOcdConsoleConfig, setActiveFile)
         })
     }, []) // Empty Array to only run on initial render
     // Load the Console Config Information
     useEffect(() => {
         OcdConfigFacade.loadConsoleConfig().then((results) => {
-            console.debug('OcdConsole: Load Console Config', results)
+            logger.debug('Loaded Console Config')
             const consoleConfig = new OcdConsoleConfig(results)
             setOcdConsoleConfig(consoleConfig)
             // setTheme({
@@ -105,17 +120,14 @@ export const OcdConsole = (): JSX.Element => {
             //     theme: consoleConfig.config.theme || defaultTheme
             // })
         }).catch((response) => {
-            console.debug('OcdConsole: Load Console Config', response)
-            OcdConfigFacade.saveConsoleConfig(ocdConsoleConfig.config).then((results) => {}).catch((response) => console.debug('OcdConsole:', response))
-            // OcdConfigFacade.saveConsoleConfig(ocdConsoleConfig.config).then((results) => {console.debug('OcdConsole: Saved Console Config')}).catch((response) => console.debug('OcdConsole:', response))
+            logger.debug('Load Console Config failed; saving default config', response)
+            OcdConfigFacade.saveConsoleConfig(ocdConsoleConfig.config).then((results) => {}).catch((error) => logger.warn('Save default Console Config failed', error))
         })
     }, []) // Empty Array to only run on initial render
     const setAndSaveOcdConsoleConfig = (consoleConfig: OcdConsoleConfig) => {
-        OcdConfigFacade.saveConsoleConfig(consoleConfig.config).then((results) => {}).catch((response) => console.debug('OcdConsole:', response))
-        // OcdConfigFacade.saveConsoleConfig(consoleConfig.config).then((results) => {console.debug('OcdConsole: Saved Config')}).catch((response) => console.debug('OcdConsole:', response))
+        OcdConfigFacade.saveConsoleConfig(consoleConfig.config).then((results) => {}).catch((error) => logger.warn('Save Console Config failed', error))
         setOcdConsoleConfig(consoleConfig)
     }
-    console.debug('OcdConsole: Console Config', ocdConsoleConfig)
     return (
         <ConsoleConfigContext.Provider value={consoleConfigContext}>
             <ActiveFileContext.Provider value={activeFileContext}>
@@ -125,10 +137,10 @@ export const OcdConsole = (): JSX.Element => {
                             <CacheProvider>
                                 <ThemeProvider>
                                     <div className={`ocd-console ocd-console-${ocdConsoleConfig.config.theme}-theme`}>
-                                        <OcdConsoleHeader ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} />
+                                        <OcdConsoleHeader setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} />
                                         <OcdConsoleToolbar ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} />
                                         <OcdConsoleBody ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} />
-                                        <OcdConsoleFooter ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setAndSaveOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} />
+                                        <OcdConsoleFooter />
                                     </div>
                                 </ThemeProvider>
                             </CacheProvider>
@@ -140,19 +152,30 @@ export const OcdConsole = (): JSX.Element => {
     )
 }
 
-const OcdConsoleTitleBar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, setOcdDocument }: ConsolePageProps): JSX.Element => {
+const OcdConsoleTitleBar = (): JSX.Element => {
+    // Reads the document directly from context: OcdConsole would otherwise drill
+    // ocdDocument/setOcdDocument here, and the title-bar never used the console
+    // config props at all. setOcdDocument from context is the same reconcile
+    // wrapper OcdConsole drills (documentContext memo), so behaviour is identical.
+    const { ocdDocument, setOcdDocument } = useContext(DocumentContext)
     const [title, setTitle] = useState(ocdDocument.design.metadata.title)
-    const onChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        ocdDocument.design.metadata.title = e.target.value
-        setTitle(ocdDocument.design.metadata.title)
-        // setOcdDocument(OcdDocument.clone(ocdDocument))
+    // The <input> stays responsive via local `title` state (immediate), while the
+    // document-identity change is propagated through setOcdDocument on a debounce
+    // so we honour the OcdDocument fresh-identity contract (Batch 4) without
+    // cloning the whole design on every keystroke. Mutating design.metadata.title
+    // in-place and skipping setOcdDocument (the previous behaviour) silently
+    // diverged the title from the document state machine.
+    const titlePropagateTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+    const propagateTitle = (value: string) => {
+        ocdDocument.design.metadata.title = value
+        setTitle(value)
+        if (titlePropagateTimer.current) clearTimeout(titlePropagateTimer.current)
+        titlePropagateTimer.current = setTimeout(() => setOcdDocument(OcdDocument.clone(ocdDocument)), 300)
     }
-    const onPaste = (e: React.ClipboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        console.debug('OcdConsole: OcdConsoleTitleBar: onPaste:', e.clipboardData)
-        ocdDocument.design.metadata.title = e.clipboardData.getData('Text')
-        setTitle(ocdDocument.design.metadata.title)
-    }
+    const onChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => propagateTitle(e.target.value)
+    const onPaste = (e: React.ClipboardEvent<HTMLTextAreaElement | HTMLInputElement>) => propagateTitle(e.clipboardData.getData('Text'))
     useEffect(() => setTitle(ocdDocument.design.metadata.title), [ocdDocument])
+    useEffect(() => () => { if (titlePropagateTimer.current) clearTimeout(titlePropagateTimer.current) }, [])
     return (
         <div className='ocd-console-title-bar'>
             <input id='ocd_document_title' type='text' value={title} onChange={onChange}></input>
@@ -160,12 +183,19 @@ const OcdConsoleTitleBar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument
     )
 }
 
-const OcdConsoleHeader = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, setOcdDocument }: ConsoleHeaderProps): JSX.Element => {
+const OcdConsoleHeader = ({ setOcdConsoleConfig }: { setOcdConsoleConfig: React.Dispatch<any> }): JSX.Element => {
+    // ocdConsoleConfig / ocdDocument / setOcdDocument are read from context (the
+    // same values OcdConsole would drill). setOcdConsoleConfig stays a prop: the
+    // ConsoleConfigContext value holds the RAW state setter, whereas the menu bar
+    // needs the persist-to-disk wrapper (setAndSaveOcdConsoleConfig) that OcdConsole
+    // owns. The title bar now sources its own document from context.
+    const { ocdConsoleConfig } = useContext(ConsoleConfigContext)
+    const { ocdDocument, setOcdDocument } = useContext(DocumentContext)
     return (
         <div className='ocd-console-header ocd-console-header-theme'>
             <div className='ocd-image ocd-logo'></div>
             <div className='ocd-title-and-menu'>
-                <OcdConsoleTitleBar ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig:any) => setOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} />
+                <OcdConsoleTitleBar />
                 <OcdConsoleMenuBar ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig:any) => setOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} />
             </div>
         </div>
@@ -218,6 +248,8 @@ const OcdConsoleSettingsEditor = ({ ocdConsoleConfig, setOcdConsoleConfig }: any
 
 const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, setOcdDocument }: ConsoleToolbarProps): JSX.Element => {
     const [bothCollapsed, setBothCollapsed] = useState(!ocdConsoleConfig.config.showPalette && !ocdConsoleConfig.config.showProperties)
+    const [showRecentPlans, setShowRecentPlans] = useState(false)
+    const recentPlanCount = useResourceManagerRecentPlanCount()
     const onValidateClick = () => {
         ocdConsoleConfig.config.displayPage = 'validation'
         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
@@ -248,6 +280,10 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
     }
     const onAgentClick = () => {
         ocdConsoleConfig.config.displayPage = 'agent'
+        setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
+    }
+    const onIntegrationsClick = () => {
+        ocdConsoleConfig.config.displayPage = 'integrations'
         setOcdConsoleConfig(OcdConsoleConfig.clone(ocdConsoleConfig))
     }
     // Designer 'LZ live reconcile' tick: records that edits should re-apply the
@@ -296,6 +332,15 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
         document.design.userDefined[LZ_IAM_BLUEPRINT_ENABLED_KEY] = true
         setOcdDocument(document)
     }
+    // Add the best-practice cross-tenancy hub-spoke topology (per-tenancy DRG +
+    // Remote Peering Connection naming the peer tenancy, non-overlapping CIDRs,
+    // DRG attachments) for connecting two OCI tenancies.
+    const onApplyCrossTenancy = () => {
+        const document = OcdDocument.clone(ocdDocument)
+        document.design.userDefined[LZ_CROSSTENANCY_HUBSPOKE_ENABLED_KEY] = true
+        document.design = applyCrossTenancyHubSpokeOverlay(document.design)
+        setOcdDocument(document)
+    }
     const onDesignerPage = ocdConsoleConfig.config.displayPage === 'designer'
     const isLzOrigin = isLzOriginDesign(ocdDocument.design)
     // Drag-to-connect mode toggle. When on, dropping a resource on another wires
@@ -307,8 +352,10 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
     }
     const showReconcile = canReconcile(ocdDocument.design)
     const reconcileOn = isReconcileEnabled(ocdDocument.design)
-    let PageLeftToolbar = OcdEmptyLeftRightToolbar
-    let PageRightToolbar = OcdEmptyLeftRightToolbar
+    // Widened so eager toolbars and the lazy-loaded page toolbars
+    // (LazyExoticComponents) are both assignable.
+    let PageLeftToolbar: React.ComponentType<ConsolePageProps> = OcdEmptyLeftRightToolbar
+    let PageRightToolbar: React.ComponentType<ConsolePageProps> = OcdEmptyLeftRightToolbar
     switch (ocdConsoleConfig.config.displayPage) {
         case 'designer':
             PageLeftToolbar = OcdDesignerLeftToolbar
@@ -325,7 +372,7 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
             break;
     }
     // const hideZoomClassName = ocdConsoleConfig.config.displayPage === 'designer' ? '' : 'hidden'
-    const validationResults = OcdValidator.validate(ocdDocument.design)
+    const validationResults = useMemo(() => OcdValidator.validate(ocdDocument.design), [ocdDocument.design])
     const hasErrors = validationResults.filter((v: OcdValidationResult) => v.type === 'error').length > 0
     const hasWarnings = validationResults.filter((v: OcdValidationResult) => v.type === 'warning').length > 0
     const validateClassName = `ocd-console-toolbar-icon ${hasErrors ? 'ocd-validation-error' : hasWarnings ? 'ocd-validation-warning' : 'ocd-validation-ok'}`
@@ -339,12 +386,16 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                         ocdConsoleConfig={ocdConsoleConfig} 
                         setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)} 
                         />
-                    <PageLeftToolbar 
-                        ocdConsoleConfig={ocdConsoleConfig} 
-                        setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)} 
-                        ocdDocument={ocdDocument} 
-                        setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} 
-                        />
+                    {/* Suspense: the markdown/tabular/terraform toolbars live in their
+                        lazy-loaded page modules; render nothing while the chunk loads. */}
+                    <React.Suspense fallback={<></>}>
+                        <PageLeftToolbar
+                            ocdConsoleConfig={ocdConsoleConfig}
+                            setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)}
+                            ocdDocument={ocdDocument}
+                            setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)}
+                            />
+                    </React.Suspense>
                 </div>
             </div>
             <div className='ocd-toolbar-centre'>
@@ -353,12 +404,14 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
             </div>
             <div className='ocd-toolbar-right'>
                 <div>
-                    <PageRightToolbar 
-                        ocdConsoleConfig={ocdConsoleConfig} 
-                        setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)} 
-                        ocdDocument={ocdDocument} 
-                        setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)} 
-                        />
+                    <React.Suspense fallback={<></>}>
+                        <PageRightToolbar
+                            ocdConsoleConfig={ocdConsoleConfig}
+                            setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)}
+                            ocdDocument={ocdDocument}
+                            setOcdDocument={(ocdDocument:OcdDocument) => setOcdDocument(ocdDocument)}
+                            />
+                    </React.Suspense>
                     <button className='ocd-lz-hero-cta' title='Open the Landing Zone Next-Gen Wizard' onClick={onLandingZoneClick}>
                         <span className='ocd-lz-hero-cta-icon' aria-hidden></span>
                         <span className='ocd-lz-hero-cta-label'>Landing Zone Next-Gen</span>
@@ -375,6 +428,15 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                         <span className='ocd-agent-cta-icon' aria-hidden></span>
                         <span className='ocd-agent-cta-label'>AI Architect</span>
                     </button>
+                    <button className='ocd-integrations-cta' title='Open Integration Hub' onClick={onIntegrationsClick}>
+                        <span className='ocd-integrations-cta-icon' aria-hidden></span>
+                        <span className='ocd-integrations-cta-label'>Integrations</span>
+                    </button>
+                    <button className='ocd-rm-plans-cta' title='Open recent Resource Manager PLAN history' onClick={() => setShowRecentPlans(true)}>
+                        <span className='ocd-rm-plans-cta-icon' aria-hidden></span>
+                        <span className='ocd-rm-plans-cta-label'>Plans</span>
+                        {recentPlanCount > 0 && <span className='ocd-rm-plans-cta-count'>{recentPlanCount}</span>}
+                    </button>
                     <div className={validateClassName} title={validateTitle} onClick={onValidateClick} aria-hidden></div>
                     <div className='governance ocd-console-toolbar-icon' title='Governance &amp; Compliance posture' onClick={onGovernanceClick} aria-hidden></div>
                     <div className='ocd-lz-plan ocd-console-toolbar-icon' title='Landing Zone Plan / Diff (compare current design with imported LZ)' onClick={onPlanClick} aria-hidden></div>
@@ -387,10 +449,15 @@ const OcdConsoleToolbar = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument,
                     {onDesignerPage && isLzOrigin && <div className='ocd-lz-observability ocd-console-toolbar-icon' title='Add DB Observability add-on (DBM/OPSI endpoints, Database Insight, Management Agent)' onClick={onApplyObservability} aria-hidden></div>}
                     {onDesignerPage && isLzOrigin && <div className='ocd-lz-oke ocd-console-toolbar-icon' title='Add OKE-native add-on (native subnets, enhanced cluster, node pool, workload identity, Vault)' onClick={onApplyOke} aria-hidden></div>}
                     {onDesignerPage && isLzOrigin && <div className='ocd-lz-iam ocd-console-toolbar-icon' title='Add Enterprise IAM blueprint (groups, least-privilege policies, governance tag namespace)' onClick={onApplyIamBlueprint} aria-hidden></div>}
+                    {onDesignerPage && isLzOrigin && <div className='ocd-lz-crosstenancy ocd-console-toolbar-icon' title='Add Cross-Tenancy hub-spoke (per-tenancy DRG + Remote Peering Connection naming the peer tenancy, non-overlapping CIDRs) — connect two OCI tenancies' onClick={onApplyCrossTenancy} aria-hidden></div>}
                     {onDesignerPage && <div className={`ocd-connect-mode ocd-console-toolbar-icon ${connectMode ? 'on' : ''}`} title='Connect mode: drag one resource onto another to wire their association' onClick={onConnectModeToggle} aria-hidden></div>}
                     <div className='cost-estimate ocd-console-toolbar-icon' title='BoM and Cost Estimate' onClick={onEstimateClick} aria-hidden></div>
                 </div>
             </div>
+            <OcdResourceManagerRecentPlansDrawer
+                onClose={() => setShowRecentPlans(false)}
+                open={showRecentPlans}
+            />
         </div>
     )
 }
@@ -440,7 +507,7 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
         clone.dialog.templateGallery = false
         setOcdDocument(clone)
     }
-    console.debug('OcdConsoleBody: Dialogs: Query', showQueryDialog, 'ReferenceData', showReferenceDataQueryDialog, 'Resource Manager', showExportToResourceManagerDialog)
+    logger.debug('OcdConsoleBody: Dialogs: Query', showQueryDialog, 'ReferenceData', showReferenceDataQueryDialog, 'Resource Manager', showExportToResourceManagerDialog)
     // Widened so an eager page component and the lazy-loaded OcdLandingZone
     // (a LazyExoticComponent) are both assignable.
     let DisplayPage: React.ComponentType<ConsolePageProps> = OcdDesigner
@@ -466,6 +533,9 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
         case 'landingzone':
             DisplayPage = OcdLandingZone
             break;
+        case 'software':
+            DisplayPage = OcdSoftware
+            break;
         case 'markdown':
             DisplayPage = OcdMarkdown
             break;
@@ -487,6 +557,9 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
         case 'governance':
             DisplayPage = OcdGovernance
             break;
+        case 'integrations':
+            DisplayPage = OcdIntegrations
+            break;
         case 'plan':
             DisplayPage = OcdLzPlanPage
             break;
@@ -497,19 +570,20 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
             DisplayPage = OcdLibrary
             break;
     }
-    // console.debug('OcdConsole: Show Query Dialog', showQueryDialog)
     return (
         <div className='ocd-console-body ocd-console-body-theme'>
             {/* <OcdDesigner ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig:any) => setOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)} /> */}
-            <React.Suspense fallback={<div className='ocd-console-loading' aria-busy='true'>Loading…</div>}>
-                <DisplayPage
-                    ocdConsoleConfig={ocdConsoleConfig}
-                    setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)}
-                    ocdDocument={ocdDocument}
-                    setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)}
-                    key={`${ocdConsoleConfig.config.displayPage}-page`}
-                    />
-            </React.Suspense>
+            <OcdErrorBoundary>
+                <React.Suspense fallback={<div className='ocd-console-loading' aria-busy='true'>Loading…</div>}>
+                    <DisplayPage
+                        ocdConsoleConfig={ocdConsoleConfig}
+                        setOcdConsoleConfig={(ocdConsoleConfig: OcdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)}
+                        ocdDocument={ocdDocument}
+                        setOcdDocument={(ocdDocument: OcdDocument) => setOcdDocument(ocdDocument)}
+                        key={`${ocdConsoleConfig.config.displayPage}-page`}
+                        />
+                </React.Suspense>
+            </OcdErrorBoundary>
             {/* <OcdPropertiesPanel ocdConsoleConfig={ocdConsoleConfig} setOcdConsoleConfig={(ocdConsoleConfig) => setOcdConsoleConfig(ocdConsoleConfig)} ocdDocument={ocdDocument} setOcdDocument={(ocdDocument) => setOcdDocument(ocdDocument)} ocdResource={resource} /> */}
             {showQueryDialog && <OcdQueryDialog 
                 ocdDocument={ocdDocument} 
@@ -531,7 +605,9 @@ const OcdConsoleBody = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, se
     )
 }
 
-const OcdConsoleFooter = ({ ocdConsoleConfig, setOcdConsoleConfig, ocdDocument, setOcdDocument }: ConsolePageProps): JSX.Element => {
+const OcdConsoleFooter = (): JSX.Element => {
+    // The footer only renders the active filename, cache picker and build details;
+    // it never used the drilled console/document props, so they are dropped.
     const {activeFile} = useContext(ActiveFileContext)
     const filenameClass = `${activeFile.modified ? 'ocd-design-modified ocd-active-file-modified-icon' : ''}`
     return (

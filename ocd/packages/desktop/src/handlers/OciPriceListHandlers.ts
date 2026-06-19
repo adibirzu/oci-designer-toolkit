@@ -16,6 +16,9 @@ import { app } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import { getOciPriceList, PriceMap } from '@ocd/query'
+import { OcdLogger } from '@ocd/core'
+
+const logger = OcdLogger.scope('OciPriceListHandlers')
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
 
@@ -34,7 +37,7 @@ const readCache = (): PricingCache => {
         if (!fs.existsSync(filename)) return {}
         return JSON.parse(fs.readFileSync(filename, 'utf-8')) as PricingCache
     } catch (err: unknown) {
-        console.warn('Electron Main: handleGetOciPriceList: failed reading pricing cache', err)
+        logger.warn('handleGetOciPriceList: failed reading pricing cache', err)
         return {}
     }
 }
@@ -46,7 +49,7 @@ const writeCache = (cache: PricingCache): void => {
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
         fs.writeFileSync(filename, JSON.stringify(cache, null, 2))
     } catch (err: unknown) {
-        console.warn('Electron Main: handleGetOciPriceList: failed writing pricing cache', err)
+        logger.warn('handleGetOciPriceList: failed writing pricing cache', err)
     }
 }
 
@@ -60,7 +63,7 @@ export async function handleGetOciPriceList(
 ): Promise<PriceMap> {
     const currency = (currencyCode || 'USD').toUpperCase()
     const requested = Array.from(new Set((partNumbers || []).filter((p) => typeof p === 'string' && p.length > 0)))
-    console.debug('Electron Main: handleGetOciPriceList', currency, requested.length, 'parts')
+    logger.debug('handleGetOciPriceList', currency, requested.length, 'parts')
     if (requested.length === 0) return {}
 
     const cache = readCache()

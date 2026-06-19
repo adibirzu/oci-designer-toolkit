@@ -9,6 +9,7 @@ import {
     mxCellToOcdType,
     isCompressedDrawio,
     buildDesignFromDrawio,
+    MAX_DRAWIO_CELLS,
 } from '../OcdDrawioImport'
 
 const DRAWIO_XML = `<mxGraphModel dx="800" dy="600" grid="1">
@@ -37,6 +38,35 @@ describe('parseMxCells', () => {
     it('decodes XML entities in labels', () => {
         const cells = parseMxCells('<root><mxCell id="x" value="A &amp; B&#10;line2" vertex="1" parent="1"/></root>')
         expect(cells[0].value).toBe('A & B line2')
+    })
+
+    it('parses an unclosed <mxCell> tag in bounded time (no ReDoS backtracking)', () => {
+        // A `<mxCell>` whose `</mxCell>` never arrives, followed by a large body —
+        // the previous lazy dot-all body match would backtrack catastrophically.
+        const malicious = `<root><mxCell id="open" value="x" vertex="1" parent="1">${'a'.repeat(200_000)}`
+        const start = performance.now()
+        const cells = parseMxCells(malicious)
+        expect(performance.now() - start).toBeLessThan(500)
+        expect(cells.map((c) => c.id)).toEqual(['open']) // opening tag still extracted
+    })
+
+    it('rejects inputs over the size cap', () => {
+        const huge = 'a'.repeat(10 * 1024 * 1024 + 1)
+        expect(() => parseMxCells(huge)).toThrow(/exceeds/)
+    })
+
+    it('bails when the cell count exceeds the limit', () => {
+        // Stays well under the byte cap but carries more than MAX_DRAWIO_CELLS
+        // tiny <mxCell> tags — the secondary cap must stop the scan.
+        const cell = '<mxCell id="c" vertex="1" parent="1"/>'
+        const flood = `<root>${cell.repeat(MAX_DRAWIO_CELLS + 1)}</root>`
+        expect(() => parseMxCells(flood)).toThrow(new RegExp(`${MAX_DRAWIO_CELLS}-cell`))
+    })
+
+    it('accepts a diagram exactly at the cell limit', () => {
+        const cell = '<mxCell id="c" vertex="1" parent="1"/>'
+        const atLimit = `<root>${cell.repeat(MAX_DRAWIO_CELLS)}</root>`
+        expect(parseMxCells(atLimit)).toHaveLength(MAX_DRAWIO_CELLS)
     })
 })
 

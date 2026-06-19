@@ -4,18 +4,33 @@
 */
 
 /*
-** Single source of truth for the official OCI Landing Zone upstream repositories
-** that this fork tracks. The in-app "OCI Landing Zone updates" check
-** (OcdLzUpdateCheck) reads this list and compares each pinnedRef against the
-** latest commit/release on GitHub.
+** Typed wrapper around OcdLzSources.json, the single source of truth for the
+** official OCI Landing Zone upstream repositories and project add-ons that this
+** fork tracks. The in-app "OCI Landing Zone updates" check and
+** scripts/setup_landing_zone.mjs both read this list.
 **
 ** IMPORTANT: the 'operating-entities' pinnedRef below MUST stay in sync with
-** UPSTREAM_SHA in scripts/setup_landing_zone.mjs. Both pin the exact commit of
-** the vendored OE jsonnet sources. When you re-vendor with `npm run setup-lz:latest`,
-** update BOTH values to the new SHA the script prints.
+** the generated OE jsonnet source bundle. When you re-vendor with
+** `npm run setup-lz:latest`, update that pinnedRef in OcdLzSources.json to
+** the new SHA the script prints.
 */
 
+import lzSourcesManifest from './OcdLzSources.json'
+
 export type LzSourceKind = 'commit' | 'release'
+export type LzSourceRole = 'vendored-jsonnet' | 'reference' | 'project-addon' | 'software-addon'
+
+export interface LzSourceSetup {
+    cloneSubdir?: string
+    localSubdir: string
+    generator?: string
+    generatedFile?: string
+    skipWorktree?: boolean
+    gitIgnored?: boolean
+    install?: {
+        mode: 'git-checkout'
+    }
+}
 
 export interface LzSource {
     /** Stable identifier used as a key/localStorage discriminator. */
@@ -28,25 +43,16 @@ export interface LzSource {
     kind: LzSourceKind
     /** Pinned commit SHA (kind 'commit') or release tag (kind 'release'). '' = not yet pinned (informational). */
     pinnedRef: string
+    /** How the app uses this upstream source. */
+    role?: LzSourceRole
+    /** Marks the canonical/always-used source for its role (e.g. the LZNG wizard source). */
+    default?: boolean
+    /** Repo-relative path of the committed, vendored (embedded) copy of this source, if any. */
+    embedded?: string
     /** Optional sub-path used to scope a compare URL (reserved; not required by the check). */
     comparePath?: string
+    /** Local vendoring instructions for setup_landing_zone.mjs. */
+    setup?: LzSourceSetup
 }
 
-export const OCI_LZ_SOURCES: LzSource[] = [
-    {
-        key: 'operating-entities',
-        label: 'OCI Operating Entities',
-        repo: 'oci-landing-zones/oci-landing-zone-operating-entities',
-        kind: 'commit',
-        // MUST equal UPSTREAM_SHA in scripts/setup_landing_zone.mjs.
-        pinnedRef: '917f56214282b2d301d95dbce799e79fb0cd94d0',
-    },
-    {
-        key: 'core-landingzone',
-        label: 'OCI Core Landing Zone (CIS)',
-        repo: 'oci-landing-zones/terraform-oci-core-landingzone',
-        kind: 'release',
-        // pinnedRef '' = not yet pinned (not vendored). Latest release shown as informational.
-        pinnedRef: '',
-    },
-]
+export const OCI_LZ_SOURCES: LzSource[] = lzSourcesManifest.sources as LzSource[]

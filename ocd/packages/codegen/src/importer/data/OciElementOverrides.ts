@@ -207,6 +207,37 @@ export const elementOverrides: OcdElementOverrides = {
         "oci_cloud_migrations_target_asset": {
             "migration_plan_id": {"list": "cloud_migrations_migration_plan", "element": "id"}
         },
+        "oci_database_migration_migration": {
+            "source_container_database_connection_id": {"list": "database_migration_connection", "element": "id"},
+            "source_database_connection_id": {"list": "database_migration_connection", "element": "id"},
+            "target_database_connection_id": {"list": "database_migration_connection", "element": "id"}
+        },
+        "oci_database_migration_connection": {
+            "db_system_id": {"list": "db_system", "element": "id"},
+            "subnet_id": {"list": "subnet", "element": "id"},
+            "vault_id": {"list": "vault", "element": "id"}
+        },
+        "oci_vulnerability_scanning_container_scan_target": {
+            "container_scan_recipe_id": {"list": "vss_container_scan_recipe", "element": "id"}
+        },
+        "oci_license_manager_license_record": {
+            "product_license_id": {"list": "license_manager_product_license", "element": "id"}
+        },
+        "oci_announcements_service_announcement_subscription": {
+            "ons_topic_id": {"list": "notification_topic", "element": "id"}
+        },
+        "oci_announcements_service_announcement_subscriptions_filter_group": {
+            "announcement_subscription_id": {"list": "announcement_subscription", "element": "id"}
+        },
+        "oci_analytics_analytics_instance_private_access_channel": {
+            "analytics_instance_id": {"list": "analytics_instance", "element": "id"},
+            "network_security_group_ids": {"list": "network_security_group", "element": "id"},
+            "subnet_id": {"list": "subnet", "element": "id"},
+            "vcn_id": {"list": "vcn", "element": "id"}
+        },
+        "oci_analytics_analytics_instance_vanity_url": {
+            "analytics_instance_id": {"list": "analytics_instance", "element": "id"}
+        },
         "oci_log_analytics_log_analytics_entity": {
             "management_agent_compartment_id": {"list": "compartment", "element": "id"}
         },

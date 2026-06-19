@@ -28,6 +28,14 @@
 
 import { OcdDesign, OciModelResources } from '@ocd/model'
 import { isLzOriginDesign } from './OcdLzPlacement'
+import {
+    cloneDesign,
+    createOverlayContext,
+    firstId,
+    isOverlayEnabled,
+    OverlayRoleSpec,
+    rootCompartmentId,
+} from './OcdLzOverlay'
 
 /** `design.userDefined` key: the wizard / designer 'OKE Native' tick. */
 export const LZ_OKE_NATIVE_ENABLED_KEY = 'lzOkeNativeEnabled'
@@ -40,12 +48,7 @@ export type OkeRole =
     | 'api_subnet' | 'node_subnet' | 'pod_subnet' | 'lb_subnet'
     | 'nsg' | 'dynamic_group' | 'policy' | 'vault' | 'key'
 
-interface RoleSpec {
-    role: OkeRole
-    listKey: string
-    displayName: string
-    create: () => Record<string, unknown>
-}
+type RoleSpec = OverlayRoleSpec<OkeRole>
 
 const NEW = OciModelResources
 const ROLE_SPECS: readonly RoleSpec[] = [
@@ -70,49 +73,20 @@ const SUBNET_CIDR: Partial<Record<OkeRole, string>> = {
     lb_subnet: '10.0.2.0/27',
 }
 
-export function isOkeNativeEnabled(design: { userDefined?: Record<string, unknown> } | null | undefined): boolean {
-    return Boolean(design?.userDefined?.[LZ_OKE_NATIVE_ENABLED_KEY])
-}
+/** Shared find/upsert machinery bound to this overlay's role key + specs. */
+const overlay = createOverlayContext(OKE_ROLE_KEY, ROLE_SPECS, 'always')
 
-function readRole(resource: Record<string, unknown>): OkeRole | undefined {
-    const role = (resource.userDefined as Record<string, unknown> | undefined)?.[OKE_ROLE_KEY]
-    return typeof role === 'string' ? (role as OkeRole) : undefined
+export function isOkeNativeEnabled(design: { userDefined?: Record<string, unknown> } | null | undefined): boolean {
+    return isOverlayEnabled(design, LZ_OKE_NATIVE_ENABLED_KEY)
 }
 
 /** Find an overlay-emitted resource by its role marker. */
 export function findOkeResource(design: OcdDesign, role: OkeRole): Record<string, unknown> | undefined {
-    const spec = ROLE_SPECS.find((s) => s.role === role)
-    if (!spec) return undefined
-    const list = (design.model.oci.resources?.[spec.listKey] ?? []) as Record<string, unknown>[]
-    return list.find((r) => readRole(r) === role)
+    return overlay.find(design, role)
 }
 
-function cloneDesign(design: OcdDesign): OcdDesign {
-    return JSON.parse(JSON.stringify(design)) as OcdDesign
-}
-
-function firstId(design: OcdDesign, listKey: string): string {
-    const list = (design.model.oci.resources?.[listKey] ?? []) as Record<string, unknown>[]
-    return list.length > 0 ? (list[0].id as string) : ''
-}
-
-/** Find-or-create the resource for a role; idempotent by role marker. */
-function upsertRole(design: OcdDesign, spec: RoleSpec, compartmentId: string): Record<string, unknown> {
-    if (!Array.isArray(design.model.oci.resources[spec.listKey])) {
-        design.model.oci.resources[spec.listKey] = []
-    }
-    const list = design.model.oci.resources[spec.listKey] as Record<string, unknown>[]
-    let resource = list.find((r) => readRole(r) === spec.role)
-    if (!resource) {
-        resource = spec.create()
-        list.push(resource)
-    }
-    const userDefined = (resource.userDefined as Record<string, unknown>) ?? {}
-    resource.userDefined = { ...userDefined, [OKE_ROLE_KEY]: spec.role }
-    resource.compartmentId = compartmentId
-    resource.displayName = spec.displayName
-    return resource
-}
+const upsertRole = (design: OcdDesign, spec: RoleSpec, compartmentId: string): Record<string, unknown> =>
+    overlay.upsert(design, spec, compartmentId)
 
 /**
  * Apply the OKE-native overlay. Pure + idempotent. Returns the SAME reference
@@ -123,8 +97,7 @@ export function applyOkeNativeOverlay(design: OcdDesign): OcdDesign {
     if (!isLzOriginDesign(design) || !isOkeNativeEnabled(design)) return design
 
     const next = cloneDesign(design)
-    const compartments = (next.model.oci.resources?.compartment ?? []) as Record<string, unknown>[]
-    const compartmentId = compartments.length > 0 ? (compartments[0].id as string) : ''
+    const compartmentId = rootCompartmentId(next)
     const vcnId = firstId(next, 'vcn')
 
     // Subnets (VCN-native layout) + NSG, all attached to the spoke VCN.

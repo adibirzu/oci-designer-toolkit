@@ -66,6 +66,29 @@ const OcdDiscoveryInventoryView = ({ snapshot }: OcdDiscoveryInventoryViewProps)
                     ))}
                 </tbody>
             </table>
+            {(snapshot.ociResources?.length ?? 0) > 0 && (
+                <>
+                    <h2>OCI Resource Inventory</h2>
+                    <table className='ocd-discovery-table'>
+                        <thead>
+                            <tr>
+                                <th>Resource Type</th>
+                                <th>Display Name</th>
+                                <th>Compartment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {snapshot.ociResources?.map((resource, index) => (
+                                <tr key={`${resource.resourceType}-${resource.displayName}-${index}`}>
+                                    <td><code>{resource.resourceType}</code></td>
+                                    <td>{resource.displayName}</td>
+                                    <td>{resource.compartmentName ?? 'Tenancy or shared scope'}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </>
+            )}
         </div>
     )
 }
