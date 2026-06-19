@@ -30,11 +30,20 @@ import path from 'node:path'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
+const sourcesManifestFile = path.join(repoRoot, 'ocd', 'packages', 'react', 'src', 'landingzone', 'OcdLzSources.json')
 const genRoot = path.join(repoRoot, 'ocd', 'packages', 'react', 'src', 'landingzone', 'oe', 'gen')
 const outFile = path.join(repoRoot, 'ocd', 'packages', 'react', 'src', 'landingzone', 'oe', 'OcdLandingZoneJsonnetSources.ts')
 
-const UPSTREAM_SHA = '917f56214282b2d301d95dbce799e79fb0cd94d0'
 const SOURCE_EXTENSIONS = new Set(['.jsonnet', '.libsonnet'])
+
+function getOperatingEntitiesSource() {
+    const manifest = JSON.parse(readFileSync(sourcesManifestFile, 'utf-8'))
+    const source = manifest.sources.find((s) => s.key === 'operating-entities')
+    if (!source?.pinnedRef) {
+        throw new Error(`Missing operating-entities pinnedRef in ${sourcesManifestFile}`)
+    }
+    return source
+}
 
 /** Recursively collect *.jsonnet / *.libsonnet files under dir. */
 function collectSources(dir) {
@@ -57,6 +66,7 @@ function toGenRelativeKey(absPath) {
 }
 
 function main() {
+    const operatingEntitiesSource = getOperatingEntitiesSource()
     const files = collectSources(genRoot).sort()
     if (files.length === 0) {
         throw new Error(`No OE jsonnet sources found under ${genRoot}`)
@@ -80,7 +90,7 @@ function main() {
         '**',
         '** Operating Entities (OE) jsonnet sources, bundled as a string map so they',
         '** survive the @ocd/react Vite library re-bundle and Electron asar packaging.',
-        `** upstream: oci-landing-zone-operating-entities @ ${UPSTREAM_SHA} (UPL-1.0).`,
+        `** upstream: ${operatingEntitiesSource.repo} @ ${operatingEntitiesSource.pinnedRef} (UPL-1.0).`,
         '** Keys are gen-relative paths. Regenerate with:',
         '**     node scripts/generate_lz_jsonnet_sources.mjs',
         '*/',

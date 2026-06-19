@@ -122,3 +122,17 @@ describe('OcdDocument.cloneResourceTree (issue #250)', () => {
         })
     })
 })
+
+describe('OcdDocument.clone', () => {
+    it('deep-clones design identity for memoized consumers', () => {
+        const ocdDocument = OcdDocument.new()
+        const clone = OcdDocument.clone(ocdDocument)
+
+        expect(clone).not.toBe(ocdDocument)
+        expect(clone.design).not.toBe(ocdDocument.design)
+        expect(clone.design.model).not.toBe(ocdDocument.design.model)
+        expect(clone.design.view).not.toBe(ocdDocument.design.view)
+        expect(clone.design.model.oci.resources).not.toBe(ocdDocument.design.model.oci.resources)
+        expect(clone.design.view.pages).not.toBe(ocdDocument.design.view.pages)
+    })
+})

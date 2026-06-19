@@ -20,6 +20,10 @@
 
 import { OcdDesign, OcdViewLayer } from '@ocd/model'
 import { OciModelResources } from '@ocd/model'
+import {
+    applyCrossTenancyHubSpokeOverlay,
+    LZ_CROSSTENANCY_HUBSPOKE_ENABLED_KEY,
+} from '../OcdLzCrossTenancyHubSpoke'
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -495,6 +499,34 @@ function buildSecureLandingZoneLite(): OcdDesign {
 }
 
 // ---------------------------------------------------------------------------
+// Template 5 — Cross-Tenancy Hub-Spoke (best practice)
+// ---------------------------------------------------------------------------
+
+/**
+ * Two-tenancy DRG + Remote Peering Connection topology. This is a thin wrapper
+ * over the Cross-Tenancy Hub-Spoke overlay (the single source of truth for the
+ * topology): seed a root compartment, mark the design LZ-origin + enabled, then
+ * apply the overlay so template + designer-overlay paths stay in lockstep.
+ */
+function buildCrossTenancyHubSpoke(): OcdDesign {
+    const design = baseDesign('Cross-Tenancy Hub-Spoke')
+
+    const rootCmpt = OciModelResources.OciCompartment.newResource()
+    rootCmpt.displayName = 'Cross-Tenancy Root'
+    push(design, 'compartment', rootCmpt)
+
+    design.userDefined = {
+        ...(design.userDefined ?? {}),
+        lzOrigin: true,
+        [LZ_CROSSTENANCY_HUBSPOKE_ENABLED_KEY]: true,
+    }
+
+    const built = applyCrossTenancyHubSpokeOverlay(design)
+    addLayer(built, rootCmpt.id, true)
+    return built
+}
+
+// ---------------------------------------------------------------------------
 // Registry
 // ---------------------------------------------------------------------------
 
@@ -530,6 +562,14 @@ export const ocdArchitectureTemplates: readonly OcdArchitectureTemplate[] = [
             'Lightweight landing zone foundation: root compartment with network, security, and app workload child compartments, a VCN with DMZ + private subnets, a Vault, IAM groups, and baseline policies.',
         tags: ['landing-zone', 'security', 'iam', 'governance'],
         build: buildSecureLandingZoneLite,
+    },
+    {
+        id: 'cross-tenancy-hub-spoke',
+        title: 'Cross-Tenancy Hub-Spoke',
+        description:
+            'Connect two OCI tenancies the best-practice way: each tenancy owns a DRG, and a Remote Peering Connection (RPC) on each DRG peers with the other (naming the peer tenancy + region). Non-overlapping VCN CIDRs, DRG attachments, and a symmetric RPC handshake — exports clean Terraform with peer_tenancy_id.',
+        tags: ['networking', 'cross-tenancy', 'drg', 'rpc', 'multi-tenancy', 'best-practice'],
+        build: buildCrossTenancyHubSpoke,
     },
 ] as const
 

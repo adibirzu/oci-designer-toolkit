@@ -37,3 +37,9 @@ Notes:
 - **Public fork — never commit real OCIDs, tenancy/namespace strings, public IPs, secrets, PII.** Vendor upstream data via `npm run setup-lz`; keep `baselines/` git-ignored. `.githooks/pre-commit` redaction gate enforces — run `npm run hooks:install` once.
 - Keep files focused (many small modules); follow existing Redwood `--oracle-*` design tokens for UI work.
 - Branch `feature/lzng-redwood-cost-estimator` → PR #1 against `master`.
+
+### Redaction gate (pre-commit + pre-push)
+
+- **Scope** (`scripts/check-redaction.sh`, added lines only): real OCIDs (`ocid1.*.oc1...`), known public-IP ranges, PEM private-key headers, `isk_*` service keys, OCI auth-token literals, and tenancy-namespace strings in context (`*.ocir.io/<ns>/...`, `/n/<ns>/b/...`). Placeholders (`<PLACEHOLDER>`, `${OCIR_TENANCY}`) never match. Test fixtures must use clearly synthetic split spellings (for example, `ocid1 tenancy oc1 example`), never realistic-looking tails.
+- **Optional deep scan**: if `gitleaks` is on PATH, pre-commit also runs `gitleaks git --pre-commit --staged`; when absent it skips with an informational line (the grep gate stays mandatory).
+- **Bypass audit**: `git commit --no-verify` skips pre-commit entirely, but `.githooks/pre-push` re-scans every outgoing commit range with the same patterns and blocks the push. Bypassing the gate therefore requires `--no-verify` on **both** commit and push (don't). Intentional public reference data: `ALLOW_OCIDS=1 git commit/push ...`. If a leak does land in history, rewrite it (`git filter-repo`) — never push a "fix" commit.

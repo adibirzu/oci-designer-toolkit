@@ -624,6 +624,139 @@ summary {
     top: -10px;
 }
 
+/* Redwood workbench shell refresh. Keeps the existing grid contract intact while
+   replacing the cramped legacy chrome with denser Oracle Cloud Console styling. */
+.ocd-console {
+    --console-titlebar-height: 28px;
+    --console-menubar-height: 28px;
+    --console-header-height: 56px;
+    --console-toolbar-height: 36px;
+    --console-footer-height: 28px;
+    color: var(--rw-stone-800, #3B4140);
+    background: var(--rw-stone-50, #FBF9F8);
+    font-family: var(--rw-font-body, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+}
+
+.ocd-console-header {
+    padding: 0 10px 0 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--rw-stone-900, #2A2F2F);
+    color: var(--rw-white, #FFFFFF);
+}
+
+.ocd-title-and-menu {
+    height: var(--console-header-height);
+    padding-left: 12px;
+}
+
+.ocd-console-title-bar {
+    padding: 0 18px 0 0;
+}
+
+.ocd-console-title-bar input {
+    min-height: 24px;
+    border: none;
+    background: transparent;
+    color: var(--rw-white, #FFFFFF);
+    font-family: var(--rw-font-display, Georgia, serif);
+    font-size: 18px;
+}
+
+.ocd-console-title-bar input:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.42);
+    outline-offset: 1px;
+}
+
+.ocd-console-menu-bar {
+    align-items: center;
+    border-bottom: none;
+    color: var(--rw-stone-200, #E4E7E6);
+}
+
+.ocd-console-main-menu {
+    min-height: var(--console-menubar-height);
+}
+
+.ocd-menu-item {
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.ocd-menu-item>a {
+    border-radius: var(--rw-radius-sm, 6px);
+    color: inherit;
+    line-height: 24px;
+}
+
+.ocd-menu-item>a:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--rw-white, #FFFFFF);
+}
+
+.ocd-dropdown-menu,
+.ocd-console-toolbar-dropdown-item > ul {
+    border: 1px solid var(--rw-stone-200, #E4E7E6);
+    border-radius: var(--rw-radius-md, 8px);
+    background: var(--rw-white, #FFFFFF);
+    color: var(--rw-stone-800, #3B4140);
+    box-shadow: var(--rw-shadow-md, 0 8px 24px rgba(42, 47, 47, 0.1));
+}
+
+.ocd-submenu-item>a {
+    border-radius: var(--rw-radius-sm, 6px);
+    color: var(--rw-stone-800, #3B4140);
+}
+
+.ocd-submenu-item a:hover,
+.ocd-dropdown-menu-item:hover {
+    background: var(--rw-stone-100, #F3F4F3);
+    box-shadow: none;
+}
+
+.ocd-console-toolbar {
+    align-items: center;
+    padding: 0 8px;
+    border-bottom: 1px solid var(--rw-stone-200, #E4E7E6);
+    background: var(--rw-white, #FFFFFF);
+    box-shadow: 0 1px 0 rgba(42, 47, 47, 0.04);
+}
+
+.ocd-toolbar-left > div,
+.ocd-toolbar-centre > div,
+.ocd-toolbar-right > div {
+    align-items: center;
+    gap: 4px;
+}
+
+.ocd-console-toolbar-icon,
+.ocd-console-three-dot-menu-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--rw-radius-sm, 6px);
+}
+
+.ocd-console-toolbar-icon:hover,
+.ocd-console-three-dot-menu-icon:hover {
+    background-color: var(--rw-stone-100, #F3F4F3);
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.ocd-toolbar-separator-right {
+    border-right: 1px solid var(--rw-stone-200, #E4E7E6) !important;
+}
+
+.ocd-console-body {
+    background: var(--rw-stone-50, #FBF9F8);
+}
+
+.ocd-console-footer {
+    border-top: 1px solid var(--rw-stone-200, #E4E7E6);
+    background: var(--rw-white, #FFFFFF);
+    color: var(--rw-stone-600, #6B7170);
+    font-family: var(--rw-font-body, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+}
+
 
 
 
@@ -838,6 +971,44 @@ summary {
     width: 100%;
     min-height: 100%;
     padding-bottom: 30px;
+}
+
+.ocd-palette-search {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 38px;
+    padding: 6px;
+    border-bottom: #b7b7b7 solid 1px;
+    background-color: #f6f7f8;
+}
+
+.ocd-palette-search input {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 26px;
+    padding: 3px 8px;
+    border: #9b9b9b solid 1px;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #1d2733;
+    font-size: 12px;
+}
+
+.ocd-palette-search input:focus {
+    outline: #c74634 solid 2px;
+    outline-offset: 1px;
+}
+
+.ocd-palette-empty {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px 10px;
+    color: #5f6267;
+    direction: ltr;
+    font-size: 12px;
+    line-height: 1.35;
 }
 
 .ocd-model-palette {
@@ -1097,6 +1268,7 @@ summary {
     box-sizing: border-box;
     min-height: 100%;
     flex-grow: 1;
+    position: relative;
 }
 
 .ocd-designer-canvas-layers-bar {
@@ -1274,6 +1446,363 @@ summary {
     flex-grow: 1;
     position: relative;
     overflow: auto;
+}
+
+.ocd-canvas-relation-toolbar {
+    position: absolute;
+    top: calc(var(--console-layers-bar-height) + 12px);
+    left: 16px;
+    z-index: 4;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    max-width: min(620px, calc(100% - 32px));
+    min-height: 30px;
+    padding: 5px 9px;
+    border: 1px solid #d8d2cc;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 8px 24px rgba(49, 45, 42, 0.12);
+    color: #312d2a;
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: auto;
+}
+
+.ocd-canvas-relation-toolbar label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.ocd-canvas-relation-toolbar input {
+    margin: 0;
+}
+
+.ocd-canvas-relation-toolbar input:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.ocd-canvas-relation-toolbar > span {
+    color: #6f6761;
+    font-variant-numeric: tabular-nums;
+}
+
+.ocd-canvas-relation-option {
+    padding-left: 8px;
+    border-left: 1px solid #e7e0db;
+}
+
+.ocd-canvas-relation-inspector-button,
+.ocd-canvas-relation-inspector button {
+    min-height: 24px;
+    border: 1px solid #d8d2cc;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #312d2a;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.ocd-canvas-relation-inspector {
+    position: absolute;
+    top: calc(var(--console-layers-bar-height) + 56px);
+    left: 16px;
+    z-index: 4;
+    box-sizing: border-box;
+    width: min(460px, calc(100% - 32px));
+    max-height: min(560px, calc(100% - 96px));
+    overflow: auto;
+    padding: 12px;
+    border: 1px solid #d8d2cc;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 12px 32px rgba(49, 45, 42, 0.14);
+    color: #312d2a;
+    pointer-events: auto;
+}
+
+.ocd-canvas-relation-inspector > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.ocd-canvas-relation-inspector ul {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ocd-canvas-relation-inspector li {
+    display: grid;
+    gap: 3px;
+    padding: 8px 10px;
+    border-left: 3px solid #76a2a0;
+    border-radius: 6px;
+    background: #f7f8f7;
+}
+
+.ocd-canvas-relation-inspector li.hidden {
+    border-left-color: #c8c1bb;
+    opacity: 0.72;
+}
+
+.ocd-canvas-relation-inspector li > span {
+    color: #6f6761;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.ocd-canvas-relation-inspector strong {
+    font-size: 12px;
+}
+
+.ocd-canvas-relation-inspector em {
+    color: #4b5656;
+    font-size: 12px;
+    font-style: normal;
+    line-height: 1.35;
+}
+
+.ocd-canvas-relation-inspector small {
+    color: #6f6761;
+    font-size: 11px;
+}
+
+.ocd-architecture-command-center {
+    position: absolute;
+    z-index: 5;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid #d8d2cc;
+    box-shadow: 0 12px 32px rgba(49, 45, 42, 0.14);
+    color: #312d2a;
+    font-family: inherit;
+    pointer-events: auto;
+}
+
+.ocd-architecture-command-center-floating {
+    right: auto;
+    transform: none;
+}
+
+.ocd-architecture-command-center-dragging {
+    box-shadow: 0 18px 42px rgba(49, 45, 42, 0.2);
+}
+
+.ocd-architecture-command-center-empty {
+    top: calc(var(--console-layers-bar-height) + 42px);
+    left: 50%;
+    width: min(760px, calc(100% - 64px));
+    min-height: 176px;
+    padding: 22px;
+    transform: translateX(-50%);
+    border-radius: 8px;
+}
+
+.ocd-architecture-command-center-compact {
+    top: calc(var(--console-layers-bar-height) + 12px);
+    right: 18px;
+    width: min(520px, calc(100% - 36px));
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.ocd-architecture-command-center-collapsed {
+    width: min(360px, calc(100% - 36px));
+    min-height: 0;
+    padding: 8px 10px;
+}
+
+.ocd-architecture-command-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.ocd-architecture-command-copy {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-bottom: 12px;
+    touch-action: none;
+    cursor: move;
+    user-select: none;
+}
+
+.ocd-architecture-command-copy strong {
+    display: block;
+    min-width: 0;
+    font-size: 18px;
+    line-height: 1.2;
+}
+
+.ocd-architecture-command-center-compact .ocd-architecture-command-copy {
+    margin-bottom: 8px;
+}
+
+.ocd-architecture-command-center-compact .ocd-architecture-command-copy strong {
+    font-size: 13px;
+}
+
+.ocd-architecture-command-copy span {
+    color: #6f6761;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ocd-architecture-command-window-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.ocd-architecture-command-window-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: 1px solid #d8d2cc;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #312d2a;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.ocd-architecture-command-window-button:hover {
+    border-color: #c74634;
+    background: #fbf9f8;
+}
+
+.ocd-architecture-command-window-button:focus-visible {
+    outline: 2px solid #312d2a;
+    outline-offset: 2px;
+}
+
+.ocd-architecture-command-center-collapsed .ocd-architecture-command-copy,
+.ocd-architecture-command-center-collapsed .ocd-architecture-command-window-controls {
+    margin-bottom: 0;
+}
+
+.ocd-architecture-command-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.ocd-architecture-command-center-compact .ocd-architecture-command-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ocd-architecture-command-action {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    min-height: 42px;
+    gap: 9px;
+    padding: 8px 10px;
+    border: 1px solid #d8d2cc;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #312d2a;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ocd-architecture-command-center-compact .ocd-architecture-command-action {
+    min-height: 30px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+
+.ocd-architecture-command-action:hover {
+    border-color: #c74634;
+    background: #fbf9f8;
+}
+
+.ocd-architecture-command-action:focus-visible {
+    outline: 2px solid #312d2a;
+    outline-offset: 2px;
+}
+
+.ocd-architecture-command-action.primary {
+    border-color: #c74634;
+    background: #c74634;
+    color: #ffffff;
+}
+
+.ocd-architecture-command-action.primary:hover {
+    background: #a63d2e;
+}
+
+.ocd-architecture-command-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    border-radius: 5px;
+    background: #f1efed;
+    color: #312d2a;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.ocd-architecture-command-action.primary .ocd-architecture-command-icon {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+}
+
+.ocd-architecture-command-action > span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+    .ocd-architecture-command-center-empty {
+        top: calc(var(--console-layers-bar-height) + 18px);
+        width: min(520px, calc(100% - 28px));
+        padding: 14px;
+    }
+
+    .ocd-architecture-command-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ocd-architecture-command-center-compact {
+        left: 14px;
+        right: 14px;
+        width: auto;
+    }
 }
 
 .ocd-designer-canvas-svg {
@@ -2504,6 +3033,76 @@ table {
 
 .ocd-resource-manager-error {
     color: #b42318;
+}
+
+.ocd-resource-manager-recent-plans {
+    display: grid;
+    gap: 6px;
+    max-width: 410px;
+}
+
+.ocd-resource-manager-recent-plans > span {
+    color: #6f6761;
+    font-family: var(--dialog-input-font-family);
+    font-size: var(--dialog-input-font-size);
+}
+
+.ocd-resource-manager-recent-plans > div {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    gap: 6px;
+    align-items: center;
+    padding: 6px;
+    border: 1px solid #d8d2cc;
+    border-radius: 6px;
+    background: #fbf9f8;
+}
+
+.ocd-resource-manager-recent-plans button {
+    min-height: 24px;
+    border: 1px solid #d8d2cc;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #312d2a;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.ocd-resource-manager-recent-plans span {
+    color: #6f6761;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.ocd-resource-manager-recent-plans strong {
+    min-width: 0;
+    overflow: hidden;
+    color: #312d2a;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ocd-resource-manager-recent-plans small {
+    grid-column: 3 / 5;
+    overflow: hidden;
+    color: #6f6761;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ocd-resource-manager-plan-preview {
+    box-sizing: border-box;
+    font-family: var(--console-font-family, monospace);
+    font-size: 0.85rem;
+    height: 12rem;
+    max-width: 410px;
+    resize: vertical;
+    white-space: pre;
+    width: 100%;
 }
 
 

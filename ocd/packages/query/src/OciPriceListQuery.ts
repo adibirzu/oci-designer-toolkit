@@ -35,6 +35,10 @@
 ** currencyCodeLocalizations[].prices[] instead, so we model that.)
 */
 
+import { OcdLogger } from '@ocd/core'
+
+const logger = OcdLogger.scope('OciPriceListQuery')
+
 export interface CetoolsPriceTier {
     model: string // e.g. "PAY_AS_YOU_GO"
     value: number
@@ -165,7 +169,7 @@ export async function getOciPriceList(
         const url = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}currencyCode=${encodeURIComponent(currency)}`
         const response = await fetch(url, { signal: controller.signal })
         if (!response.ok) {
-            console.warn(`OciPriceListQuery: pricing request failed with status ${response.status}`)
+            logger.warn(`pricing request failed with status ${response.status}`)
             return result
         }
         const data = (await response.json()) as CetoolsResponse
@@ -186,7 +190,7 @@ export async function getOciPriceList(
     } catch (error: unknown) {
         // Explicitly handled: log and return the partial map. Do NOT rethrow.
         const message = error instanceof Error ? error.message : String(error)
-        console.warn(`OciPriceListQuery: pricing fetch error (${message}); returning partial price map`)
+        logger.warn(`pricing fetch error (${message}); returning partial price map`)
     } finally {
         clearTimeout(timer)
     }

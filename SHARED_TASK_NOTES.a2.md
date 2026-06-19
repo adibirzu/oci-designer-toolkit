@@ -13,6 +13,46 @@ ocd/packages/codegen/src/importer/data/OciResourceMap.ts.
 
 ## Progress
 - (loop appends per-iteration here)
+- STATUS CORRECTION 2026-06-10: entries below stop at iteration 8 (238) but the LIVE
+  catalog in OciResourceMap.ts has 265 entries — iterations 9-10 ran without updating
+  this file. Vendored oci tf-schema has 727 resource schemas; 460 still absent.
+  Verified by codex sweep. Next-batch candidates identified (14): oci_core_volume_backup,
+  oci_core_volume_backup_policy, oci_core_volume_backup_policy_assignment,
+  oci_core_volume_group_backup, oci_core_instance_console_connection,
+  oci_core_route_table_attachment, oci_core_ipv6, oci_core_public_ip_pool,
+  oci_file_storage_snapshot, oci_mysql_mysql_backup, oci_mysql_mysql_configuration,
+  oci_mysql_replica, oci_dns_record, oci_dns_steering_policy_attachment.
+  Before any new iteration: recount live entries first; trust the code, not this log.
+- Iteration 11 (catalog 265 -> 279): added 14 high-value services across block volume
+  backups/policies, instance console access, route-table attachments, IPv6/public-IP
+  pools, FSS snapshots, MySQL backups/configuration/replicas, and DNS records/steering
+  attachments:
+  volume_backup (oci_core_volume_backup),
+  volume_backup_policy (oci_core_volume_backup_policy),
+  volume_backup_policy_assignment (oci_core_volume_backup_policy_assignment),
+  volume_group_backup (oci_core_volume_group_backup),
+  instance_console_connection (oci_core_instance_console_connection),
+  route_table_attachment (oci_core_route_table_attachment),
+  ipv6 (oci_core_ipv6),
+  public_ip_pool (oci_core_public_ip_pool),
+  file_storage_snapshot (oci_file_storage_snapshot),
+  mysql_backup (oci_mysql_mysql_backup),
+  mysql_configuration (oci_mysql_mysql_configuration),
+  mysql_replica (oci_mysql_replica),
+  dns_record (oci_dns_record),
+  dns_steering_policy_attachment (oci_dns_steering_policy_attachment).
+  Notes:
+  * All 14 confirmed present in resource_schemas of the vendored tf-schema.json before
+    curation; none were already mapped.
+  * Dropped nested `source_details.region`, MySQL snapshot `region`, and operational
+    state/time/size read-only fields from the curated attribute lists. Kept console
+    connection `public_key` as public key material, matching prior identity_api_key
+    treatment.
+  * MySQL configuration keeps a representative non-secret variable subset; the provider
+    exposes dozens of tunables, but curating all of them would bloat the generated
+    properties surface without improving common design/import workflows.
+  Regenerated OCI codegen; workspace compile clean; react build clean. Active resourceMap
+  entries: 279.
 - Iteration 2 (catalog 140 -> 154): added 14 high-value services across
   identity/security/db/observability/compute/networking/storage/AI:
   identity_domain (oci_identity_domain),

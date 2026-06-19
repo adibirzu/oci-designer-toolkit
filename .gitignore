@@ -85,6 +85,12 @@ containers/ssh/*
 
 # Copied wasm (Landing Zone Wizard) — prebuild copies from react/src/landingzone/wasm
 **/desktop/public/libjsonnet.wasm
+# Standalone react dev server — predev copies these into public/ (see react/scripts/copy-static-assets.mjs)
+**/react/public/libjsonnet.wasm
+
+# Copied reference architecture library — prebuild copies from ocd/library
+**/desktop/public/library/
+**/react/public/library/
 
 # Landing Zone Wizard — vendored OCI Operating Entities sources are fetched
 # locally via `npm run setup-lz` and NOT committed (they embed upstream OCI
@@ -102,6 +108,9 @@ log/
 okitclassic/instance/
 baselines/oci-landing-zones/
 addons/oci-observability-end-to-end/dist/
+external/lz-addons/
+# Never commit env files into the embedded vendored LZNG copy (placeholder keys trip the redaction gate)
+ocd/external/landing-zone-next-gen/.env*
 
 # Testing
 test

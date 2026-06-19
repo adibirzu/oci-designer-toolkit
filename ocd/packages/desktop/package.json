@@ -22,14 +22,14 @@
   "license": "UPL-1.0",
   "main": ".vite/build/main.js",
   "scripts": {
-    "dev": "vite",
-    "web": "vite --host 0.0.0.0",
+    "dev": "npm run prebuild && vite",
+    "web": "npm run prebuild && vite --host 0.0.0.0",
     "vite-build": "tsc -b ./tsconfig.json && vite build",
-    "build:web": "npm run prebuild && vite build --config vite.web.config.mts",
+    "build:web": "npm run prebuild && tsc -p ./tsconfig.web.json && vite build --config vite.web.config.mts",
     "build:pages": "npm run build:web && node scripts/prepare-pages-build.mjs web-dist",
     "clean": "rm -rf lib dist .vite out web-dist",
     "purge": "npm run clean && rm -rf node_modules",
-    "prebuild": "cp -v ../react/src/css/*.css ./src/css && cp -v ../react/src/landingzone/wasm/libjsonnet.wasm ./public/libjsonnet.wasm || (copy /y ..\\react\\src\\css\\*.css .\\src\\css && copy /y ..\\react\\src\\landingzone\\wasm\\libjsonnet.wasm .\\public\\libjsonnet.wasm)",
+    "prebuild": "node scripts/prepare-static-assets.mjs",
     "build": "npm run make",
     "start": "NODE_OPTIONS=--max-old-space-size=8192 electron-forge start",
     "package": "NODE_OPTIONS=--max-old-space-size=8192 electron-forge package",
@@ -38,7 +38,9 @@
     "make-macos-arm64": "NODE_OPTIONS=--max-old-space-size=8192 DEBUG=electron-installer-dmg* electron-forge make --arch='arm64'",
     "make-macos-x64": "NODE_OPTIONS=--max-old-space-size=8192 DEBUG=electron-installer-dmg* electron-forge make --arch='x64'",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "premake": "npm run typecheck || true"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.6.0",
@@ -54,13 +56,14 @@
     "@types/electron-squirrel-startup": "^1.0.2",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
+    "@vitejs/plugin-react": "^6.0.2",
     "electron": ">=32.2.0",
-    "electron-builder": "^25.1.8",
+    "electron-builder": "^26.15.2",
     "eslint": ">=8.57.1",
     "eslint-plugin-import": "^2.31.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3",
-    "vite": ">=6.3.4"
+    "vite": "^8.0.16"
   },
   "dependencies": {
     "@ocd/core": ">=0.3.0",
