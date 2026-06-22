@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest'
 import * as AwsModelResources from '../resources.js'
 
 describe('AwsModelResources namespaces', () => {
-    it('exposes all 13 self-contained AWS resource namespaces', () => {
+    it('exposes all 19 self-contained AWS resource namespaces', () => {
         expect(AwsModelResources.AwsVpc).toBeDefined()
         expect(AwsModelResources.AwsSubnet).toBeDefined()
         expect(AwsModelResources.AwsInternetGateway).toBeDefined()
@@ -21,6 +21,39 @@ describe('AwsModelResources namespaces', () => {
         expect(AwsModelResources.AwsLoadBalancer).toBeDefined()
         expect(AwsModelResources.AwsIamRole).toBeDefined()
         expect(AwsModelResources.AwsLambdaFunction).toBeDefined()
+        expect(AwsModelResources.AwsCloudfrontDistribution).toBeDefined()
+        expect(AwsModelResources.AwsSnsTopic).toBeDefined()
+        expect(AwsModelResources.AwsSqsQueue).toBeDefined()
+        expect(AwsModelResources.AwsEcsCluster).toBeDefined()
+        expect(AwsModelResources.AwsApiGateway).toBeDefined()
+        expect(AwsModelResources.AwsDynamodbTable).toBeDefined()
+    })
+})
+
+describe('cdn, messaging, containers, serverless AWS resources', () => {
+    it('AwsCloudfrontDistribution is top-level with an origin', () => {
+        const cf = AwsModelResources.AwsCloudfrontDistribution.newResource()
+        expect(cf.resourceType).toBe('CloudfrontDistribution')
+        expect(cf.originDomain).toBe('')
+        expect(AwsModelResources.AwsCloudfrontDistribution.allowedParentTypes()).toEqual([])
+    })
+    it('AwsSnsTopic and AwsSqsQueue default to standard (non-fifo)', () => {
+        expect(AwsModelResources.AwsSnsTopic.newResource().fifo).toBe(false)
+        expect(AwsModelResources.AwsSqsQueue.newResource().fifo).toBe(false)
+        expect(AwsModelResources.AwsSnsTopic.newResource().resourceType).toBe('SnsTopic')
+        expect(AwsModelResources.AwsSqsQueue.newResource().resourceType).toBe('SqsQueue')
+    })
+    it('AwsEcsCluster parents to a Vpc with a launch type', () => {
+        const ecs = AwsModelResources.AwsEcsCluster.newResource()
+        expect(ecs.resourceType).toBe('EcsCluster')
+        expect(ecs.launchType).toBe('FARGATE')
+        expect(AwsModelResources.AwsEcsCluster.allowedParentTypes()).toContain('Vpc')
+    })
+    it('AwsApiGateway and AwsDynamodbTable have sensible defaults', () => {
+        expect(AwsModelResources.AwsApiGateway.newResource().protocolType).toBe('HTTP')
+        expect(AwsModelResources.AwsDynamodbTable.newResource().billingMode).toBe('PAY_PER_REQUEST')
+        expect(AwsModelResources.AwsApiGateway.newResource().resourceType).toBe('ApiGateway')
+        expect(AwsModelResources.AwsDynamodbTable.newResource().resourceType).toBe('DynamodbTable')
     })
 })
 
