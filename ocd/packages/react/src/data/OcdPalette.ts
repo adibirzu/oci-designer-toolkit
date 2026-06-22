@@ -1105,60 +1105,82 @@ export const palette = {
         //         },
         //     ]
         // },
-        // {
-        //     "title": "Google",
-        //     "provider": "google",
-        //     "class": "google-provider",
-        //     "groups": [
-        //         {
-        //             "title": "Networking",
-        //             "class": "google-network",
-        //             "resources": [
-        //                 {
-        //                     "container": true,
-        //                     "title": "Virtual Private Cloud",
-        //                     "class": "google-compute-network"
-        //                 },
-        //                 // {
-        //                 //     "container": true,
-        //                 //     "title": "Subnet",
-        //                 //     "class": "azure-subnet"
-        //                 // },
-        //                 // {
-        //                 //     "container": false,
-        //                 //     "title": "Load Balancer",
-        //                 //     "class": "azure-load-balancer"
-        //                 // },
-        //                 // {
-        //                 //     "container": false,
-        //                 //     "title": "DNS Zone",
-        //                 //     "class": "azure-dns-zone"
-        //                 // },
-        //             ]
-        //         },
-        //         {
-        //             "title": "Database",
-        //             "class": "google-database",
-        //             "resources": [
-        //                 {
-        //                     "container": false,
-        //                     "title": "Oracle Exadata Database@Google",
-        //                     "class": "google-oracle-database-cloud-exadata-infrastructure"
-        //                 },
-        //                 {
-        //                     "container": false,
-        //                     "title": "Oracle Autonomous Database@Google",
-        //                     "class": "google-oracle-database-autonomous-database"
-        //                 },
-        //                 {
-        //                     "container": false,
-        //                     "title": "Oracle VM Cluster Database@Google",
-        //                     "class": "google-oracle-database-cloud-vm-cluster"
-        //                 },
-        //             ]
-        //         },
-        //     ]
-        // },
+        {
+            "title": "Google",
+            "provider": "google",
+            "class": "google-provider",
+            "groups": [
+                {
+                    "title": "Networking",
+                    "class": "google-network",
+                    "resources": [
+                        {
+                            "container": true,
+                            "title": "Virtual Private Cloud",
+                            "class": "google-compute-network"
+                        },
+                        {
+                            "container": true,
+                            "title": "Subnetwork",
+                            "class": "google-compute-subnetwork"
+                        },
+                        {
+                            "container": false,
+                            "title": "Firewall",
+                            "class": "google-compute-firewall"
+                        },
+                        {
+                            "container": false,
+                            "title": "Router",
+                            "class": "google-compute-router"
+                        },
+                    ]
+                },
+                {
+                    "title": "Compute",
+                    "class": "google-compute",
+                    "resources": [
+                        {
+                            "container": false,
+                            "title": "Instance",
+                            "class": "google-compute-instance"
+                        },
+                    ]
+                },
+                {
+                    "title": "Storage",
+                    "class": "google-storage",
+                    "resources": [
+                        {
+                            "container": false,
+                            "title": "Bucket",
+                            "class": "google-storage-bucket"
+                        },
+                    ]
+                },
+                {
+                    "title": "Database",
+                    "class": "google-database",
+                    "resources": [
+                        {
+                            "container": false,
+                            "title": "Oracle Exadata Database@Google",
+                            "class": "google-oracle-database-cloud-exadata-infrastructure"
+                        },
+                        {
+                            "container": false,
+                            "title": "Oracle Autonomous Database@Google",
+                            "class": "google-oracle-database-autonomous-database"
+                        },
+                        {
+                            "container": false,
+                            "title": "Oracle VM Cluster Database@Google",
+                            "class": "google-oracle-database-cloud-vm-cluster"
+                        },
+                    ]
+                },
+            ]
+        },
         {
             "title": "General",
             "provider": "general",
