@@ -117,6 +117,9 @@ export const validateResourceManagerJobOptions = (value: unknown): OciResourceMa
     const planJobId = stringValue(value.planJobId, 'planJobId', '', true)
     const approval = stringValue(value.approval, 'approval', '', true)
     if (approval !== 'APPLY') throw new Error('approval must be APPLY')
+    // Plan-review-before-apply: an APPLY must reference the PLAN job that was
+    // reviewed, so a design can never be applied without first inspecting a plan.
+    if (!planJobId.trim()) throw new Error('planJobId is required for APPLY — run and review a PLAN job before applying')
     return { operation, planJobId, approval }
 }
 
