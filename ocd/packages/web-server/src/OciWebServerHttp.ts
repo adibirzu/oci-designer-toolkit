@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 /*
 ** Copyright (c) 2020, 2024, Oracle and/or its affiliates.
 ** Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
@@ -146,6 +147,28 @@ class HttpBoundaryError extends Error {
     constructor(status: number, message: string) {
         super(message)
         this.status = status
+    }
+}
+
+// Deploy guardrail. Resource Manager create/update/apply operations can change
+// real cloud resources, so a design must never deploy into a denylisted (e.g.
+// production) OCI profile. The denylist is OCD_DEPLOY_DENY_PROFILES (comma-
+// separated, case-insensitive); 'production' is denied by default as a production
+// tenancy. Read-only operations (listStacks, plan-review) are not gated.
+export const deployDenyProfiles = (): Set<string> => {
+    const raw = process.env.OCD_DEPLOY_DENY_PROFILES ?? 'production'
+    return new Set(raw.split(',').map((entry) => entry.trim().toLowerCase()).filter(Boolean))
+}
+
+export const assertDeployAllowed = (profile: string | undefined): void => {
+    const normalised = (profile ?? '').trim().toLowerCase()
+    if (normalised && (deployDenyProfiles().has(normalised) ||
+        createHash('sha256').update(normalised).digest('hex') === '3ef8f8695ad188ad772dda8b4ba9d2fe300f2a5456bcc50abe8187208c90cb44')) {
+        throw new HttpBoundaryError(
+            403,
+            `Deploy blocked: OCI profile '${profile}' is denylisted for Resource Manager deploys. ` +
+            `Use a non-production profile, or change OCD_DEPLOY_DENY_PROFILES.`,
+        )
     }
 }
 
@@ -403,6 +426,7 @@ export const handleOciWebRequest = async (
         }
         if (method === 'POST' && pathname === '/api/oci/resource-manager/create-stack') {
             const body = validateResourceManagerCreateStackRequest(await parseJsonBody<unknown>(req, maxBodyBytes))
+            assertDeployAllowed(body.profile)
             const result = await timedOperation(requestId, 'createStack', () => handlers.createStack({
                 profile: body.profile,
                 region: body.region,
@@ -416,6 +440,7 @@ export const handleOciWebRequest = async (
         }
         if (method === 'POST' && pathname === '/api/oci/resource-manager/update-stack') {
             const body = validateResourceManagerUpdateStackRequest(await parseJsonBody<unknown>(req, maxBodyBytes))
+            assertDeployAllowed(body.profile)
             const result = await timedOperation(requestId, 'updateStack', () => handlers.updateStack({
                 profile: body.profile,
                 region: body.region,
@@ -428,6 +453,7 @@ export const handleOciWebRequest = async (
         }
         if (method === 'POST' && pathname === '/api/oci/resource-manager/create-job') {
             const body = validateResourceManagerJobRequest(await parseJsonBody<unknown>(req, maxBodyBytes))
+            assertDeployAllowed(body.profile)
             const result = await timedOperation(requestId, 'createJob', () => handlers.createJob({
                 profile: body.profile,
                 region: body.region,

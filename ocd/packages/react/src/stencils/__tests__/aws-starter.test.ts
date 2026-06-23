@@ -10,7 +10,7 @@ import awsStarter from '../packs/aws-starter.json'
 describe('AWS starter stencil pack', () => {
     it('validates as importable custom stencils', () => {
         const manifests = validateStencilManifest(awsStarter)
-        expect(manifests).toHaveLength(13)
+        expect(manifests).toHaveLength(19)
         for (const manifest of manifests) {
             expect(manifest.provider).toBe('custom')
             expect(manifest.class.startsWith('custom-aws-')).toBe(true)
@@ -18,7 +18,7 @@ describe('AWS starter stencil pack', () => {
         }
     })
 
-    it('covers the thirteen AWS model resources', () => {
+    it('covers the nineteen AWS model resources', () => {
         const classes = validateStencilManifest(awsStarter).map((m) => m.class)
         for (const expected of [
             'custom-aws-vpc',
@@ -34,6 +34,12 @@ describe('AWS starter stencil pack', () => {
             'custom-aws-load-balancer',
             'custom-aws-iam-role',
             'custom-aws-lambda-function',
+            'custom-aws-cloudfront-distribution',
+            'custom-aws-sns-topic',
+            'custom-aws-sqs-queue',
+            'custom-aws-ecs-cluster',
+            'custom-aws-api-gateway',
+            'custom-aws-dynamodb-table',
         ]) {
             expect(classes).toContain(expected)
         }
@@ -42,6 +48,6 @@ describe('AWS starter stencil pack', () => {
     it('builds a palette provider block from the pack', () => {
         const provider = manifestToPaletteProvider(validateStencilManifest(awsStarter))
         expect(provider.provider).toBe('custom')
-        expect(provider.groups[0].resources).toHaveLength(13)
+        expect(provider.groups[0].resources).toHaveLength(19)
     })
 })
