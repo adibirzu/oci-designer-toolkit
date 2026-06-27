@@ -51,7 +51,8 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@xyflow/react": "^12.11.0"
+    "@xyflow/react": "^12.11.0",
+    "zod": "^3.23.8"
   },
   "peerDependencies": {
     "@ocd/core": ">=0.3.0",
