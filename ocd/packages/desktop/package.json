@@ -39,8 +39,8 @@
     "make-macos-x64": "NODE_OPTIONS=--max-old-space-size=8192 DEBUG=electron-installer-dmg* electron-forge make --arch='x64'",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx .",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "premake": "npm run typecheck || true"
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.vite.json",
+    "premake": "npm run typecheck"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.6.0",
