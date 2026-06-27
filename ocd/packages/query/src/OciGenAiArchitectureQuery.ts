@@ -61,6 +61,16 @@ const SENSITIVE_PATTERNS: ReadonlyArray<[RegExp, string]> = [
     [/\b(?:10\.42|10\.0\.10)\.\d{1,3}\.\d{1,3}\b/g, '<PRIVATE_IP>'],
 ]
 
+const ARCHITECTURE_RESOURCE_KINDS = [
+    'compartment', 'vcn', 'subnet', 'internet_gateway', 'nat_gateway', 'service_gateway',
+    'network_security_group', 'load_balancer', 'instance', 'db_system', 'oke_cluster',
+    'oke_node_pool', 'bastion', 'vault', 'key', 'log_group', 'monitoring_alarm', 'budget',
+    'policy', 'dynamic_group', 'api_gateway', 'functions_application', 'functions_function',
+    'web_app_firewall', 'data_safe_target_database', 'data_safe_security_assessment',
+    'cloud_guard_target', 'log_analytics_log_group', 'service_connector',
+    'streaming_stream_pool', 'streaming_stream',
+] as const
+
 const clampNumber = (value: number | undefined, fallback: number, min: number, max: number): number => {
     if (value === undefined || !Number.isFinite(value)) return fallback
     return Math.min(max, Math.max(min, value))
@@ -96,6 +106,28 @@ export const resolveGenAiArchitectureRequestDefaults = (
 
 export const redactArchitecturePrompt = (prompt: string): string =>
     SENSITIVE_PATTERNS.reduce((current, [pattern, replacement]) => current.replace(pattern, replacement), prompt)
+
+/**
+ * The OCI GenAI backend is intentionally independent from the React architecture
+ * workbench, so it owns the inference contract that turns a natural-language
+ * request into the JSON plan consumed by the canvas, relation graph, and
+ * Terraform exporter. Keep this contract explicit: JSON mode alone constrains
+ * syntax, not the architecture-plan shape or dependency guidance.
+ */
+export const buildOciGenAiArchitecturePrompt = (prompt: string): string => {
+    const userRequest = redactArchitecturePrompt(prompt)
+    return [
+        'You are an OCI architecture design agent for Oracle Cloud Designer Toolkit.',
+        'Create an editable, deployment-neutral OCI architecture plan from the user request.',
+        'Return only valid JSON. Do not include markdown, explanations, OCIDs, credentials, IP addresses, or Terraform.',
+        'Schema: {"title": string, "summary": string, "assumptions": string[], "resources": [{"kind": string, "displayName": string, "cidrBlock"?: string, "tier"?: string, "public"?: boolean, "count"?: number, "notes"?: string}]}.',
+        `Supported resource kinds: ${ARCHITECTURE_RESOURCE_KINDS.join(', ')}.`,
+        'Model relations through compatible resources: subnets require a VCN; compute, databases, and load balancers require subnets; OKE node pools require an OKE cluster; Functions functions require a Functions application.',
+        'Prefer private application and database subnets, explicit public edge subnets only where required, least-privilege IAM, logging, monitoring, and cost controls when relevant.',
+        'This is a design proposal only. Never claim to create or apply cloud resources; the operator must review generated Terraform and run PLAN before APPLY.',
+        `User request: ${userRequest}`,
+    ].join('\n')
+}
 
 export const validateGenAiArchitectureRequest = (request: OciGenAiArchitectureRequest): OciGenAiArchitectureRequest => {
     const resolved = resolveGenAiArchitectureRequestDefaults(request)
@@ -166,7 +198,7 @@ export const buildGenAiArchitectureChatRequest = (request: OciGenAiArchitectureR
                     role: generativeaiinference.models.UserMessage.role,
                     content: [{
                         type: generativeaiinference.models.TextContent.type,
-                        text: redactArchitecturePrompt(validated.prompt),
+                        text: buildOciGenAiArchitecturePrompt(validated.prompt),
                     } as generativeaiinference.models.TextContent],
                 }],
             },
@@ -201,7 +233,10 @@ export const buildGenAiArchitectureVisionChatRequest = (request: OciGenAiArchite
                     content: [
                         {
                             type: generativeaiinference.models.TextContent.type,
-                            text: redactArchitecturePrompt(validated.prompt),
+                            text: [
+                                'Use the attached architecture diagram as an additional source of truth. Identify its components, tiers, and connections.',
+                                buildOciGenAiArchitecturePrompt(validated.prompt),
+                            ].join('\n'),
                         } as generativeaiinference.models.TextContent,
                         {
                             type: generativeaiinference.models.ImageContent.type,

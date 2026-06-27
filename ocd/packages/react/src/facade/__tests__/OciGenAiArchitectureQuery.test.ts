@@ -65,6 +65,12 @@ describe('OciGenAiArchitectureQuery helpers', () => {
             temperature: 1,
             responseFormat: { type: 'JSON_OBJECT' },
         })
+
+        const content = (request.chatDetails.chatRequest as { messages: Array<{ content: Array<{ text?: string }> }> }).messages[0].content[0].text ?? ''
+        expect(content).toContain('Return only valid JSON')
+        expect(content).toContain('Schema: {"title": string')
+        expect(content).toContain('Supported resource kinds:')
+        expect(content).toContain('User request: Create an OCI hub and spoke network.')
     })
 
     it('requires region, compartment, and prompt after applying defaults', () => {
