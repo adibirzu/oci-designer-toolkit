@@ -15,12 +15,12 @@
         },
         {
             "path": "addon_observability_enterprise.json",
-            "sha256": "08b31398a76d9cb3978bf80fcacdad1ae1eeb3fb84f1cd70cf40a8dbe17d5a93",
+            "sha256": "54180f5a36120a92cdd6e033c88e261c2ef682ca76ce1830df735975ef6b07b3",
             "size_bytes": 15656
         },
         {
             "path": "addon_observability_free_first.json",
-            "sha256": "474374da6599fe6e83873788a3ae7242c0795926695595ffd3015eebbfb6b90f",
+            "sha256": "cdb45409d2e51c2e3d515253795400dee1d23871881c0668b7f9f51bfbf16b97",
             "size_bytes": 15297
         },
         {
@@ -60,12 +60,12 @@
         },
         {
             "path": "observability.auto.tfvars.json",
-            "sha256": "d677310e92596de38e2a616843375bae552ca3bb274f22abcf0aaabf33fe8e8c",
+            "sha256": "fbcb07686843a07a3c587f76428054a5c4525b19a256dbe0b97d38b6d3fdd8c5",
             "size_bytes": 693
         },
         {
             "path": "observability.enterprise.auto.tfvars.json",
-            "sha256": "4b2421b7bdaf6b6099b2d66029f9687a87ac39f24eb5143c09cd8823821b688d",
+            "sha256": "e0cccfd6833f65c0bd3f2dd5e7d0db600f21c122951426be18bba80a9d4b17a9",
             "size_bytes": 690
         },
         {
@@ -90,12 +90,12 @@
         },
         {
             "path": "resourcemanager/free-first/main.tf.json",
-            "sha256": "ad2c09a5bc40bb413a399c857bc7bcda465183b91c5402aa9b81fa5cf1650d1a",
+            "sha256": "86c06125a52a2739162eed934e4ddf7a52231a7b39587863a064f5e092ed6386",
             "size_bytes": 11828
         },
         {
             "path": "resourcemanager/free-first/observability.auto.tfvars.json",
-            "sha256": "d677310e92596de38e2a616843375bae552ca3bb274f22abcf0aaabf33fe8e8c",
+            "sha256": "fbcb07686843a07a3c587f76428054a5c4525b19a256dbe0b97d38b6d3fdd8c5",
             "size_bytes": 693
         },
         {
@@ -125,12 +125,12 @@
         },
         {
             "path": "resourcemanager/full-enterprise/main.tf.json",
-            "sha256": "eb737147f6b2ec6ef87a4e3eefe1c4e19120aa30a058aa7023ab54dc56cd4390",
+            "sha256": "5cb8ecb79669412d6b2314ca93e96970f79699ed78a0fe5dbdab45232bb5f43a",
             "size_bytes": 11835
         },
         {
             "path": "resourcemanager/full-enterprise/observability.auto.tfvars.json",
-            "sha256": "4b2421b7bdaf6b6099b2d66029f9687a87ac39f24eb5143c09cd8823821b688d",
+            "sha256": "e0cccfd6833f65c0bd3f2dd5e7d0db600f21c122951426be18bba80a9d4b17a9",
             "size_bytes": 690
         },
         {
@@ -150,12 +150,12 @@
         },
         {
             "path": "terraform/free-first-hcl/main.tf",
-            "sha256": "7d085d85b2fa95d7847828e328f7cc5cd2fd166a88bf76b605871624616ef1c4",
+            "sha256": "1b7cb2d19b096aa9548d8192ae15c3f4d4698b1da0042c8a203436113637de2c",
             "size_bytes": 8891
         },
         {
             "path": "terraform/free-first-hcl/observability.auto.tfvars.json",
-            "sha256": "d677310e92596de38e2a616843375bae552ca3bb274f22abcf0aaabf33fe8e8c",
+            "sha256": "fbcb07686843a07a3c587f76428054a5c4525b19a256dbe0b97d38b6d3fdd8c5",
             "size_bytes": 693
         },
         {
@@ -165,12 +165,12 @@
         },
         {
             "path": "terraform/free-first-json/main.tf.json",
-            "sha256": "ad2c09a5bc40bb413a399c857bc7bcda465183b91c5402aa9b81fa5cf1650d1a",
+            "sha256": "86c06125a52a2739162eed934e4ddf7a52231a7b39587863a064f5e092ed6386",
             "size_bytes": 11828
         },
         {
             "path": "terraform/free-first-json/observability.auto.tfvars.json",
-            "sha256": "d677310e92596de38e2a616843375bae552ca3bb274f22abcf0aaabf33fe8e8c",
+            "sha256": "fbcb07686843a07a3c587f76428054a5c4525b19a256dbe0b97d38b6d3fdd8c5",
             "size_bytes": 693
         },
         {
@@ -180,12 +180,12 @@
         },
         {
             "path": "terraform/full-enterprise-hcl/main.tf",
-            "sha256": "39ba494c3a5341b89d809ebb800b097993fb9781df1a3de283b5b1b2ff3c20f5",
+            "sha256": "5988f8dff3e1594e3f155db41fc7958a25aa2601f5b08692fea7f1d3cac2699c",
             "size_bytes": 8898
         },
         {
             "path": "terraform/full-enterprise-hcl/observability.auto.tfvars.json",
-            "sha256": "4b2421b7bdaf6b6099b2d66029f9687a87ac39f24eb5143c09cd8823821b688d",
+            "sha256": "e0cccfd6833f65c0bd3f2dd5e7d0db600f21c122951426be18bba80a9d4b17a9",
             "size_bytes": 690
         },
         {
@@ -195,17 +195,17 @@
         },
         {
             "path": "terraform/full-enterprise-json/main.tf.json",
-            "sha256": "eb737147f6b2ec6ef87a4e3eefe1c4e19120aa30a058aa7023ab54dc56cd4390",
+            "sha256": "5cb8ecb79669412d6b2314ca93e96970f79699ed78a0fe5dbdab45232bb5f43a",
             "size_bytes": 11835
         },
         {
             "path": "terraform/full-enterprise-json/observability.auto.tfvars.json",
-            "sha256": "4b2421b7bdaf6b6099b2d66029f9687a87ac39f24eb5143c09cd8823821b688d",
+            "sha256": "e0cccfd6833f65c0bd3f2dd5e7d0db600f21c122951426be18bba80a9d4b17a9",
             "size_bytes": 690
         },
         {
             "path": "variables.json",
-            "sha256": "f3c874e7f1e2d7e911fb8fb83b95d719dcbae8dc56383345abc1dbb6b63598ae",
+            "sha256": "a36d65526e69250d6276ec0c2dcea424c1d297ade479e659e9751889b1a555c0",
             "size_bytes": 30160
         }
     ],
